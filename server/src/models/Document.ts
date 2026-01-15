@@ -8,6 +8,11 @@ interface IDocument extends Document {
   content: string;
   createdAt: Date;
   updatedAt: Date;
+
+  lock: {
+    isLocked: boolean;
+    lockedBy: mongoose.Types.ObjectId | null;
+  };
 }
 
 const DocumentSchema = new Schema<IDocument>(
@@ -36,12 +41,16 @@ const DocumentSchema = new Schema<IDocument>(
     content: {
       type: String,
       default: ""
+    },
+    lock: {
+      isLocked: { type: Boolean, default: false },
+      lockedBy: { type: Schema.Types.ObjectId, ref: "User", default: null }
     }
   },
   { timestamps: true }
 );
 
 const DocumentModel: mongoose.Model<IDocument> =
-mongoose.model<IDocument>("Document", DocumentSchema);
+  mongoose.model<IDocument>("Document", DocumentSchema);
 
 export { DocumentModel as Document, IDocument };

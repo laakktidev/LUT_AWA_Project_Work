@@ -8,6 +8,10 @@ import dotenv from "dotenv"
 
 import userRouter from "./src/routes/user"
 import documentRouter from "./src/routes/document"; 
+import documentLockRoutes from "./src/routes/documentLock";
+
+//import "./middleware/validateToken";
+
 
 dotenv.config()
 
@@ -56,6 +60,8 @@ app.get("/", (req, res) => {
 
 app.use("/api/user", userRouter)
 app.use("/api/document", documentRouter)
+ 
+app.use("/api/documentLock", documentLockRoutes);
 //app.use("/api", topicRouter)
 
 app.listen(port, () => {

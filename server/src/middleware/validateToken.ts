@@ -6,8 +6,7 @@ dotenv.config();
 
 export interface DecodedUser extends JwtPayload {
   _id: string;
-  username: string;
-  isAdmin: boolean;
+  username: string;  
 }
 
 // GLOBAL TYPE AUGMENTATION ei tarvii tehdä tyyppimuutoksia tms. puliveivausta moneen paikkaan

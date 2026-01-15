@@ -26,8 +26,43 @@ router.post("/", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-
 router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const userId = req.user._id;
+    const doc = await Document.findById(req.params.id);
+
+    if (!doc) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+
+    // Permission check
+    const isOwner = doc.userId.toString() === userId;
+    const isEditor = doc.editors.some(e => e.toString() === userId);
+
+    if (!isOwner && !isEditor) {
+      return res.status(403).json({ message: "No permission to view this document" });
+    }
+
+    // Lock check on OPEN
+    if (doc.lock.isLocked && doc.lock.lockedBy?.toString() !== userId) {
+      return res.status(423).json({ message: "Document is locked by another user" });
+    }
+
+    return res.json(doc);
+
+  } catch (err) {
+    console.error("Error fetching document:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+/*router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
     const doc = await Document.findOne({
       _id: req.params.id,
@@ -46,7 +81,7 @@ router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
     console.error("Error fetching document:", err);
     return res.status(500).json({ message: "Server error" });
   }
-});
+});*/
 
 
 router.get("/", authenticateUser, async (req: Request, res: Response) => {

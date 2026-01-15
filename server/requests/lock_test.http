@@ -1,0 +1,56 @@
+### login User A
+POST http://localhost:8000/api/user/login
+Content-Type: application/json
+
+{
+  "email": "timo.laakkonen@hotmail.com",
+  "password": "Rytky#2025"
+}
+
+
+### login User B
+POST http://localhost:8000/api/user/login
+Content-Type: application/json
+
+{
+  "email": "pekka.puu@gmail.com",
+  "password": "Miuku@14"
+}
+
+
+### 1. User A locks the document (should succeed)
+POST http://localhost:8000/api/documentLock/696670e0e4a740b13d8f5096/lock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTYxZDc4MTgxOGFiODBhMDAxNDMwMzUiLCJ1c2VybmFtZSI6ImxhYWtrdGltYW4iLCJpYXQiOjE3Njg0ODgyMzIsImV4cCI6MTc2ODQ5MTgzMn0.f-Kh4B1xCmk5Xlxs4F7-zRSYoKf2BR5vxqt8RVu3NEg
+Content-Type: application/json
+
+###
+
+### 2. User B tries to lock the same document (should fail with 423)
+POST http://localhost:8000/api/documentLock/696670e0e4a740b13d8f5096/lock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTY1ZWQ0Y2JiNzRjZTQxZmMyMmVhOGEiLCJ1c2VybmFtZSI6IlBla2thIFB1dXDDpMOkIiwiaWF0IjoxNzY4NDg5MDYzLCJleHAiOjE3Njg0OTI2NjN9.vGY37Ruu8jBnDDlexQ31dIPXPnWc8mLtWpf0x4KsYt0
+Content-Type: application/json
+
+###
+
+### 3. User B tries to open the document (should fail with 423)
+GET http://localhost:8000/api/document/696670e0e4a740b13d8f5096
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTY1ZWQ0Y2JiNzRjZTQxZmMyMmVhOGEiLCJ1c2VybmFtZSI6IlBla2thIFB1dXDDpMOkIiwiaWF0IjoxNzY4NDg5MDYzLCJleHAiOjE3Njg0OTI2NjN9.vGY37Ruu8jBnDDlexQ31dIPXPnWc8mLtWpf0x4KsYt0
+
+###
+
+### 4. User A unlocks the document (should succeed)
+POST http://localhost:8000/api/documentLock/696670e0e4a740b13d8f5096/unlock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTYxZDc4MTgxOGFiODBhMDAxNDMwMzUiLCJ1c2VybmFtZSI6ImxhYWtrdGltYW4iLCJpYXQiOjE3Njg0ODgyMzIsImV4cCI6MTc2ODQ5MTgzMn0.f-Kh4B1xCmk5Xlxs4F7-zRSYoKf2BR5vxqt8RVu3NEg
+Content-Type: application/json
+
+###
+
+### 5. User B tries to lock again (should now succeed)
+POST http://localhost:8000/api/documentLock/696670e0e4a740b13d8f5096/lock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTY1ZWQ0Y2JiNzRjZTQxZmMyMmVhOGEiLCJ1c2VybmFtZSI6IlBla2thIFB1dXDDpMOkIiwiaWF0IjoxNzY4NDg5MDYzLCJleHAiOjE3Njg0OTI2NjN9.vGY37Ruu8jBnDDlexQ31dIPXPnWc8mLtWpf0x4KsYt0
+Content-Type: application/json
+
+### 6. User B unlocks the document (should succeed)
+POST http://localhost:8000/api/documentLock/696670e0e4a740b13d8f5096/unlock
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTY1ZWQ0Y2JiNzRjZTQxZmMyMmVhOGEiLCJ1c2VybmFtZSI6IlBla2thIFB1dXDDpMOkIiwiaWF0IjoxNzY4NDg5MDYzLCJleHAiOjE3Njg0OTI2NjN9.vGY37Ruu8jBnDDlexQ31dIPXPnWc8mLtWpf0x4KsYt0
+Content-Type: application/json

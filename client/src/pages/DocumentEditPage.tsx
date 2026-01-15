@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useDocument } from "../hooks/useDocuments";
+import { useDocument } from "../hooks/useDocument";
 import { updateDocument } from "../services/documentService";
 import {
   Container,
