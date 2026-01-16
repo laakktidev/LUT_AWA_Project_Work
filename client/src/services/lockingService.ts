@@ -1,10 +1,11 @@
 // services/lockingService.ts
 import axios from "axios";
+import { BASE_URL } from "./config";
 
 export async function lockDocument(docId: string, token: string) {
   try {
     await axios.post(
-      `/api/documentLock/${docId}/lock`,
+      `${BASE_URL}/documentLock/${docId}/lock`,
       {},
       {
         headers: {
@@ -26,7 +27,7 @@ export async function lockDocument(docId: string, token: string) {
 export async function unlockDocument(docId: string, token: string) {
   try {
     await axios.post(
-      `/api/documentLock/${docId}/unlock`,
+      `${BASE_URL}/documentLock/${docId}/unlock`,      
       {},
       {
         headers: {

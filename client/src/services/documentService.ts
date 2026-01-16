@@ -30,7 +30,7 @@ export async function getDocumentById(
   id: string,
   token: string
 ): Promise<Document> {
-  console.log("xxxxxxxxxxxxxxxxxxxx   ",token);
+  //console.log("xxxxxxxxxxxxxxxxxxxx   ",token);
   const response = await axios.get<Document>(
     `${BASE_URL}/document/${id}`,
     {

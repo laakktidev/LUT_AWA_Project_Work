@@ -49,7 +49,15 @@ router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
 
     // Lock check on OPEN
     if (doc.lock.isLocked && doc.lock.lockedBy?.toString() !== userId) {
-      return res.status(423).json({ message: "Document is locked by another user" });
+      //return res.status(423).json({ message: "Document is locked by another user" });
+      // Lock check on OPEN (viewing)
+
+      return res.status(200).json({
+        ...doc.toObject(),
+        lockWarning: "Document is locked by another user"
+      });
+
+
     }
 
     return res.json(doc);
@@ -131,7 +139,7 @@ router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
 // DELETE a document
 router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
-    
+
     const id: string = req.params.id as string;
 
     // ONLY owner can delete
@@ -153,7 +161,7 @@ router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
 
 
 // PATCH /documents/:id/editors
-router.patch("/:id/editors", authenticateUser, async(req: Request, res: Response) => {
+router.patch("/:id/editors", authenticateUser, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { userIds } = req.body; // array of user IDs
@@ -181,7 +189,7 @@ router.patch("/:id/editors", authenticateUser, async(req: Request, res: Response
 
     //res.status(200).json("updated");
 
-    
+
     const updated = await Document.findByIdAndUpdate(
       id,
       { $addToSet: { editors: { $each: userIds } } },
@@ -190,7 +198,7 @@ router.patch("/:id/editors", authenticateUser, async(req: Request, res: Response
 
     //console.log("Updated document editors:", updated);
     return res.status(200).json({ message: "New editor(s) added" });
-    
+
   } catch (err) {
     console.error("Error updating editors:", err);
     return res.status(500).json({ message: "Server error" });
