@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { getDocuments } from "../services/documentService";
 import { Document } from "../types/Document";
 
-export function useDocument(token: string | null) {
+export function useDocuments(token: string | null) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

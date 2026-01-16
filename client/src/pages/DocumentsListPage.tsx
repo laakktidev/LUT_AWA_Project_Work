@@ -14,7 +14,7 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
 
-import { useDocument } from "../hooks/useDocuments";
+import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
 import { deleteDocument } from "../services/documentService";
 import { ShareDialog } from "../components/ShareDialog";
@@ -32,7 +32,7 @@ export default function DocumentsListPage({ token, userId }: DocumentsListPagePr
 //export default function DocumentsListPage({ token, userId }) {
   const navigate = useNavigate();
 
-  const { documents, loading, error, refetch } = useDocument(token);
+  const { documents, loading, error, refetch } = useDocuments(token);
 
   const [shareOpen, setShareOpen] = useState(false);
   
