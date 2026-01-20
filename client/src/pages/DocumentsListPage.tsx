@@ -16,82 +16,52 @@ import ShareIcon from "@mui/icons-material/Share";
 
 import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
-import { deleteDocument } from "../services/documentService";
+import { deleteDocument, shareDocument } from "../services/documentService";
 import { ShareDialog } from "../components/ShareDialog";
-import { shareDocument } from "../services/documentService";
 import { User } from "../types/User";
 import { Document } from "../types/Document";
+import { useAuth } from "../context/AuthContext";
 
-// tämä typesiin ehkä nimi pitää muuttaa 
-interface DocumentsListPageProps {
-  token: string | null;
-  userId: string | null;
-}
-
-export default function DocumentsListPage({ token, userId }: DocumentsListPageProps) {
-//export default function DocumentsListPage({ token, userId }) {
+export default function DocumentsListPage() {
   const navigate = useNavigate();
+  const { token, user } = useAuth();   // ← global auth
 
   const { documents, loading, error, refetch } = useDocuments(token);
 
   const [shareOpen, setShareOpen] = useState(false);
-  
-  
-  // vois olla selectedDocId
   const [docId, setDocId] = useState("");
   const [users, setUsers] = useState<User[]>([]);
 
-  
   async function handleShareDocument(selectedUserIds: string[]) {
-    // Implement share functionality here
-    //console.log("document ",docId);
-    //console.log("Sharing document with users:", selectedUserIds);
-    const response=await shareDocument(docId, selectedUserIds, token as string);
-    console.log("Sharing document ",response.message);
+    if (!token) return;
+
+    const response = await shareDocument(docId, selectedUserIds, token);
+    console.log("Sharing document:", response.message);
     refetch();
   }
 
-  async function openShareSelection(doc:Document) {
+  async function openShareSelection(doc: Document) {
+    if (!token) return;
 
-    if (!token) 
-       return;
-    
-    const users: User[] = await getUsers(token);
-    
-    console.log("All users:", users);
-    console.log("Document to share:", doc);
-    console.log("Document to share:", doc.editors);
+    const allUsers = await getUsers(token);
 
-    
-    // suodatetaan omistaja ja jo editorit pois
-    const filteredUsers = users.filter(
-      (u) => {
-        //console.log(doc.editors.includes(u.id));
-        //console.log(u.id," == ",doc.userId," - ", u.email);
-        return (u.id !== doc.userId &&
-        !doc.editors.includes(u.id))
-      }
+    // Filter out owner + existing editors
+    const filteredUsers = allUsers.filter(
+      (u) => u.id !== doc.userId && !doc.editors.includes(u.id)
     );
-    console.log("Filtered users for sharing:", filteredUsers);
 
     setDocId(doc._id);
     setUsers(filteredUsers);
     setShareOpen(true);
-
   }
 
   async function handleDelete(id: string) {
-    // Implement delete functionality here
-    //console.log("Delete document with id:", id);
-    if (!token) 
-      return;
-    
+    if (!token) return;
+
     const ret = await deleteDocument(id, token);
-    console.log("Deleted document with id:", id, ret);
+    console.log("Deleted document:", id, ret);
     refetch();
   }
-
-   console.log(documents);
 
   if (!token) {
     return (
@@ -126,7 +96,6 @@ export default function DocumentsListPage({ token, userId }: DocumentsListPagePr
 
   return (
     <Container maxWidth="md">
-
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
@@ -134,17 +103,13 @@ export default function DocumentsListPage({ token, userId }: DocumentsListPagePr
         onShare={(selectedUserIds) => {
           setShareOpen(false);
           handleShareDocument(selectedUserIds);
-          
         }}
       />
 
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Your Documents</Typography>
 
-        <Button
-          variant="contained"
-          onClick={() => navigate("/create")}
-        >
+        <Button variant="contained" onClick={() => navigate("/create")}>
           New Document
         </Button>
       </Stack>
@@ -153,50 +118,53 @@ export default function DocumentsListPage({ token, userId }: DocumentsListPagePr
         <Alert severity="info">No documents yet. Create your first one!</Alert>
       ) : (
         <Stack spacing={2}>
-          {documents.map((doc) => (            
-            <Paper
-              key={doc._id}
-              sx={{
-                p: 2,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-              onClick={() => navigate(`/view/${doc._id}`)}
-            >
-              {/* LEFT SIDE: Title + date */}
-              <Box>
-                <Typography variant="h6">{doc.title}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Last updated: {new Date(doc.updatedAt as string).toLocaleString()}
-                </Typography>
-              </Box>
+          {documents.map((doc) => {
+            const isOwner = user?.id === doc.userId;
 
-              {/* RIGHT SIDE: Icons */}
-              <Box sx={{ display: "flex", gap: 1 }}>
-                
-                <IconButton disabled={userId!==doc.userId} 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    //console.log("share", doc._id);
-                    openShareSelection(doc);
-                  }}
-                >
-                  <ShareIcon />
-                </IconButton>
+            return (
+              <Paper
+                key={doc._id}
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+                onClick={() => navigate(`/view/${doc._id}`)}
+              >
+                {/* LEFT SIDE */}
+                <Box>
+                  <Typography variant="h6">{doc.title}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Last updated: {new Date(doc.updatedAt as string).toLocaleString()}
+                  </Typography>
+                </Box>
 
-                <IconButton disabled={userId!==doc.userId}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete(doc._id);
-                  }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </Paper>
-          ))}
+                {/* RIGHT SIDE */}
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <IconButton
+                    disabled={!isOwner}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openShareSelection(doc);
+                    }}
+                  >
+                    <ShareIcon />
+                  </IconButton>
 
+                  <IconButton
+                    disabled={!isOwner}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(doc._id);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Paper>
+            );
+          })}
         </Stack>
       )}
     </Container>

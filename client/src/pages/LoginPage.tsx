@@ -1,5 +1,4 @@
-import { useState,useEffect } from 'react';
-
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -10,19 +9,16 @@ import {
   InputAdornment,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
+} from "@mui/material";
 
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
-import EmailIcon from '@mui/icons-material/Email';
-import LockIcon from '@mui/icons-material/Lock';
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
 import { loginUser } from "../services/userService";
+import { useAuth } from "../context/AuthContext";
 
-
-import { LoginPageProps } from "../types/LoginPageprops";
-//import { User } from '../types/User';
-
-const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -30,6 +26,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const { login } = useAuth();   // ← global login function
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,24 +38,19 @@ const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
     return () => clearTimeout(timer);
   }, []);
 
-
-  const navigate = useNavigate();
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     const data = await loginUser(email, password);
 
-    console.log("Login response data:", data);
-
     if (!data) {
       console.log("Invalid credentials");
       return;
     }
-    
-    // parametrin saadut funktiot
-    setToken(data.token);
-    setUser(data.user);
+
+    // Call global login()
+    login(data.token, data.user);
+
     navigate("/");
   }
 
@@ -83,7 +77,6 @@ const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
         </Box>
 
         <form onSubmit={handleSubmit}>
-
           <input type="text" name="fake-email" autoComplete="username" style={{ display: "none" }} />
           <input type="password" name="fake-password" autoComplete="new-password" style={{ display: "none" }} />
 
@@ -122,12 +115,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
             onChange={(e) => setPassword(e.target.value)}
           />
 
-          <Button
-            fullWidth
-            variant="contained"
-            sx={{ mt: 3 }}
-            type="submit"   // <-- now triggers handleSubmit
-          >
+          <Button fullWidth variant="contained" sx={{ mt: 3 }} type="submit">
             Login
           </Button>
         </form>
@@ -135,12 +123,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
         <Box sx={{ textAlign: "center", mt: 2 }}>
           <Typography variant="body2">
             New to us?{" "}
-            <Link
-              component={RouterLink}
-              to="/signup"
-              underline="hover"
-              color="primary"
-            >
+            <Link component={RouterLink} to="/signup" underline="hover" color="primary">
               Sign Up
             </Link>
           </Typography>
@@ -148,6 +131,4 @@ const LoginPage: React.FC<LoginPageProps> = ({ setToken, setUser }) => {
       </Box>
     </Grid>
   );
-};
-
-export default LoginPage;
+}

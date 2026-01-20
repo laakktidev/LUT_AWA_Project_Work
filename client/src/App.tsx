@@ -1,45 +1,48 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import AppLayout from "./layout/AppLayout";
 
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import DocumentCreatePage from "./pages/DocumentCreatePage";
-import DocumentDetailPage from "./pages/DocumentDetailPage";
+import DocumentDetailPage from "./pages/DocumentDetailsPage";
 import DocumentsListPage from "./pages/DocumentsListPage";
 import DocumentEditPage from "./pages/DocumentEditPage";
 import PublicDocumentPage from "./pages/PublicDocumentPage";
 
+import { useAuth } from "./context/AuthContext";
 
-//import RequireAuth from "./layout/RequireAuth";
-import AppLayout from "./layout/AppLayout";
-import { User } from "./types/User";
-
-const App = () => {
-const [token, setToken] = useState<string | null>(null);
-const [user, setUser] = useState<User | null>(null);
+export default function App() {
+  const { token } = useAuth();
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public */}
-                
-        <Route path="/login" element={<LoginPage setToken={setToken} setUser={setUser} />} />
+
+        {/* PUBLIC ROUTES */}
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUpPage />} />
+        <Route path="/public/:id" element={<PublicDocumentPage />} />
 
-        {/* Protected */}
-        {/*<Route element={<RequireAuth token={token} />}>*/}
-        <Route element={<AppLayout token={token} setToken={setToken} />}>
-          <Route path="/create" element={<DocumentCreatePage token={token} />} />
-          <Route path="/view/:id" element={<DocumentDetailPage token={token} userId={user?.id}/>} />
-          <Route path="/edit/:id" element={<DocumentEditPage token={token} />} />
-          <Route path="/" element={token ? <DocumentsListPage token={token} userId={user?.id}/> : <LoginPage setToken={setToken} setUser={setUser}/>} />
-          <Route path="/public/:id" element={<PublicDocumentPage />} />
-
+        {/* PROTECTED ROUTES */}
+        <Route
+          element={
+            token ? (
+              <AppLayout />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        >
+          <Route path="/" element={<DocumentsListPage />} />
+          <Route path="/create" element={<DocumentCreatePage />} />
+          <Route path="/view/:id" element={<DocumentDetailPage />} />
+          <Route path="/edit/:id" element={<DocumentEditPage />} />
         </Route>
-        {/*</Route>*/}
+
+        {/* FALLBACK */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+
       </Routes>
     </BrowserRouter>
   );
-};
-
-export default App;
+}

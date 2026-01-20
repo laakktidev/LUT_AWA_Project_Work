@@ -13,9 +13,10 @@ import {
 import DocumentForm from "../components/DocumentForm";
 
 import { lockDocument, unlockDocument } from "../services/lockingService";
+import { useAuth } from "../context/AuthContext";
 
-
-export default function DocumentEditPage({ token }: { token: string | null }) {
+export default function DocumentEditPage() {
+  const { token } = useAuth();          // ← get token from global context
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -25,13 +26,13 @@ export default function DocumentEditPage({ token }: { token: string | null }) {
   const { doc, loading, error } = useDocument(id!, token);
 
   useEffect(() => {
-    if (!doc) return;
+    if (!doc || !token) return;
 
     let mounted = true;
 
     async function init() {
       try {
-        await lockDocument(doc._id, token as string);
+        await lockDocument(doc._id, token);
         if (mounted) setCanEdit(true);
       } catch (err: any) {
         if (mounted) {
@@ -45,9 +46,9 @@ export default function DocumentEditPage({ token }: { token: string | null }) {
 
     return () => {
       mounted = false;
-      unlockDocument(doc._id, token as string);
+      if (token) unlockDocument(doc._id, token);
     };
-  }, [doc?._id]);
+  }, [doc?._id, token]);
 
   if (!token) {
     return <Alert severity="warning">You must be logged in.</Alert>;
@@ -83,7 +84,7 @@ export default function DocumentEditPage({ token }: { token: string | null }) {
           headline="Edit Document"
           submitLabel="Save Changes"
           onSubmit={async (values) => {
-            await updateDocument(id!, values, token as string);
+            await updateDocument(id!, values, token);
             navigate(`/view/${id}`);
           }}
         />

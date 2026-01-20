@@ -2,23 +2,27 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useColorScheme } from "@mui/material/styles";
+import { useAuth } from "../context/AuthContext";
 
-interface HeaderProps {
-  token: string | null;
-  setToken: (token: string | null) => void;
-}
-
-export default function Header({ token, setToken }: HeaderProps) {
+export default function Header() {
   const { mode, setMode } = useColorScheme();
+  const { token, user, logout } = useAuth();   // now includes user
+  const navigate = useNavigate();
 
   return (
     <AppBar position="fixed">
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography variant="h6">Documents</Typography>
 
-        <div>
+        <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          {token && user && (
+            <Typography variant="body1">
+              Logged in as: <strong>{user.username}</strong>
+            </Typography>
+          )}
+
           <Button color="inherit" component={Link} to="/" sx={{ marginRight: 2 }}>
             home
           </Button>
@@ -35,7 +39,6 @@ export default function Header({ token, setToken }: HeaderProps) {
             Create
           </Button>
 
-          {/* Show Login/Signup only when NOT logged in */}
           {!token && (
             <>
               <Button color="inherit" component={Link} to="/login">
@@ -47,12 +50,12 @@ export default function Header({ token, setToken }: HeaderProps) {
             </>
           )}
 
-          {/* Show Logout only when logged in */}
           {token && (
             <Button
               color="inherit"
               onClick={() => {
-                setToken(null);
+                logout();
+                navigate("/login");
               }}
             >
               Logout

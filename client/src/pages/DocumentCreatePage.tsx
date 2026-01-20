@@ -2,14 +2,11 @@ import { Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import DocumentForm from "../components/DocumentForm";
 import { createDocument } from "../services/documentService";
+import { useAuth } from "../context/AuthContext";
 
-//tämä typesiin ehkä nimi pitää muuttaa
-interface DocumentCreatePageProps {
-  token: string | null;
-}
-
-export default function DocumentCreatePage({ token }: DocumentCreatePageProps) {
+export default function DocumentCreatePage() {
   const navigate = useNavigate();
+  const { token } = useAuth();   // ← get token from global context
 
   async function handleSubmit(data: { title: string; content: string }) {
     if (!token) {
@@ -39,7 +36,6 @@ export default function DocumentCreatePage({ token }: DocumentCreatePageProps) {
         submitLabel="Create"
         onSubmit={handleSubmit}
       />
-
     </Container>
   );
 }
