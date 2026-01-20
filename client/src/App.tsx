@@ -7,6 +7,7 @@ import DocumentCreatePage from "./pages/DocumentCreatePage";
 import DocumentDetailPage from "./pages/DocumentDetailPage";
 import DocumentsListPage from "./pages/DocumentsListPage";
 import DocumentEditPage from "./pages/DocumentEditPage";
+import PublicDocumentPage from "./pages/PublicDocumentPage";
 
 
 //import RequireAuth from "./layout/RequireAuth";
@@ -29,10 +30,11 @@ const [user, setUser] = useState<User | null>(null);
         {/*<Route element={<RequireAuth token={token} />}>*/}
         <Route element={<AppLayout token={token} setToken={setToken} />}>
           <Route path="/create" element={<DocumentCreatePage token={token} />} />
-          <Route path="/view/:id" element={<DocumentDetailPage token={token} />} />
+          <Route path="/view/:id" element={<DocumentDetailPage token={token} userId={user?.id}/>} />
           <Route path="/edit/:id" element={<DocumentEditPage token={token} />} />
-          <Route path="/" element={token ? <DocumentsListPage token={token} userId={user.id}/> : <LoginPage setToken={setToken} setUser={setUser}/>}
-        />
+          <Route path="/" element={token ? <DocumentsListPage token={token} userId={user?.id}/> : <LoginPage setToken={setToken} setUser={setUser}/>} />
+          <Route path="/public/:id" element={<PublicDocumentPage />} />
+
         </Route>
         {/*</Route>*/}
       </Routes>

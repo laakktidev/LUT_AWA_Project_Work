@@ -117,3 +117,29 @@ export async function shareDocument(
   return response.data;
 }
 
+export const updateDocumentVisibility = async (
+  documentId: string,
+  isPublic: boolean,
+  token: string
+) => {
+
+  try {
+  const response = await axios.put(
+    `${BASE_URL}/document/${documentId}/public`,
+    { isPublic },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return response.data;
+} catch (err: any) {
+    if (err.response?.status === 423) {
+      throw new Error(err.response.data.message);
+    }
+
+    throw new Error("Failed to xxxxx document");
+  }
+}

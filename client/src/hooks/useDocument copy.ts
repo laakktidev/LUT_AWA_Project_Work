@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
 import { getDocumentById } from "../services/documentService";
-import { getPublicDocumentById } from "../services/publicService";
 import { Document } from "../types/Document";
 
 export function useDocument(id: string | undefined, token: string | null) {
@@ -9,16 +8,13 @@ export function useDocument(id: string | undefined, token: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const fetchDoc = useCallback(async () => {
-    if (!id) return;
+    if (!id || !token) return;
 
     try {
       setLoading(true);
       setError(null);
 
-      const data = token
-        ? await getDocumentById(id, token)     // private route
-        : await getPublicDocumentById(id);     // public route
-
+      const data = await getDocumentById(id, token);
       setDoc(data);
     } catch (err) {
       setError("Failed to load document");

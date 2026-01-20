@@ -9,6 +9,7 @@ import dotenv from "dotenv"
 import userRouter from "./src/routes/user"
 import documentRouter from "./src/routes/document"; 
 import documentLockRoutes from "./src/routes/documentLock";
+import publicRoutes from "./src/routes/public";
 
 
 dotenv.config()
@@ -67,6 +68,8 @@ app.use("/api/user", userRouter)
 app.use("/api/document", documentRouter)
  
 app.use("/api/documentLock", documentLockRoutes);
+
+app.use("/api/public", publicRoutes);
 
 app.listen(port, () => {
     //console.log(`Server running on port ${port}`)

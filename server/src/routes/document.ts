@@ -206,104 +206,43 @@ router.patch("/:id/editors", authenticateUser, async (req: Request, res: Respons
 });
 
 
-/*
-router.post("/:id/editors", authenticateUser, async (req: Request, res: Response) => {
+router.put("/:id/public", authenticateUser, async (req: Request, res: Response) => {
   try {
-    const { documentId, userIds} = req.body;
-
-    console.log("documentId:", documentId);
-    console.log("userIds:", userIds);
-    //console.log("token:", token);
-
-    
-
-    if (!userIds) {
-      return res.status(400).json({ message: "userIds array is required" });
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // ONLY owner can add editors
-    const doc = await Document.findOne({
-      _id: req.params.id,
-      userId: req.user!._id
-    });
+    const userId = req.user._id;
+    const { isPublic } = req.body;
+
+    if (typeof isPublic !== "boolean") {
+      return res.status(400).json({ message: "isPublic must be boolean" });
+    }
+
+    const doc = await Document.findById(req.params.id);
 
     if (!doc) {
-      return res.status(404).json({ message: "Document not found or no permission" });
+      return res.status(404).json({ message: "Document not found" });
     }
 
-    // tämä varmistettiin myös clientissa
-    if (!doc.editors.includes(userIdToAdd)) {
-      doc.editors.push(userIdToAdd);
-      await doc.save();
+    const isOwner = doc.userId.toString() === userId;
+
+    // Only owner can change visibility
+    if (!isOwner) {
+      return res.status(403).json({ message: "Only the owner can change visibility" });
     }
 
-    return res.json({ message: "Editor added", doc });
-    
-    console.log("ADDING EDITORS");
-    return res.status(666).json({ message: "ADDING EDITORS" });
-
-  } catch (err) {
-    console.error("Error adding editor:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-})*/
-
-
-import crypto from "crypto";
-
-// GENERATE a view-only link (owner only) thats why authenticateUser  
-router.post("/:id/view-token", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    // Only owner can generate view link
-    const doc = await Document.findOne({
-      _id: req.params.id,
-      userId: req.user!._id
-    });
-
-    if (!doc) {
-      return res.status(404).json({ message: "Document not found or no permission" });
-    }
-
-    // Generate a secure random token
-    const token = crypto.randomBytes(32).toString("hex");
-
-    doc.viewToken = token;
+    doc.isPublic = isPublic;
     await doc.save();
 
-    return res.json({
-      message: "View link generated",
-      viewUrl: `${process.env.FRONTEND_URL}/documents/${doc._id}/public?view-token=${token}`
-    });
+    return res.json({ message: "Visibility updated", isPublic: doc.isPublic });
+
   } catch (err) {
-    console.error("Error generating view link:", err);
+    console.error("Error updating public status:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
 
-// PUBLIC VIEW via token (no login required)
-router.get("/:id/public", async (req: Request, res: Response) => {
-  try {
-    const token = req.query["view-token"];
-
-    if (!token) {
-      return res.status(400).json({ message: "Missing view-token" });
-    }
-
-    const doc = await Document.findOne({
-      _id: req.params.id,
-      viewToken: token
-    }).select("title content updatedAt createdAt");
-
-    if (!doc) {
-      return res.status(404).json({ message: "Invalid or expired view-token" });
-    }
-
-    return res.json(doc);
-  } catch (err) {
-    console.error("Error fetching public document:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
 
 
 export default router;

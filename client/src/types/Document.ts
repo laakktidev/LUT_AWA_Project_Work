@@ -4,6 +4,7 @@ export interface Document {
   content: string;
   userId: string;
   editors: string[];
+  isPublic: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

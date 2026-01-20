@@ -2,12 +2,12 @@ import mongoose, { Schema, Document } from "mongoose";
 
 interface IDocument extends Document {
   userId: mongoose.Types.ObjectId;           // owner
-  editors: mongoose.Types.ObjectId[];        // users with edit rights
-  viewToken: string | null;                  // link-based read-only access
+  editors: mongoose.Types.ObjectId[];        // users with edit rights  
   title: string;
   content: string;
   createdAt: Date;
   updatedAt: Date;
+  isPublic: Boolean;
 
   lock: {
     isLocked: boolean;
@@ -29,10 +29,7 @@ const DocumentSchema = new Schema<IDocument>(
         default: []
       }
     ],
-    viewToken: {
-      type: String,
-      default: null
-    },
+    
     title: {
       type: String,
       required: true,
@@ -45,8 +42,10 @@ const DocumentSchema = new Schema<IDocument>(
     lock: {
       isLocked: { type: Boolean, default: false },
       lockedBy: { type: Schema.Types.ObjectId, ref: "User", default: null }
-    }
+    },
+    isPublic: { type: Boolean, default: false },
   },
+  
   { timestamps: true }
 );
 
