@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -13,10 +13,11 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
+//import RestoreFromTrashOutlinedIcon from '@mui/icons-material/RestoreFromTrashOutlined';
 
 import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
-import { deleteDocument, shareDocument } from "../services/documentService";
+import { softDeleteDocument, shareDocument, getTrashCount } from "../services/documentService";
 import { ShareDialog } from "../components/ShareDialog";
 import { User } from "../types/User";
 import { Document } from "../types/Document";
@@ -31,12 +32,28 @@ export default function DocumentsListPage() {
   const [shareOpen, setShareOpen] = useState(false);
   const [docId, setDocId] = useState("");
   const [users, setUsers] = useState<User[]>([]);
+  const [trashCount, setTrashCount] = useState(0);
+
 
   const [sortBy, setSortBy] = useState<
     "name-asc" | "name-desc" |
     "created-asc" | "created-desc" |
     "updated-asc" | "updated-desc"
   >("updated-desc");
+
+
+  async function refreshTrashCount() {
+    if (!token) return;
+    const count = await getTrashCount(token);
+    setTrashCount(count);
+  }
+
+
+  useEffect(() => {
+    refreshTrashCount();
+  }, [token]);
+
+
 
   async function handleShareDocument(selectedUserIds: string[]) {
     if (!token) return;
@@ -57,11 +74,25 @@ export default function DocumentsListPage() {
     setShareOpen(true);
   }
 
+  // tätä tullaan jatkossa kutsumaan trashPagelta nyt testataan soft-deleteä
   async function handleDelete(id: string) {
     if (!token) return;
-    await deleteDocument(id, token);
-    refetch();
+    //await deleteDocument(id, token);
+    await softDeleteDocument(id, token);
+    await refetch();
+    await refreshTrashCount();
+
   }
+
+  // POIS SIIRRÄ trashPagelle
+  /*async function handleRestore(id: string) {
+    if (!token) return;
+    //await deleteDocument(id, token);
+    await restoreDocument(id, token);
+
+   // refetch();
+  }*/
+
 
   if (!token) {
     return (
@@ -129,7 +160,7 @@ export default function DocumentsListPage() {
       />
 
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">Your Documents</Typography>
+        <Typography variant="h4">My Documents</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
           <select
@@ -153,6 +184,16 @@ export default function DocumentsListPage() {
           <Button variant="contained" onClick={() => navigate("/create")}>
             New Document
           </Button>
+
+          {trashCount > 0 && (
+            <Button
+              variant="outlined"
+              startIcon={<DeleteIcon />}
+              onClick={() => navigate("/trash")}
+            >
+              Trash
+            </Button>
+          )}
         </Stack>
       </Stack>
 
@@ -207,6 +248,7 @@ export default function DocumentsListPage() {
                   >
                     <DeleteIcon />
                   </IconButton>
+
                 </Box>
               </Paper>
             );

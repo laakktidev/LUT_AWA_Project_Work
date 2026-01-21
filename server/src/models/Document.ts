@@ -1,19 +1,21 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface IDocument extends Document {
-  userId: mongoose.Types.ObjectId;           // owner
-  editors: mongoose.Types.ObjectId[];        // users with edit rights  
+  userId: mongoose.Types.ObjectId;
+  editors: mongoose.Types.ObjectId[];
   title: string;
   content: string;
   createdAt: Date;
   updatedAt: Date;
-  isPublic: Boolean;
-
+  isPublic: boolean;
+  isDeleted: boolean;
+  deletedAt: Date | null;
   lock: {
     isLocked: boolean;
     lockedBy: mongoose.Types.ObjectId | null;
   };
 }
+
 
 const DocumentSchema = new Schema<IDocument>(
   {
@@ -44,6 +46,9 @@ const DocumentSchema = new Schema<IDocument>(
       lockedBy: { type: Schema.Types.ObjectId, ref: "User", default: null }
     },
     isPublic: { type: Boolean, default: false },
+    isDeleted: { type: Boolean, default: false },
+    deletedAt: { type: Date, default: null },
+
   },
   
   { timestamps: true }

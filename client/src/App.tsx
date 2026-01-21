@@ -10,6 +10,7 @@ import DocumentEditPage from "./pages/DocumentEditPage";
 import PublicDocumentPage from "./pages/PublicDocumentPage";
 
 import { useAuth } from "./context/AuthContext";
+import TrashListPage from "./pages/TrashListPage";
 
 export default function App() {
   const { token, loading } = useAuth();
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/create" element={<DocumentCreatePage />} />
           <Route path="/view/:id" element={<DocumentDetailPage />} />
           <Route path="/edit/:id" element={<DocumentEditPage />} />
+          <Route path="/trash" element={<TrashListPage />} />
         </Route>
 
         {/* FALLBACK */}

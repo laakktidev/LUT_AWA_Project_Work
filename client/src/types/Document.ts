@@ -5,6 +5,8 @@ export interface Document {
   userId: string;
   editors: string[];
   isPublic: boolean;
+  isDeleted?: boolean;
+  deletedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }

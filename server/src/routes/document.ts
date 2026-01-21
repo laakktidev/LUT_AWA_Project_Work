@@ -29,6 +29,60 @@ router.post("/", authenticateUser, async (req: Request, res: Response) => {
 });
 
 /* -------------------------------------------------------
+   GET ALL DOCUMENTS (owner OR editor)
+------------------------------------------------------- */
+router.get("/", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const docs = await Document.find({
+      $or: [
+        { userId: req.user!._id },
+        { editors: req.user!._id }
+      ],
+      isDeleted: { $ne: true }
+    }).sort({ updatedAt: -1 });
+
+    return res.json(docs);
+  } catch (err) {
+    console.error("Error fetching documents:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// GET /documents/trash
+router.get("/trash", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const docs = await Document.find({
+      userId: req.user!._id,
+      isDeleted: true
+    }).sort({ deletedAt: -1 });
+
+    return res.json(docs);
+  } catch (err) {
+    console.error("Error fetching trash:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// GET /documents/trash/count
+router.get("/trash/count", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const count = await Document.countDocuments({
+      userId: req.user!._id,
+      isDeleted: true
+    });
+
+    return res.json({ count });
+  } catch (err) {
+    console.error("Error counting trash:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+/* -------------------------------------------------------
    GET SINGLE DOCUMENT (owner OR editor OR public)
 ------------------------------------------------------- */
 router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
@@ -65,24 +119,6 @@ router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-/* -------------------------------------------------------
-   GET ALL DOCUMENTS (owner OR editor)
-------------------------------------------------------- */
-router.get("/", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    const docs = await Document.find({
-      $or: [
-        { userId: req.user!._id },
-        { editors: req.user!._id }
-      ]
-    }).sort({ updatedAt: -1 });
-
-    return res.json(docs);
-  } catch (err) {
-    console.error("Error fetching documents:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
 
 /* -------------------------------------------------------
    UPDATE DOCUMENT (OWNER and EDITORS)
@@ -97,7 +133,7 @@ router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
           { userId: req.user!._id },
           { editors: req.user!._id }
         ]
-      },      
+      },
       { title: req.body.title, content: req.body.content },
       { new: true }
     );
@@ -109,27 +145,6 @@ router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
     return res.json(updated);
   } catch (err) {
     console.error("Error updating document:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
-/* -------------------------------------------------------
-   DELETE DOCUMENT (OWNER ONLY)
-------------------------------------------------------- */
-router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    const deleted = await Document.findOneAndDelete({
-      _id: req.params.id,
-      userId: req.user!._id
-    });
-
-    if (!deleted) {
-      return res.status(403).json({ message: "Not allowed to delete this document" });
-    }
-
-    return res.status(200).json({ message: "Document deleted" });
-  } catch (err) {
-    console.error("Error deleting document:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
@@ -168,10 +183,45 @@ router.patch("/:id/editors", authenticateUser, async (req: Request, res: Respons
   }
 });
 
+
+// PATCH /documents/:id/soft-delete
+router.patch("/:id/soft-delete", authenticateUser, async (req: Request, res: Response) => {
+  const doc = await Document.findById(req.params.id);
+  if (!doc) return res.status(404).json({ message: "Not found" });
+
+  // permission check here (owner only)
+  doc.isDeleted = true;
+  doc.deletedAt = new Date();
+
+  await doc.save();
+
+  //res.json(doc);
+  return res.status(200).json({ message: "Moved to trash", doc });
+
+});
+
+
+router.patch("/:id/restore", authenticateUser, async (req: Request, res: Response) => {
+  const doc = await Document.findById(req.params.id);
+  if (!doc) return res.status(404).json({ message: "Not found" });
+
+  // permission check here (owner only)
+  doc.isDeleted = false;
+  doc.deletedAt = null;
+
+  await doc.save();
+
+  //res.json(doc);
+  return res.status(200).json({ message: "Restored", doc });
+
+});
+
+
+
 /* -------------------------------------------------------
    UPDATE PUBLIC VISIBILITY (OWNER ONLY)
 ------------------------------------------------------- */
-router.put("/:id/public", authenticateUser, async (req: Request, res: Response) => {
+router.patch("/:id/public", authenticateUser, async (req: Request, res: Response) => {
   try {
     const { isPublic } = req.body;
 
@@ -201,5 +251,30 @@ router.put("/:id/public", authenticateUser, async (req: Request, res: Response) 
     return res.status(500).json({ message: "Server error" });
   }
 });
+
+
+
+/* -------------------------------------------------------
+   DELETE DOCUMENT (OWNER ONLY)
+------------------------------------------------------- */
+router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const deleted = await Document.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user!._id
+    });
+
+    if (!deleted) {
+      return res.status(403).json({ message: "Not allowed to delete this document" });
+    }
+
+    return res.status(200).json({ message: "Document deleted" });
+  } catch (err) {
+    console.error("Error deleting document:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
 
 export default router;

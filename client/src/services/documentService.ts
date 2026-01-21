@@ -136,7 +136,7 @@ export async function updateDocumentVisibility(
   token: string
 ) {
   try {
-    const response = await axios.put(
+    const response = await axios.patch(
       `${BASE_URL}/document/${documentId}/public`,
       { isPublic },
       {
@@ -157,3 +157,61 @@ export async function updateDocumentVisibility(
     throw new Error("Failed to update document visibility");
   }
 }
+
+
+export async function softDeleteDocument(id: string, token: string) {
+
+  console.log("xxxxxxxxxxxx ",token);
+
+  const res = await axios.patch(
+    `${BASE_URL}/document/${id}/soft-delete`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data;
+}
+
+export async function restoreDocument(id: string, token: string) {
+  const res = await axios.patch(
+    `${BASE_URL}/document/${id}/restore`,
+    {},
+    {
+      headers: {  
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data;
+}
+
+////////////////////
+
+// Get all deleted documents
+export async function getTrashDocuments(token: string) {
+  const res = await axios.get(`${BASE_URL}/document/trash`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data; // array of documents
+}
+
+// Get count of deleted documents
+export async function getTrashCount(token: string) {
+  const res = await axios.get(`${BASE_URL}/document/trash/count`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return res.data.count; // number
+}
+
+//////////////////

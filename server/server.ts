@@ -31,7 +31,8 @@ app.use(cors(corsOptions))
 
 const corsOptions: CorsOptions = {
   origin: "http://localhost:3000",
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  //methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  methods: "*",
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }
