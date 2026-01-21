@@ -11,7 +11,8 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-import RestoreIcon from "@mui/icons-material/Restore";
+//import RestoreIcon from "@mui/icons-material/Restore";
+import RestoreFromTrashOutlinedIcon from '@mui/icons-material/RestoreFromTrashOutlined';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 import { useAuth } from "../context/AuthContext";
@@ -115,7 +116,7 @@ export default function TrashListPage() {
 
               <Box sx={{ display: "flex", gap: 1 }}>
                 <IconButton onClick={() => handleRestore(doc._id)}>
-                  <RestoreIcon />
+                  <RestoreFromTrashOutlinedIcon />
                 </IconButton>
 
                 <IconButton onClick={() => handlePermanentDelete(doc._id)}>

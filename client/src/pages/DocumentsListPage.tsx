@@ -13,11 +13,12 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
+import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 //import RestoreFromTrashOutlinedIcon from '@mui/icons-material/RestoreFromTrashOutlined';
 
 import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
-import { softDeleteDocument, shareDocument, getTrashCount } from "../services/documentService";
+import { softDeleteDocument, shareDocument, getTrashCount, cloneDocument } from "../services/documentService";
 import { ShareDialog } from "../components/ShareDialog";
 import { User } from "../types/User";
 import { Document } from "../types/Document";
@@ -81,6 +82,14 @@ export default function DocumentsListPage() {
     await softDeleteDocument(id, token);
     await refetch();
     await refreshTrashCount();
+
+  }
+
+  async function handleClone(id: string) {
+    if (!token) return;
+
+    await cloneDocument(id, token);
+    await refetch();
 
   }
 
@@ -237,6 +246,16 @@ export default function DocumentsListPage() {
                     }}
                   >
                     <ShareIcon />
+                  </IconButton>
+
+                  <IconButton
+                    disabled={!isOwner}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClone(doc._id);
+                    }}
+                  >
+                    <FileCopyOutlinedIcon />
                   </IconButton>
 
                   <IconButton

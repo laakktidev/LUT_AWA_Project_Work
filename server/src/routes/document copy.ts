@@ -5,8 +5,51 @@ import { authenticateUser } from "../middleware/validateToken";
 const router = Router();
 
 /* -------------------------------------------------------
-   STATIC ROUTES (MUST BE FIRST)
+   CREATE DOCUMENT (owner only)
 ------------------------------------------------------- */
+router.post("/", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const { title, content } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const newDoc = await Document.create({
+      userId: req.user!._id,
+      title,
+      content: content || ""
+    });
+
+    return res.status(200).json(newDoc);
+  } catch (err) {
+    console.error("Error creating document:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+/* -------------------------------------------------------
+   GET ALL DOCUMENTS (owner OR editor)
+------------------------------------------------------- */
+router.get("/", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const docs = await Document.find({
+      $or: [
+        { userId: req.user!._id },
+        { editors: req.user!._id }
+      ],
+      isDeleted: { $ne: true }
+    }).sort({ updatedAt: -1 });
+
+    return res.json(docs);
+  } catch (err) {
+    console.error("Error fetching documents:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// GET /documents/trash
 router.get("/trash", authenticateUser, async (req: Request, res: Response) => {
   try {
     const docs = await Document.find({
@@ -21,11 +64,13 @@ router.get("/trash", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
+
+// GET /documents/trash/count
 router.get("/trash/count", authenticateUser, async (req: Request, res: Response) => {
   try {
     const count = await Document.countDocuments({
-    userId: req.user!._id,
-    isDeleted: true
+      userId: req.user!._id,
+      isDeleted: true
     });
 
     return res.json({ count });
@@ -35,11 +80,6 @@ router.get("/trash/count", authenticateUser, async (req: Request, res: Response)
   }
 });
 
-/* -------------------------------------------------------
-   ACTION ROUTES (MUST BE BEFORE /:id)
-------------------------------------------------------- */
-
-// CLONE DOCUMENT
 router.post("/:id/clone", authenticateUser, async (req, res) => {
   try {
     const original = await Document.findOne({
@@ -70,7 +110,10 @@ router.post("/:id/clone", authenticateUser, async (req, res) => {
   }
 });
 
-// ADD EDITORS
+
+/* -------------------------------------------------------
+   ADD EDITORS (OWNER ONLY)
+------------------------------------------------------- */
 router.patch("/:id/editors", authenticateUser, async (req: Request, res: Response) => {
   try {
     const { userIds } = req.body;
@@ -81,7 +124,7 @@ router.patch("/:id/editors", authenticateUser, async (req: Request, res: Respons
 
     const doc = await Document.findOne({
       _id: req.params.id,
-      userId: req.user!._id
+      userId: req.user!._id   // OWNER ONLY
     });
 
     if (!doc) {
@@ -102,33 +145,44 @@ router.patch("/:id/editors", authenticateUser, async (req: Request, res: Respons
   }
 });
 
-// SOFT DELETE
+
+// PATCH /documents/:id/soft-delete
 router.patch("/:id/soft-delete", authenticateUser, async (req: Request, res: Response) => {
   const doc = await Document.findById(req.params.id);
   if (!doc) return res.status(404).json({ message: "Not found" });
 
+  // permission check here (owner only)
   doc.isDeleted = true;
   doc.deletedAt = new Date();
 
   await doc.save();
 
+  //res.json(doc);
   return res.status(200).json({ message: "Moved to trash", doc });
+
 });
 
-// RESTORE
+
 router.patch("/:id/restore", authenticateUser, async (req: Request, res: Response) => {
   const doc = await Document.findById(req.params.id);
   if (!doc) return res.status(404).json({ message: "Not found" });
 
+  // permission check here (owner only)
   doc.isDeleted = false;
   doc.deletedAt = null;
 
   await doc.save();
 
+  //res.json(doc);
   return res.status(200).json({ message: "Restored", doc });
+
 });
 
-// UPDATE PUBLIC VISIBILITY
+
+
+/* -------------------------------------------------------
+   UPDATE PUBLIC VISIBILITY (OWNER ONLY)
+------------------------------------------------------- */
 router.patch("/:id/public", authenticateUser, async (req: Request, res: Response) => {
   try {
     const { isPublic } = req.body;
@@ -161,30 +215,8 @@ router.patch("/:id/public", authenticateUser, async (req: Request, res: Response
 });
 
 /* -------------------------------------------------------
-   GET ALL DOCUMENTS (MUST BE HERE, NOT AT TOP)
+   GET SINGLE DOCUMENT (owner OR editor OR public)
 ------------------------------------------------------- */
-router.get("/", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    const docs = await Document.find({
-      $or: [
-        { userId: req.user!._id },
-        { editors: req.user!._id }
-      ],
-      isDeleted: { $ne: true }
-    }).sort({ updatedAt: -1 });
-
-    return res.json(docs);
-  } catch (err) {
-    console.error("Error fetching documents:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});
-
-/* -------------------------------------------------------
-   DYNAMIC ROUTES (ALWAYS LAST)
-------------------------------------------------------- */
-
-// GET SINGLE DOCUMENT
 router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
     const userId = req.user!._id.toString();
@@ -198,10 +230,12 @@ router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
     const isEditor = doc.editors.some(e => e.toString() === userId);
     const isPublic = doc.isPublic === true;
 
+    // SECURITY: Only owner, editor, or public can view
     if (!isOwner && !isEditor && !isPublic) {
       return res.status(403).json({ message: "No permission to view this document" });
     }
 
+    // Lock check (viewing allowed, but warn)
     if (doc.lock.isLocked && doc.lock.lockedBy?.toString() !== userId) {
       return res.status(200).json({
         ...doc.toObject(),
@@ -217,10 +251,14 @@ router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-// UPDATE DOCUMENT
+
+/* -------------------------------------------------------
+   UPDATE DOCUMENT (OWNER and EDITORS)
+------------------------------------------------------- */
 router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
     const updated = await Document.findOneAndUpdate(
+      // UPDATE DOCUMENT (OWNER OR EDITOR)
       {
         _id: req.params.id,
         $or: [
@@ -243,7 +281,9 @@ router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-// DELETE DOCUMENT
+/* -------------------------------------------------------
+   DELETE DOCUMENT (OWNER ONLY)
+------------------------------------------------------- */
 router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
     const deleted = await Document.findOneAndDelete({
@@ -261,5 +301,6 @@ router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+
 
 export default router;

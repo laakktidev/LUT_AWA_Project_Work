@@ -1,4 +1,4 @@
-  import axios from "axios";
+import axios from "axios";
 import { Document } from "../types/Document";
 import { BASE_URL } from "./config";
 
@@ -161,8 +161,6 @@ export async function updateDocumentVisibility(
 
 export async function softDeleteDocument(id: string, token: string) {
 
-  console.log("xxxxxxxxxxxx ",token);
-
   const res = await axios.patch(
     `${BASE_URL}/document/${id}/soft-delete`,
     {},
@@ -214,4 +212,18 @@ export async function getTrashCount(token: string) {
   return res.data.count; // number
 }
 
-//////////////////
+export async function cloneDocument(id: string, token: string) {
+  
+  const res = await axios.post(
+    `${BASE_URL}/document/${id}/clone`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data; // the new cloned document
+}
+

@@ -31,13 +31,12 @@ app.use(cors(corsOptions))
 
 const corsOptions: CorsOptions = {
   origin: "http://localhost:3000",
-  //methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  methods: "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],  
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }
 
-app.use(cors(corsOptions))
+//app.use(cors(corsOptions))
 
 
 const MONGO_URL = 'mongodb://127.0.0.1:27017/testdb';
@@ -49,9 +48,15 @@ mongoose.connection.on("connected", () => {
 });
 
 
+//app.use(express.json())
+//app.use(express.urlencoded({ extended: false }))
+//app.use(morgan("dev"))
+
+app.use(morgan("dev"))           // << first
+app.use(cors(corsOptions))       // handles preflight
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use(morgan("dev"))
+
 
 
 //app.use(express.static(path.join(__dirname, "./public")))
