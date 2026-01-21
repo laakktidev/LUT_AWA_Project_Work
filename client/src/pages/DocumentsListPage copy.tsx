@@ -32,6 +32,7 @@ export default function DocumentsListPage() {
   const [docId, setDocId] = useState("");
   const [users, setUsers] = useState<User[]>([]);
 
+  // SORTING STATE
   const [sortBy, setSortBy] = useState<
     "name-asc" | "name-desc" |
     "created-asc" | "created-desc" |
@@ -40,7 +41,9 @@ export default function DocumentsListPage() {
 
   async function handleShareDocument(selectedUserIds: string[]) {
     if (!token) return;
-    await shareDocument(docId, selectedUserIds, token);
+
+    const response = await shareDocument(docId, selectedUserIds, token);
+    console.log("Sharing document:", response.message);
     refetch();
   }
 
@@ -48,6 +51,7 @@ export default function DocumentsListPage() {
     if (!token) return;
 
     const allUsers = await getUsers(token);
+
     const filteredUsers = allUsers.filter(
       (u) => u.id !== doc.userId && !doc.editors.includes(u.id)
     );
@@ -59,7 +63,9 @@ export default function DocumentsListPage() {
 
   async function handleDelete(id: string) {
     if (!token) return;
-    await deleteDocument(id, token);
+
+    const ret = await deleteDocument(id, token);
+    console.log("Deleted document:", id, ret);
     refetch();
   }
 
@@ -94,6 +100,7 @@ export default function DocumentsListPage() {
     );
   }
 
+  // SORTING LOGIC
   const sortedDocs = [...documents].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
@@ -102,14 +109,14 @@ export default function DocumentsListPage() {
         return b.title.localeCompare(a.title);
 
       case "created-asc":
-        return new Date(a.createdAt as string).getTime() - new Date(b.createdAt as string).getTime();
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       case "created-desc":
-        return new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 
       case "updated-asc":
-        return new Date(a.updatedAt as string).getTime() - new Date(b.updatedAt as string).getTime();
+        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
       case "updated-desc":
-        return new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime();
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
 
       default:
         return 0;
@@ -128,6 +135,7 @@ export default function DocumentsListPage() {
         }}
       />
 
+      {/* HEADER + SORTING */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Your Documents</Typography>
 
@@ -156,6 +164,7 @@ export default function DocumentsListPage() {
         </Stack>
       </Stack>
 
+      {/* DOCUMENT LIST */}
       {sortedDocs.length === 0 ? (
         <Alert severity="info">No documents yet. Create your first one!</Alert>
       ) : (
@@ -175,18 +184,15 @@ export default function DocumentsListPage() {
                 }}
                 onClick={() => navigate(`/view/${doc._id}`)}
               >
+                {/* LEFT SIDE */}
                 <Box>
                   <Typography variant="h6">{doc.title}</Typography>
-
                   <Typography variant="body2" color="text.secondary">
-                    Last edited: {new Date(doc.updatedAt).toLocaleString()}
-                  </Typography>
-
-                  <Typography variant="body2" color="text.secondary">
-                    Created: {new Date(doc.createdAt).toLocaleString()}
+                    Last updated: {new Date(doc.updatedAt).toLocaleString()}
                   </Typography>
                 </Box>
 
+                {/* RIGHT SIDE */}
                 <Box sx={{ display: "flex", gap: 1 }}>
                   <IconButton
                     disabled={!isOwner}

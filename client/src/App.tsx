@@ -12,7 +12,11 @@ import PublicDocumentPage from "./pages/PublicDocumentPage";
 import { useAuth } from "./context/AuthContext";
 
 export default function App() {
-  const { token } = useAuth();
+  const { token, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ padding: 40 }}>Loading session…</div>;
+  }
 
   return (
     <BrowserRouter>
@@ -26,11 +30,7 @@ export default function App() {
         {/* PROTECTED ROUTES */}
         <Route
           element={
-            token ? (
-              <AppLayout />
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            token ? <AppLayout /> : <Navigate to="/login" replace />
           }
         >
           <Route path="/" element={<DocumentsListPage />} />

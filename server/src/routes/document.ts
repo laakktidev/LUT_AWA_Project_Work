@@ -4,7 +4,9 @@ import { authenticateUser } from "../middleware/validateToken";
 
 const router = Router();
 
-// CREATE a document
+/* -------------------------------------------------------
+   CREATE DOCUMENT (owner only)
+------------------------------------------------------- */
 router.post("/", authenticateUser, async (req: Request, res: Response) => {
   try {
     const { title, content } = req.body;
@@ -26,38 +28,33 @@ router.post("/", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
+/* -------------------------------------------------------
+   GET SINGLE DOCUMENT (owner OR editor OR public)
+------------------------------------------------------- */
 router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const userId = req.user._id;
+    const userId = req.user!._id.toString();
     const doc = await Document.findById(req.params.id);
 
     if (!doc) {
       return res.status(404).json({ message: "Document not found" });
     }
 
-    // Permission check
     const isOwner = doc.userId.toString() === userId;
     const isEditor = doc.editors.some(e => e.toString() === userId);
+    const isPublic = doc.isPublic === true;
 
-    if (!isOwner && !isEditor) {
+    // SECURITY: Only owner, editor, or public can view
+    if (!isOwner && !isEditor && !isPublic) {
       return res.status(403).json({ message: "No permission to view this document" });
     }
 
-    // Lock check on OPEN
+    // Lock check (viewing allowed, but warn)
     if (doc.lock.isLocked && doc.lock.lockedBy?.toString() !== userId) {
-      //return res.status(423).json({ message: "Document is locked by another user" });
-      // Lock check on OPEN (viewing)
-
       return res.status(200).json({
         ...doc.toObject(),
         lockWarning: "Document is locked by another user"
       });
-
-
     }
 
     return res.json(doc);
@@ -68,30 +65,9 @@ router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-
-
-/*router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
-  try {
-    const doc = await Document.findOne({
-      _id: req.params.id,
-      $or: [
-        { userId: req.user!._id },
-        { editors: req.user!._id }
-      ]
-    });
-
-    if (!doc) {
-      return res.status(404).json({ message: "Document not found" });
-    }
-
-    return res.json(doc);
-  } catch (err) {
-    console.error("Error fetching document:", err);
-    return res.status(500).json({ message: "Server error" });
-  }
-});*/
-
-
+/* -------------------------------------------------------
+   GET ALL DOCUMENTS (owner OR editor)
+------------------------------------------------------- */
 router.get("/", authenticateUser, async (req: Request, res: Response) => {
   try {
     const docs = await Document.find({
@@ -108,24 +84,26 @@ router.get("/", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-
-// UPDATE a document (owner OR editor)
+/* -------------------------------------------------------
+   UPDATE DOCUMENT (OWNER and EDITORS)
+------------------------------------------------------- */
 router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
     const updated = await Document.findOneAndUpdate(
+      // UPDATE DOCUMENT (OWNER OR EDITOR)
       {
         _id: req.params.id,
         $or: [
           { userId: req.user!._id },
           { editors: req.user!._id }
         ]
-      },
+      },      
       { title: req.body.title, content: req.body.content },
       { new: true }
     );
 
     if (!updated) {
-      return res.status(404).json({ message: "Document not found or no permission" });
+      return res.status(403).json({ message: "Not allowed to edit this document" });
     }
 
     return res.json(updated);
@@ -135,21 +113,18 @@ router.put("/:id", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-
-// DELETE a document
+/* -------------------------------------------------------
+   DELETE DOCUMENT (OWNER ONLY)
+------------------------------------------------------- */
 router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
   try {
-
-    const id: string = req.params.id as string;
-
-    // ONLY owner can delete
     const deleted = await Document.findOneAndDelete({
-      _id: id,
+      _id: req.params.id,
       userId: req.user!._id
     });
 
     if (!deleted) {
-      return res.status(404).json({ message: "Document not found or no permission" });
+      return res.status(403).json({ message: "Not allowed to delete this document" });
     }
 
     return res.status(200).json({ message: "Document deleted" });
@@ -159,45 +134,33 @@ router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-
-// PATCH /documents/:id/editors
+/* -------------------------------------------------------
+   ADD EDITORS (OWNER ONLY)
+------------------------------------------------------- */
 router.patch("/:id/editors", authenticateUser, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { userIds } = req.body; // array of user IDs
+    const { userIds } = req.body;
 
     if (!Array.isArray(userIds)) {
-      console.log("User IDs must be an array");
-      return res.status(400).json({ message: "UserIDs must be an array" });
+      return res.status(400).json({ message: "userIds must be an array" });
     }
 
-    //console.log("user:", req.user);
-
-    // ONLY owner can add editors
     const doc = await Document.findOne({
-      _id: id,
-      userId: req.user!._id
+      _id: req.params.id,
+      userId: req.user!._id   // OWNER ONLY
     });
 
-    console.log("id:", id);
-    console.log("useId:", id);
-    console.log("editors:", userIds);
-
     if (!doc) {
-      return res.status(404).json({ message: "Document not found or no permission" });
+      return res.status(403).json({ message: "Not allowed to modify editors" });
     }
 
-    //res.status(200).json("updated");
-
-
-    const updated = await Document.findByIdAndUpdate(
-      id,
+    await Document.findByIdAndUpdate(
+      req.params.id,
       { $addToSet: { editors: { $each: userIds } } },
       { new: true }
     );
 
-    //console.log("Updated document editors:", updated);
-    return res.status(200).json({ message: "New editor(s) added" });
+    return res.status(200).json({ message: "Editors updated" });
 
   } catch (err) {
     console.error("Error updating editors:", err);
@@ -205,14 +168,11 @@ router.patch("/:id/editors", authenticateUser, async (req: Request, res: Respons
   }
 });
 
-
+/* -------------------------------------------------------
+   UPDATE PUBLIC VISIBILITY (OWNER ONLY)
+------------------------------------------------------- */
 router.put("/:id/public", authenticateUser, async (req: Request, res: Response) => {
   try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    const userId = req.user._id;
     const { isPublic } = req.body;
 
     if (typeof isPublic !== "boolean") {
@@ -225,9 +185,8 @@ router.put("/:id/public", authenticateUser, async (req: Request, res: Response) 
       return res.status(404).json({ message: "Document not found" });
     }
 
-    const isOwner = doc.userId.toString() === userId;
+    const isOwner = doc.userId.toString() === req.user!._id.toString();
 
-    // Only owner can change visibility
     if (!isOwner) {
       return res.status(403).json({ message: "Only the owner can change visibility" });
     }
@@ -235,14 +194,12 @@ router.put("/:id/public", authenticateUser, async (req: Request, res: Response) 
     doc.isPublic = isPublic;
     await doc.save();
 
-    return res.json({ message: "Visibility updated", isPublic: doc.isPublic });
+    return res.json({ message: "Visibility updated", isPublic });
 
   } catch (err) {
     console.error("Error updating public status:", err);
     return res.status(500).json({ message: "Server error" });
   }
 });
-
-
 
 export default router;

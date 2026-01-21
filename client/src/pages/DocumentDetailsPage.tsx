@@ -23,7 +23,8 @@ export default function DocumentDetailsPage() {
   const { doc, loading, error, refetch } = useDocument(id, token);
 
   const isOwner = user?.id === doc?.userId;
-  const canEdit = isOwner; // later: add editors, permissions, etc.
+  const isEditor = doc?.editors?.includes(user?.id as string);
+  const canEdit = isOwner || isEditor;
 
   const handleTogglePublic = async (value: boolean) => {
     if (!token) return;

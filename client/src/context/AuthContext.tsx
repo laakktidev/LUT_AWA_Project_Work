@@ -4,6 +4,7 @@ import { User } from "../types/User";
 interface AuthContextType {
   token: string | null;
   user: User | null;
+  loading: boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
 }
@@ -13,6 +14,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   // Restore session on refresh
   useEffect(() => {
@@ -21,6 +23,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (savedToken) setToken(savedToken);
     if (savedUser) setUser(JSON.parse(savedUser));
+
+    setLoading(false);
   }, []);
 
   const login = (newToken: string, newUser: User) => {
@@ -40,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ token, user, login, logout }}>
+    <AuthContext.Provider value={{ token, user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -48,8 +52,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error("useAuth must be used inside AuthProvider");
-  }
+  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
   return ctx;
 }

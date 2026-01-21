@@ -25,16 +25,8 @@ export default function PublicVisibilitySection({
 
   return (
     <Box sx={{ border: "1px solid #ddd", borderRadius: 2, p: 2, mt: 2 }}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          flexWrap: "wrap"
-        }}
-      >
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         {isPublic ? <PublicIcon color="success" /> : <LockIcon color="action" />}
-
         <Typography variant="h6">
           {isPublic ? "Public document" : "Private document"}
         </Typography>
@@ -43,35 +35,23 @@ export default function PublicVisibilitySection({
           checked={isPublic}
           onChange={(e) => onTogglePublic(e.target.checked)}
         />
-
-        {isPublic && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: 1,
-              backgroundColor: "#fafafa",
-              borderRadius: 1,
-              padding: "4px 8px",
-              ml: 1
-            }}
-          >
-            <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
-              {publicUrl}
-            </Typography>
-
-            <IconButton onClick={handleCopy}>
-              <ContentCopyIcon fontSize="small" />
-            </IconButton>
-
-            {copied && (
-              <Typography variant="body2" color="success.main">
-                Copied
-              </Typography>
-            )}
-          </Box>
-        )}
       </Box>
+
+      {isPublic && (
+        <Box sx={{ mt: 1, display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="body2">{publicUrl}</Typography>
+
+          <IconButton onClick={handleCopy}>
+            <ContentCopyIcon fontSize="small" />
+          </IconButton>
+
+          {copied && (
+            <Typography variant="body2" color="success.main">
+              Copied
+            </Typography>
+          )}
+        </Box>
+      )}
     </Box>
   );
 }
