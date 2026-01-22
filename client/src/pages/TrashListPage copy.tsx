@@ -11,18 +11,12 @@ import {
   Stack,
   IconButton,
 } from "@mui/material";
-
+//import RestoreIcon from "@mui/icons-material/Restore";
 import RestoreFromTrashOutlinedIcon from '@mui/icons-material/RestoreFromTrashOutlined';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 import { useAuth } from "../context/AuthContext";
-import {
-  getTrashDocuments,
-  restoreDocument,
-  deleteDocument,
-  emptyTrash
-} from "../services/documentService";
-
+import { getTrashDocuments, restoreDocument, deleteDocument } from "../services/documentService";
 import { Document } from "../types/Document";
 
 export default function TrashListPage() {
@@ -49,25 +43,13 @@ export default function TrashListPage() {
   async function handleRestore(id: string) {
     if (!token) return;
     await restoreDocument(id, token);
-    loadTrash();
+    loadTrash(); // refresh list
   }
 
   async function handlePermanentDelete(id: string) {
     if (!token) return;
     await deleteDocument(id, token);
-    loadTrash();
-  }
-
-  async function handleEmptyTrash() {
-    if (!token) return;
-
-    const ok = window.confirm(
-      "Are you sure you want to permanently delete ALL items in Trash?"
-    );
-    if (!ok) return;
-
-    await emptyTrash(token);
-    loadTrash();
+    loadTrash(); // refresh list
   }
 
   useEffect(() => {
@@ -105,21 +87,9 @@ export default function TrashListPage() {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h4">Trash</Typography>
 
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<DeleteForeverIcon />}
-            onClick={handleEmptyTrash}
-          >
-            Empty
-          </Button>
-
-
-          <Button variant="outlined" onClick={() => navigate("/")}>
-            Back to Documents
-          </Button>
-        </Stack>
+        <Button variant="outlined" onClick={() => navigate("/")}>
+          Back to Documents
+        </Button>
       </Stack>
 
       {docs.length === 0 ? (
@@ -138,6 +108,7 @@ export default function TrashListPage() {
             >
               <Box>
                 <Typography variant="h6">{doc.title}</Typography>
+
                 <Typography variant="body2" color="text.secondary">
                   Deleted: {new Date(doc.deletedAt!).toLocaleString()}
                 </Typography>

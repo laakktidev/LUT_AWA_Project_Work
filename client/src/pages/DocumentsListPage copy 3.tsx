@@ -11,14 +11,13 @@ import {
   Stack,
   IconButton,
   TextField,
-  InputAdornment,
-  Pagination
+  InputAdornment
 } from "@mui/material";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
-import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
+import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
 
 import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
@@ -55,10 +54,6 @@ export default function DocumentsListPage() {
     "updated-asc" | "updated-desc"
   >("updated-desc");
 
-  // Pagination state
-  const [page, setPage] = useState(1);
-  const pageSize = 5;
-
   async function refreshTrashCount() {
     if (!token) return;
     const count = await getTrashCount(token);
@@ -69,7 +64,7 @@ export default function DocumentsListPage() {
     refreshTrashCount();
   }, [token]);
 
-  // Debounced server-side search
+  // 🔍 Debounced server-side search
   useEffect(() => {
     if (!token) return;
 
@@ -86,10 +81,6 @@ export default function DocumentsListPage() {
     return () => clearTimeout(timeout);
   }, [search, token]);
 
-  // Reset page when search or sort changes
-  useEffect(() => {
-    setPage(1);
-  }, [search, sortBy]);
 
   async function handleShareDocument(selectedUserIds: string[]) {
     if (!token) return;
@@ -163,25 +154,20 @@ export default function DocumentsListPage() {
       case "name-desc":
         return b.title.localeCompare(a.title);
       case "created-asc":
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+        return new Date(a.createdAt as string).getTime() - new Date(b.createdAt as string).getTime();
       case "created-desc":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        return new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime();
       case "updated-asc":
-        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+        return new Date(a.updatedAt as string).getTime() - new Date(b.updatedAt as string).getTime();
       case "updated-desc":
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        return new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime();
       default:
         return 0;
     }
   });
 
-  //  Use search results if available
+  // 🔥 Use search results if available
   const docsToShow = searchResults ?? sortedDocs;
-
-  // Pagination slice
-  const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  const paginatedDocs = docsToShow.slice(start, end);
 
   return (
     <Container maxWidth="md">
@@ -199,6 +185,8 @@ export default function DocumentsListPage() {
         <Typography variant="h4">My Documents</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
+
+          {/* 🔍 MUI Search Field with Clear Button */}
           <TextField
             size="small"
             placeholder="Search…"
@@ -253,81 +241,69 @@ export default function DocumentsListPage() {
       {docsToShow.length === 0 ? (
         <Alert severity="info">No documents yet. Create your first one!</Alert>
       ) : (
-        <>
-          <Stack spacing={2}>
-            {paginatedDocs.map((doc) => {
-              const isOwner = user?.id === doc.userId;
+        <Stack spacing={2}>
+          {docsToShow.map((doc) => {
+            const isOwner = user?.id === doc.userId;
 
-              return (
-                <Paper
-                  key={doc._id}
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => navigate(`/view/${doc._id}`)}
-                >
-                  <Box>
-                    <Typography variant="h6">{doc.title}</Typography>
+            return (
+              <Paper
+                key={doc._id}
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  cursor: "pointer",
+                }}
+                onClick={() => navigate(`/view/${doc._id}`)}
+              >
+                <Box>
+                  <Typography variant="h6">{doc.title}</Typography>
 
-                    <Typography variant="body2" color="text.secondary">
-                      Last edited: {new Date(doc.updatedAt as string).toLocaleString()}
-                    </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Last edited: {new Date(doc.updatedAt).toLocaleString()}
+                  </Typography>
 
-                    <Typography variant="body2" color="text.secondary">
-                      Created: {new Date(doc.createdAt as string).toLocaleString()}
-                    </Typography>
-                  </Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Created: {new Date(doc.createdAt).toLocaleString()}
+                  </Typography>
+                </Box>
 
-                  <Box sx={{ display: "flex", gap: 1 }}>
-                    <IconButton
-                      disabled={!isOwner}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openShareSelection(doc);
-                      }}
-                    >
-                      <ShareIcon />
-                    </IconButton>
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  <IconButton
+                    disabled={!isOwner}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openShareSelection(doc);
+                    }}
+                  >
+                    <ShareIcon />
+                  </IconButton>
 
-                    <IconButton
-                      disabled={!isOwner}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleClone(doc._id);
-                      }}
-                    >
-                      <FileCopyOutlinedIcon />
-                    </IconButton>
+                  <IconButton
+                    disabled={!isOwner}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClone(doc._id);
+                    }}
+                  >
+                    <FileCopyOutlinedIcon />
+                  </IconButton>
 
-                    <IconButton
-                      disabled={!isOwner}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(doc._id);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </Paper>
-              );
-            })}
-          </Stack>
-
-          {/* Pagination */}
-          <Box mt={3} display="flex" justifyContent="center">
-            <Pagination
-              count={Math.ceil(docsToShow.length / pageSize)}
-              page={page}
-              onChange={(_, value) => setPage(value)}
-              color="primary"
-            />
-          </Box>
-        </>
+                  <IconButton
+                    disabled={!isOwner}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(doc._id);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </Paper>
+            );
+          })}
+        </Stack>
       )}
     </Container>
   );

@@ -7,12 +7,15 @@ import {
   CircularProgress,
   Alert,
   Stack,
-  Paper
+  Paper,
+  IconButton
 } from "@mui/material";
+
+import DownloadIcon from "@mui/icons-material/Download";
 
 import { useDocument } from "../hooks/useDocument";
 import PublicVisibilitySection from "../components/PublicVisibilitySection";
-import { updateDocumentVisibility } from "../services/documentService";
+import { updateDocumentVisibility, downloadPdf } from "../services/documentService";
 import { useAuth } from "../context/AuthContext";
 
 export default function DocumentDetailsPage() {
@@ -31,6 +34,22 @@ export default function DocumentDetailsPage() {
     await updateDocumentVisibility(id!, value, token);
     await refetch();
   };
+
+  async function handleDownload() {
+
+    if (!token || !doc) return;
+
+    const blob = await downloadPdf(doc._id, token);
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${doc.title}.pdf`;
+    a.click();
+
+    window.URL.revokeObjectURL(url);
+  }
+
 
   if (loading) {
     return (
@@ -79,7 +98,7 @@ export default function DocumentDetailsPage() {
             </Button>
           )}
 
-          {isOwner && (
+          {/*{isOwner && (
             <>
               <Button variant="outlined" color="primary">
                 Rename
@@ -88,7 +107,17 @@ export default function DocumentDetailsPage() {
                 Share
               </Button>
             </>
-          )}
+
+          )}*/}
+
+          <IconButton
+            onClick={handleDownload}
+            disabled={!doc}
+            sx={{ border: "1px solid #ccc", borderRadius: 2 }}
+          >
+            <DownloadIcon />
+          </IconButton>
+
         </Stack>
       </Stack>
 

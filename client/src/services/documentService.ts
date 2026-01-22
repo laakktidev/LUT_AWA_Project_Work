@@ -227,3 +227,40 @@ export async function cloneDocument(id: string, token: string) {
   return res.data; // the new cloned document
 }
 
+export async function emptyTrash(token: string) {
+  const res = await axios.delete(
+    `${BASE_URL}/document/trash/empty`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  return res.data;
+}
+
+
+export async function searchDocuments(search: string, token: string) {
+  const res = await axios.get(
+    `${BASE_URL}/document/search`,
+    {
+      params: { q:search },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return res.data; // array of matching documents
+}
+
+
+export async function downloadPdf(id: string, token: string) {
+  const res = await axios.get(`${BASE_URL}/document/${id}/pdf`, {
+    responseType: "blob",
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  return res.data;
+}

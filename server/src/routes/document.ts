@@ -1,12 +1,36 @@
 import { Router, Request, Response } from "express";
 import { Document } from "../models/Document";
 import { authenticateUser } from "../middleware/validateToken";
+import PDFDocument from "pdfkit";
+
 
 const router = Router();
 
-/* -------------------------------------------------------
-   STATIC ROUTES (MUST BE FIRST)
-------------------------------------------------------- */
+
+//   CREATE DOCUMENT
+
+router.post("/", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const { title, content } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const newDoc = await Document.create({
+      userId: req.user!._id,
+      title,
+      content: content || ""
+    });
+
+    return res.status(200).json(newDoc);
+  } catch (err) {
+    console.error("Error creating document:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+// DOCUMENTS IN TRASH
 router.get("/trash", authenticateUser, async (req: Request, res: Response) => {
   try {
     const docs = await Document.find({
@@ -21,11 +45,31 @@ router.get("/trash", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
+router.delete("/trash/empty", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const result = await Document.deleteMany({
+      userId: req.user!._id,
+      isDeleted: true
+    });
+
+    return res.status(200).json({
+      message: "Trash emptied",
+      deletedCount: result.deletedCount
+    });
+
+  } catch (err) {
+    console.error("Error emptying trash:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+// COUNT OF ITEMS IN TRASH
 router.get("/trash/count", authenticateUser, async (req: Request, res: Response) => {
   try {
     const count = await Document.countDocuments({
-    userId: req.user!._id,
-    isDeleted: true
+      userId: req.user!._id,
+      isDeleted: true
     });
 
     return res.json({ count });
@@ -35,9 +79,6 @@ router.get("/trash/count", authenticateUser, async (req: Request, res: Response)
   }
 });
 
-/* -------------------------------------------------------
-   ACTION ROUTES (MUST BE BEFORE /:id)
-------------------------------------------------------- */
 
 // CLONE DOCUMENT
 router.post("/:id/clone", authenticateUser, async (req, res) => {
@@ -160,9 +201,9 @@ router.patch("/:id/public", authenticateUser, async (req: Request, res: Response
   }
 });
 
-/* -------------------------------------------------------
-   GET ALL DOCUMENTS (MUST BE HERE, NOT AT TOP)
-------------------------------------------------------- */
+
+// GET ALL DOCUMENTS
+
 router.get("/", authenticateUser, async (req: Request, res: Response) => {
   try {
     const docs = await Document.find({
@@ -180,9 +221,45 @@ router.get("/", authenticateUser, async (req: Request, res: Response) => {
   }
 });
 
-/* -------------------------------------------------------
-   DYNAMIC ROUTES (ALWAYS LAST)
-------------------------------------------------------- */
+
+// SEARCH FROM ALL DOCUMENTS 
+
+router.get("/search", authenticateUser, async (req: Request, res: Response) => {
+  try {
+    const search = (req.query.q as string) || "";
+
+    const docs = await Document.find({
+      isDeleted: { $ne: true },
+
+      $and: [
+        // user must be owner OR editor
+        {
+          $or: [
+            { userId: req.user!._id },
+            { editors: req.user!._id }
+          ]
+        },
+
+        // title OR content must match search
+        {
+          $or: [
+            { title: { $regex: search, $options: "i" } },
+            { content: { $regex: search, $options: "i" } }
+          ]
+        }
+      ]
+    }).sort({ updatedAt: -1 });
+
+    return res.json(docs);
+
+  } catch (err) {
+    console.error("Error fetching documents:", err);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
 
 // GET SINGLE DOCUMENT
 router.get("/:id", authenticateUser, async (req: Request, res: Response) => {
@@ -261,5 +338,35 @@ router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Server error" });
   }
 });
+
+
+router.get("/:id/pdf", authenticateUser, async (req, res) => {
+  const doc = await Document.findById(req.params.id);
+
+  if (!doc) {
+    return res.status(404).json({ message: "Document not found" });
+  }
+
+  // Only owner or editor can download
+  const userId = req.user!._id.toString();
+
+  if (doc.userId.toString() !== userId && !doc.editors.some(e => e.equals(userId))) {
+  
+    return res.status(403).json({ message: "Not allowed" });
+  }
+
+  const pdf = new PDFDocument();
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename="${doc.title}.pdf"`);
+
+  pdf.pipe(res);
+
+  pdf.fontSize(20).text(doc.title, { underline: true });
+  pdf.moveDown();
+  pdf.fontSize(12).text(doc.content || "");
+
+  pdf.end();
+});
+
 
 export default router;
