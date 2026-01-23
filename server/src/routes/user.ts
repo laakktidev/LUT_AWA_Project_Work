@@ -7,9 +7,38 @@ import { User } from "../models/User";
 import { authenticateUser } from "../middleware/validateToken";
 
 import { registerValidation, loginValidation } from "../middleware/inputValidation";
-
+import { upload } from "../middleware/upload";
 
 const router = Router();
+
+//*******************
+
+
+// POST /api/users/profile-picture
+router.post(
+  "/profile-picture",
+  authenticateUser,
+  upload.single("image"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const filePath = "/" + req.file.path.replace(/\\/g, "/");
+
+      await User.findByIdAndUpdate(req.user?._id, {
+        profilePicture: filePath
+      });
+
+      res.json({ success: true, path: filePath });
+      //path: `/uploads/profile-pictures/${filename}`
+    } catch (err) {
+      res.status(500).json({ message: "Upload failed" });
+    }
+  }
+);
+
 
 // ---------------------- REGISTER ----------------------
 router.post(
@@ -84,7 +113,11 @@ router.post(
                 process.env.SECRET as string,
                 { expiresIn: "1h" }
             );
-            return res.status(200).json({ token: token, user: { id: user._id, email: user.email, username: user.username } });
+            return res.status(200).json({ token: token, 
+                                          user: { id: user._id, 
+                                                  email: user.email, 
+                                                  username: user.username,
+                                                  profilePicture:user.profilePicture } });
         } catch (error) {
             console.log(error, "-----");
             return res.status(666).json("JOTAIN VIKKOO")

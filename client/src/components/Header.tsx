@@ -22,6 +22,10 @@ export default function Header() {
               Logged in as: <strong>{user.username}</strong>
             </Typography>
           )}
+          
+          <Button color="inherit" component={Link} to="/profile" sx={{ marginRight: 2 }}>  
+            Profile
+          </Button>
 
           <Button color="inherit" component={Link} to="/" sx={{ marginRight: 2 }}>
             home

@@ -77,6 +77,9 @@ app.use("/api/documentLock", documentLockRoutes);
 
 app.use("/api/public", publicRoutes);
 
+app.use("/uploads", express.static("uploads"));
+
+
 app.listen(port, () => {
     //console.log(`Server running on port ${port}`)
     //const MONGO_URL = 'mongodb://127.0.0.1:27017/testdb';

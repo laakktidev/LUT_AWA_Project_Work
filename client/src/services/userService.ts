@@ -54,3 +54,18 @@ export async function getUsers(token: string): Promise<User[]> {
 }
 
 
+export async function uploadProfilePicture(formData: FormData, token: string) {
+  const res = await axios.post(     
+    `${BASE_URL}/user/profile-picture`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data"
+      }
+    }
+  );
+
+  console.log("res.data: ",res.data);
+  return res.data;
+}
