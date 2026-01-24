@@ -1,6 +1,9 @@
 import { Router, Request, Response } from "express";
 import { Document } from "../models/Document";
 import { authenticateUser } from "../middleware/validateToken";
+
+import { uploadDocumentImage } from "../middleware/uploadDocumentImage";
+
 import PDFDocument from "pdfkit";
 
 
@@ -81,7 +84,7 @@ router.get("/trash/count", authenticateUser, async (req: Request, res: Response)
 
 
 // CLONE DOCUMENT
-router.post("/:id/clone", authenticateUser, async (req, res) => {
+router.post("/:id/clone", authenticateUser, async (req: Request, res: Response) => {
   try {
     const original = await Document.findOne({
       _id: req.params.id,
@@ -340,7 +343,7 @@ router.delete("/:id", authenticateUser, async (req: Request, res: Response) => {
 });
 
 
-router.get("/:id/pdf", authenticateUser, async (req, res) => {
+router.get("/:id/pdf", authenticateUser, async (req: Request, res: Response) => {
   const doc = await Document.findById(req.params.id);
 
   if (!doc) {
@@ -351,7 +354,7 @@ router.get("/:id/pdf", authenticateUser, async (req, res) => {
   const userId = req.user!._id.toString();
 
   if (doc.userId.toString() !== userId && !doc.editors.some(e => e.equals(userId))) {
-  
+
     return res.status(403).json({ message: "Not allowed" });
   }
 
@@ -369,4 +372,23 @@ router.get("/:id/pdf", authenticateUser, async (req, res) => {
 });
 
 
+router.post("/:id/images", authenticateUser, uploadDocumentImage.single("image"),
+  async (req: Request, res: Response) => {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    //const url = `http://localhost:8000/uploads/documents/${req.file.filename}`;
+    const protocol = req.protocol;
+    const host = req.get("host");
+    const url = `${protocol}://${host}/uploads/documents/${req.file.filename}`;
+
+    return res.json({ url });
+  }
+);
+
 export default router;
+
+
+
+

@@ -264,3 +264,26 @@ export async function downloadPdf(id: string, token: string) {
 
   return res.data;
 }
+
+
+export async function uploadDocumentImage(
+  documentId: string,
+  file: File,
+  token: string
+): Promise<string> {
+  const formData = new FormData();
+  formData.append("image", file);
+
+  const res = await axios.post(
+    `${BASE_URL}/document/${documentId}/images`,
+    formData,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return res.data.url; // backend returns { url: "..." }
+}

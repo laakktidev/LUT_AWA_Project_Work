@@ -1,144 +1,112 @@
+import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useDocument } from "../hooks/useDocument";
-import { updateDocument } from "../services/documentService";
-import {
-  Container,
-  Button,
-  CircularProgress,
-  Alert,
-  Stack,
-  Typography
-} from "@mui/material";
-import DocumentForm from "../components/DocumentForm";
-
-import { lockDocument, unlockDocument } from "../services/lockingService";
+import { DocumentEditor } from "../components/DocumentEditor";
+import { getDocumentById, updateDocument } from "../services/documentService";
 import { useAuth } from "../context/AuthContext";
+import { uploadDocumentImage } from "../services/documentService";
+
+import {
+    Box,
+    Button,
+    Container,
+    IconButton,
+    TextField
+} from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 export default function DocumentEditPage() {
-  const { token, user } = useAuth();
-  const { id } = useParams();
-  const navigate = useNavigate();
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const { token } = useAuth();
 
-  const [canEditLock, setCanEditLock] = useState(false);
-  const [editError, setError] = useState<string | null>(null);
+    const [title, setTitle] = useState("");
+    const [content, setContent] = useState("");
+    const [loading, setLoading] = useState(true);
 
-  const { doc, loading, error } = useDocument(id!, token);
+    useEffect(() => {
+        async function load() {
+            if (!id || !token) return;
 
-  // -------------------------------------------------------
-  // PERMISSION CHECK (owner OR editor)
-  // -------------------------------------------------------
-  const isOwner = doc && user?.id === doc.userId;
-  const isEditor = doc && doc.editors?.includes(user?.id);
-  const hasEditPermission = isOwner || isEditor;
-
-  // -------------------------------------------------------
-  // LOCKING LOGIC (only if user has permission)
-  // -------------------------------------------------------
-  useEffect(() => {
-    if (!doc || !token || !hasEditPermission) return;
-
-    let mounted = true;
-
-    async function init() {
-      try {
-        await lockDocument(doc._id, token);
-        if (mounted) setCanEditLock(true);
-      } catch (err: any) {
-        if (mounted) {
-          setCanEditLock(false);
-          setError(err.message);
+            const doc = await getDocumentById(id, token);
+            setTitle(doc.title || "");
+            setContent(doc.content || "");
+            setLoading(false);
         }
-      }
+
+        load();
+    }, [id, token]);
+
+    async function handleImageUpload(file: File): Promise<string> {
+        if (!id || !token) throw new Error("Missing id or token");
+        return uploadDocumentImage(id, file, token);
     }
 
-    init();
+    async function handleSave() {
+        if (!id || !token) return;
 
-    return () => {
-      mounted = false;
-      if (token && doc) unlockDocument(doc._id, token);
-    };
-  }, [doc?._id, token, hasEditPermission]);
+        await updateDocument(id, { title, content }, token);
+        navigate(`/documents/${id}`);
+    }
 
-  // -------------------------------------------------------
-  // BASIC LOADING / ERROR STATES
-  // -------------------------------------------------------
-  if (!token) {
-    return <Alert severity="warning">You must be logged in.</Alert>;
-  }
+    if (loading) return <div>Loading…</div>;
 
-  if (loading) {
-    return <CircularProgress />;
-  }
-
-  if (error || !doc) {
-    return <Alert severity="error">{error || "Document not found"}</Alert>;
-  }
-
-  // -------------------------------------------------------
-  // PERMISSION BLOCK (viewers)
-  // -------------------------------------------------------
-  if (!hasEditPermission) {
     return (
-      <Container maxWidth="md">
-        <Alert severity="warning" sx={{ mt: 2 }}>
-          You do not have permission to edit this document.
-        </Alert>
-        <Button
-          sx={{ mt: 2 }}
-          variant="outlined"
-          onClick={() => navigate(`/view/${doc._id}`)}
-        >
-          Back to document
-        </Button>
-      </Container>
-    );
-  }
+  <Container maxWidth="md">
+    {/* Sticky top bar */}
+    <Box
+      display="flex"
+      alignItems="center"
+      justifyContent="space-between"
+      sx={{
+        position: "sticky",
+        top: 0,
+        zIndex: 20,
+        backgroundColor: "white",
+        paddingTop: "12px",
+        paddingBottom: "12px",
+      }}
+    >
+      <IconButton onClick={() => navigate(-1)}>
+        <ArrowBackIcon />
+      </IconButton>
 
-  // -------------------------------------------------------
-  // LOCK BLOCK (owner/editor but locked by someone else)
-  // -------------------------------------------------------
-  if (!canEditLock) {
-    return (
-      <Container maxWidth="md">
-        <Alert severity="warning" sx={{ mt: 2 }}>
-          {editError || "This document is currently locked by another user."}
-        </Alert>
-        <Button
-          sx={{ mt: 2 }}
-          variant="outlined"
-          onClick={() => navigate(`/view/${doc._id}`)}
-        >
-          Back to document
-        </Button>
-      </Container>
-    );
-  }
-
-  // -------------------------------------------------------
-  // EDIT FORM (owner OR editor, lock acquired)
-  // -------------------------------------------------------
-  return (
-    <Container maxWidth="md">
-      <Typography variant="h4" mb={3}>Edit Document</Typography>
-
-      <Stack direction="row" spacing={2} mb={2}>
-        <Button variant="outlined" onClick={() => navigate("/")}>Back to list</Button>
-        <Button variant="outlined" color="secondary" onClick={() => navigate(`/view/${id}`)}>
-          Cancel
-        </Button>
-      </Stack>
-
-      <DocumentForm
-        initialTitle={doc.title}
-        initialContent={doc.content}
-        headline="Edit Document"
-        submitLabel="Save Changes"
-        onSubmit={async (values) => {
-          await updateDocument(id!, values, token);
-          navigate(`/view/${id}`);
+      <TextField
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Document title"
+        variant="outlined"
+        size="small"
+        sx={{
+          flexGrow: 1,
+          mx: 2,
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "8px",
+            height: "48px",
+            fontSize: "1.5rem",
+            fontWeight: 600,
+            paddingLeft: "12px",
+            paddingRight: "12px",
+          },
+          "& input": {
+            padding: 0,
+          },
         }}
       />
-    </Container>
-  );
+
+      <Button variant="contained" onClick={handleSave}>
+        Save
+      </Button>
+    </Box>
+
+    {/* Editor */}
+    <Box p={1}>
+      <DocumentEditor
+        value={content}
+        onChange={setContent}
+        onImageUpload={handleImageUpload}
+      />
+    </Box>
+  </Container>
+);
+
 }
