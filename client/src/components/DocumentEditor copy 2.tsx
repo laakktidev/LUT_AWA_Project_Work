@@ -8,10 +8,10 @@ import { DocumentEditorToolbar } from "./DocumentEditorToolbar";
 interface Props {
   value: string;
   onChange: (value: string) => void;
-  onImageAdd: (localUrl: string, file: File) => void;
+  onImageUpload: (file: File) => Promise<string>;
 }
 
-export function DocumentEditor({ value, onChange, onImageAdd }: Props) {
+export function DocumentEditor({ value, onChange, onImageUpload }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const editor = useEditor({
@@ -30,17 +30,8 @@ export function DocumentEditor({ value, onChange, onImageAdd }: Props) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Create local preview URL
-    const localUrl = URL.createObjectURL(file);
-
-    // Insert preview image into editor
-    editor?.chain().focus().setImage({ src: localUrl }).run();
-
-    // Inform parent about this image
-    onImageAdd(localUrl, file);
-
-    // Reset input so same file can be selected again if needed
-    e.target.value = "";
+    const url = await onImageUpload(file);
+    editor?.chain().focus().setImage({ src: url }).run();
   }
 
   return (
@@ -59,8 +50,7 @@ export function DocumentEditor({ value, onChange, onImageAdd }: Props) {
         },
       }}
     >
-
-      <DocumentEditorToolbar editor={editor} onImageAddRequest={triggerImagePicker} />
+      <DocumentEditorToolbar editor={editor} onImageUpload={triggerImagePicker} />
 
       <input
         type="file"

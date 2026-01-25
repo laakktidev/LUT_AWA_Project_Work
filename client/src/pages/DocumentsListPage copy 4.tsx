@@ -12,19 +12,13 @@ import {
   IconButton,
   TextField,
   InputAdornment,
-  Pagination,
-  MenuItem
+  Pagination
 } from "@mui/material";
 
 import ClearIcon from "@mui/icons-material/Clear";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import DescriptionIcon from "@mui/icons-material/Description";
-import SlideshowIcon from "@mui/icons-material/Slideshow";
-import SearchIcon from "@mui/icons-material/Search";
-
 
 import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
@@ -61,6 +55,7 @@ export default function DocumentsListPage() {
     "updated-asc" | "updated-desc"
   >("updated-desc");
 
+  // Pagination state
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
@@ -74,6 +69,7 @@ export default function DocumentsListPage() {
     refreshTrashCount();
   }, [token]);
 
+  // Debounced server-side search
   useEffect(() => {
     if (!token) return;
 
@@ -90,6 +86,7 @@ export default function DocumentsListPage() {
     return () => clearTimeout(timeout);
   }, [search, token]);
 
+  // Reset page when search or sort changes
   useEffect(() => {
     setPage(1);
   }, [search, sortBy]);
@@ -166,27 +163,28 @@ export default function DocumentsListPage() {
       case "name-desc":
         return b.title.localeCompare(a.title);
       case "created-asc":
-        return new Date(a.createdAt as string).getTime() - new Date(b.createdAt as string).getTime();
+        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       case "created-desc":
-        return new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       case "updated-asc":
-        return new Date(a.updatedAt as string).getTime() - new Date(b.updatedAt as string).getTime();
+        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
       case "updated-desc":
-        return new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime();
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
       default:
         return 0;
     }
   });
 
+  //  Use search results if available
   const docsToShow = searchResults ?? sortedDocs;
 
+  // Pagination slice
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
   const paginatedDocs = docsToShow.slice(start, end);
 
-
   return (
-    <Container maxWidth="md" sx={{ pt: 0, pb: 0 }}>
+    <Container maxWidth="md">
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
@@ -197,70 +195,52 @@ export default function DocumentsListPage() {
         }}
       />
 
-      {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h5" fontWeight={600}>
-          My Documents
-        </Typography>
+        <Typography variant="h4">My Documents</Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          {/* Search */}
           <TextField
-  size="small"
-  placeholder="Search…"
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  sx={{ width: 220 }}
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <SearchIcon sx={{ color: "text.secondary" }} />
-      </InputAdornment>
-    ),
-    endAdornment: search.length > 0 && (
-      <InputAdornment position="end">
-        <IconButton onClick={() => setSearch("")} edge="end">
-          <ClearIcon />
-        </IconButton>
-      </InputAdornment>
-    )
-  }}
-/>
-
-
-          {/* Sort */}
-          <TextField
-            select
             size="small"
+            placeholder="Search…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{ width: 220 }}
+            InputProps={{
+              endAdornment: search.length > 0 && (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setSearch("")} edge="end">
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
+
+          <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            sx={{ width: 180 }}
+            style={{
+              padding: "6px 10px",
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              fontSize: "0.9rem",
+            }}
           >
-            <MenuItem value="name-asc">Name (A → Z)</MenuItem>
-            <MenuItem value="name-desc">Name (Z → A)</MenuItem>
-            <MenuItem value="created-desc">Created (newest)</MenuItem>
-            <MenuItem value="created-asc">Created (oldest)</MenuItem>
-            <MenuItem value="updated-desc">Last edited (newest)</MenuItem>
-            <MenuItem value="updated-asc">Last edited (oldest)</MenuItem>
-          </TextField>
+            <option value="name-asc">Name (A → Z)</option>
+            <option value="name-desc">Name (Z → A)</option>
+            <option value="created-desc">Created (newest first)</option>
+            <option value="created-asc">Created (oldest first)</option>
+            <option value="updated-desc">Last edited (newest first)</option>
+            <option value="updated-asc">Last edited (oldest first)</option>
+          </select>
 
-          {/* New Document */}
-          
-          <Button
-            variant="outlined"
-            color="success"
-            startIcon={<NoteAddIcon />}
-            onClick={() => navigate("/create")}
-          >
-            New
+          <Button variant="contained" onClick={() => navigate("/create")}>
+            New Document
           </Button>
 
-
-          {/* Trash */}
           {trashCount > 0 && (
             <Button
               variant="outlined"
-              color="success"
               startIcon={<DeleteIcon />}
               onClick={() => navigate("/trash")}
             >
@@ -270,7 +250,6 @@ export default function DocumentsListPage() {
         </Stack>
       </Stack>
 
-      {/* Document List */}
       {docsToShow.length === 0 ? (
         <Alert severity="info">No documents yet. Create your first one!</Alert>
       ) : (
@@ -282,46 +261,30 @@ export default function DocumentsListPage() {
               return (
                 <Paper
                   key={doc._id}
-                  elevation={1}
                   sx={{
-                    p: 1,
+                    p: 2,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     cursor: "pointer",
-                    borderRadius: 2,
-                    transition: "0.2s",
-                    "&:hover": {
-                      boxShadow: 4,
-                      transform: "translateY(-2px)"
-                    }
                   }}
                   onClick={() => navigate(`/view/${doc._id}`)}
                 >
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    {/* Document Type Icon */}
-                    {doc.type === "presentation" ? (
-                      <SlideshowIcon color="primary" />
-                    ) : (
-                      <DescriptionIcon color="primary" />
-                    )}
+                  <Box>
+                    <Typography variant="h6">{doc.title}</Typography>
 
-                    <Box>
-                      <Typography variant="h6">{doc.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Last edited: {new Date(doc.updatedAt as string).toLocaleString()}
+                    </Typography>
 
-                      <Typography variant="body2" color="text.secondary">
-                        Last edited: {new Date(doc.updatedAt as string).toLocaleString()}
-                      </Typography>
-
-                      <Typography variant="body2" color="text.secondary">
-                        Created: {new Date(doc.createdAt as string).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  </Stack>
+                    <Typography variant="body2" color="text.secondary">
+                      Created: {new Date(doc.createdAt as string).toLocaleString()}
+                    </Typography>
+                  </Box>
 
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <IconButton
-                      disabled={!isOwner}                      
+                      disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();
                         openShareSelection(doc);

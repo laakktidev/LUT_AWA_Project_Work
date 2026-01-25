@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticateUser } from "../middleware/validateToken";
-import { lockDocument, unlockDocument } from "../controllers/documentController";
+import { lockDocument, unlockDocument } from "../controllers/documentLockController";
 
 const router = Router();
 

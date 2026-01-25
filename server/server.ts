@@ -9,7 +9,12 @@ import dotenv from "dotenv"
 import userRouter from "./src/routes/user"
 import documentRouter from "./src/routes/document"; 
 import documentLockRoutes from "./src/routes/documentLock";
-import publicRoutes from "./src/routes/public";
+//import publicRoutes from "./src/routes/public";
+
+import documentPublicRouter from "./src/routes/documentPublic";
+
+
+
 
 
 dotenv.config()
@@ -75,7 +80,8 @@ app.use("/api/document", documentRouter)
  
 app.use("/api/documentLock", documentLockRoutes);
 
-app.use("/api/public", publicRoutes);
+//app.use("/api/public", publicRoutes);
+app.use("/public", documentPublicRouter);
 
 app.use("/uploads", express.static("uploads"));
 

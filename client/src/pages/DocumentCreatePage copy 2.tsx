@@ -14,37 +14,22 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { DocumentEditor } from "../components/DocumentEditor";
 
-interface PendingImage {
-  localUrl: string;
-  file: File;
-}
-
 export default function DocumentCreatePage() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
 
-  function handleImageAdd(localUrl: string, file: File) {
-    setPendingImages((prev) => [...prev, { localUrl, file }]);
+  async function handleImageUpload(file: File): Promise<string> {
+    if (!token) throw new Error("Missing token");
+    return uploadDocumentImage("new", file, token); 
   }
 
   async function handleCreate() {
     if (!token) return;
 
-    let finalContent = content;
-
-    // 1. Upload all pending images and replace local URLs with real URLs
-    for (const { localUrl, file } of pendingImages) {
-      const uploadedUrl = await uploadDocumentImage("new", file, token);
-      finalContent = finalContent.replaceAll(localUrl, uploadedUrl);
-    }
-
-    // 2. Create document with updated content
-    const newDoc = await createDocument({ title, content: finalContent }, token);
-
+    const newDoc = await createDocument({ title, content }, token);
     navigate(`/documents/${newDoc.id}`);
   }
 
@@ -101,7 +86,7 @@ export default function DocumentCreatePage() {
         <DocumentEditor
           value={content}
           onChange={setContent}
-          onImageAdd={handleImageAdd}
+          onImageUpload={handleImageUpload}
         />
       </Box>
     </Container>

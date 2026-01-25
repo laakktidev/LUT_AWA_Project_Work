@@ -14,6 +14,7 @@ import {
 
 import RestoreFromTrashOutlinedIcon from '@mui/icons-material/RestoreFromTrashOutlined';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { useAuth } from "../context/AuthContext";
 import {
@@ -103,22 +104,28 @@ export default function TrashListPage() {
   return (
     <Container maxWidth="md">
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
         <Typography variant="h4">Trash</Typography>
 
         <Stack direction="row" spacing={2}>
           <Button
             variant="outlined"
             color="error"
-            startIcon={<DeleteForeverIcon />}
+            startIcon={
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <DeleteForeverIcon sx={{ color: "text.secondary", fontSize: 30 }} />
+              </Box>
+            }
             onClick={handleEmptyTrash}
           >
             Empty
           </Button>
 
-
-          <Button variant="outlined" onClick={() => navigate("/")}>
+          {/*<Button variant="outlined" onClick={() => navigate("/")}>
             Back to Documents
-          </Button>
+          </Button>*/}
         </Stack>
       </Stack>
 
@@ -130,7 +137,7 @@ export default function TrashListPage() {
             <Paper
               key={doc._id}
               sx={{
-                p: 2,
+                p: 1,
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -145,11 +152,11 @@ export default function TrashListPage() {
 
               <Box sx={{ display: "flex", gap: 1 }}>
                 <IconButton onClick={() => handleRestore(doc._id)}>
-                  <RestoreFromTrashOutlinedIcon />
+                  <RestoreFromTrashOutlinedIcon sx={{ color: "text.secondary", fontSize: 28 }} />
                 </IconButton>
 
                 <IconButton onClick={() => handlePermanentDelete(doc._id)}>
-                  <DeleteForeverIcon color="error" />
+                  <DeleteForeverIcon color="error" sx={{ color: "text.secondary", fontSize: 28 }} />
                 </IconButton>
               </Box>
             </Paper>
