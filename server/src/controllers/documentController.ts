@@ -25,12 +25,19 @@ export const createDocument = async (req: Request, res: Response) => {
       content: content || ""
     });
 
-    return res.status(200).json(newDoc);
+    return res.status(201).json({
+      id: newDoc._id.toString(),
+      title: newDoc.title,
+      content: newDoc.content,
+      userId: newDoc.userId.toString()
+    });
+
   } catch (err) {
     console.error("Error creating document:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 // GET ALL DOCUMENTS

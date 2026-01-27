@@ -48,10 +48,18 @@ export async function getAllDeletedDocuments(userId: string) {
 }
 
 
-// PERMANENT DELETE
+// PERMANENT DELETE ALL marked
 export async function permanentlyDeleteDocuments(userId: string) {
   return Document.deleteMany({
     userId,
     isDeleted: true
   });
 }
+
+// PERMANENT DELETE document by id
+
+export async function permanentlyDeleteDocumentById(id: string) {
+  return Document.findByIdAndDelete(id);
+}
+
+

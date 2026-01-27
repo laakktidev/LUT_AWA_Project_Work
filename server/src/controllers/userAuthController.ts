@@ -22,14 +22,23 @@ export const registerUser = async (req: Request, res: Response) => {
       return res.status(403).json({ message: "Email already in use" });
     }
 
-    await registerUserInDb(email, password, username);
+    const newUser = await registerUserInDb(email, password, username);
 
-    return res.status(201).json({ email });
+    return res.status(201).json({
+      message: "User registered successfully",
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        username: newUser.username
+      }
+    });
+
   } catch (err) {
     console.error("Register error:", err);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 export const loginUser = async (req: Request, res: Response) => {

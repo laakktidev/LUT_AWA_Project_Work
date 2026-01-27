@@ -1,6 +1,6 @@
 import { Document } from "../models/Document";
 
-export async function searchDocumentsForUser(userId: string, search: string) {
+export async function searchDocumentsInDb(userId: string, search: string) {
   return Document.find({
     isDeleted: { $ne: true },
 
