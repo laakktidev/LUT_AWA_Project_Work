@@ -340,7 +340,8 @@ export default function DocumentsListPage() {
                       <FileCopyOutlinedIcon />
                     </IconButton>
 
-                    <IconButton
+                    <IconButton 
+                      aria-label="Delete"
                       disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();

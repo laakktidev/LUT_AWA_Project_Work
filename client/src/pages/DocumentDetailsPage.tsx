@@ -123,6 +123,7 @@ export default function DocumentDetailsPage() {
             <Stack direction="row" spacing={1}>
               {canEdit && (
                 <IconButton
+                  aria-label="Edit" 
                   onClick={() => navigate(`/edit/${doc._id}`)}
                   sx={{ border: "1px solid #ccc", borderRadius: 2 }}
                 >
@@ -144,7 +145,7 @@ export default function DocumentDetailsPage() {
       </Stack>
 
       <Paper sx={{ p: 2 }}>
-        <Box
+        <Box 
           className="tiptap"
           sx={{
             fontSize: "1rem",

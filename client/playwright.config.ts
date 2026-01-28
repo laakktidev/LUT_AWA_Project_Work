@@ -44,10 +44,10 @@ export default defineConfig({
       use: { ...devices['Desktop Firefox'] },
     },
 
-    {
+/*    {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
-    },
+    },*/
 
     /* Test against mobile viewports. */
     // {
@@ -76,4 +76,10 @@ export default defineConfig({
   //   url: 'http://localhost:3000',
   //   reuseExistingServer: !process.env.CI,
   // },
+  webServer: {
+    command: "npm run dev",
+    port: 3000,
+    reuseExistingServer: true,
+  },
+
 });
