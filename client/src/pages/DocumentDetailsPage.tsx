@@ -190,6 +190,7 @@ export default function DocumentDetailsPage() {
         isPublic={doc.isPublic}
         documentId={doc._id}
         onTogglePublic={handleTogglePublic}
+        token={token}
       />
     </Container>
   );

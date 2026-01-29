@@ -45,16 +45,48 @@ export default function PublicDocumentPage() {
             {doc.title}
           </Typography>
 
-          <Typography
-            variant="body1"
+          {/* Render Tiptap HTML content */}
+          <Box
+            className="tiptap"
             sx={{
-              whiteSpace: "pre-wrap",
-              lineHeight: 1.6,
-              mt: 2
+              fontSize: "1rem",
+              lineHeight: 1.7,
+              color: "#333",
+              mt: 2,
+              "& img": {
+                maxWidth: "100%",
+                borderRadius: "6px",
+                margin: "16px 0",
+              },
+              "& h1, & h2, & h3, & h4, & h5, & h6": {
+                fontWeight: 600,
+                marginTop: "24px",
+                marginBottom: "12px",
+              },
+              "& p": {
+                marginBottom: "16px",
+              },
+              "& ul, & ol": {
+                paddingLeft: "24px",
+                marginBottom: "16px",
+              },
+              "& blockquote": {
+                borderLeft: "4px solid #90caf9",
+                paddingLeft: "16px",
+                margin: "16px 0",
+                color: "#555",
+                fontStyle: "italic",
+              },
+              "& pre": {
+                background: "#f4f4f4",
+                padding: "12px",
+                borderRadius: "6px",
+                overflowX: "auto",
+                marginBottom: "16px",
+              }
             }}
-          >
-            {doc.content}
-          </Typography>
+            dangerouslySetInnerHTML={{ __html: doc.content }}
+          />
 
           <Box sx={{ mt: 4, opacity: 0.6 }}>
             <Typography variant="caption">

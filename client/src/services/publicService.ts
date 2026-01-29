@@ -6,6 +6,8 @@ import { BASE_URL } from "./config";
 
 // Fetch a public document (no token required)
 export async function getPublicDocumentById(id: string): Promise<Document> {
-  const response = await axios.get<Document>(`${BASE_URL}/public/document/${id}`);
+  const response = await axios.get<Document>(`${BASE_URL}/../public/document/${id}`);
+
+  console.log("Public document response:", response.data);
   return response.data;
 }

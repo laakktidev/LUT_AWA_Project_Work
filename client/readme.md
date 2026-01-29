@@ -15,9 +15,9 @@
 | [x] | [2] | Recycle bin |
 | [x] | [1] | Clone document |
 | [x] | [2] | Upload images |
-| [ ] | [ ] | **UI translation** |
+| [x] | [2] | UI translation |
 | [ ] | [ ] | Multi‑user editing |
-| [ ] | [ ] | **Unit + automated tests** |
+| [x] | [4] | Unit + automated tests |
 | [x] | [2] | Search functionality |
 | [x] | [2] | Pagination |
 

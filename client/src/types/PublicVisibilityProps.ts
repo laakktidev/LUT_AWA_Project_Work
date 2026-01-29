@@ -3,4 +3,5 @@ export interface PublicVisibilityProps {
   isPublic: boolean;
   documentId: string;
   onTogglePublic: (value: boolean) => void;
+  token: string;
 }

@@ -6,11 +6,13 @@ import userRouter from "./routes/user";
 import documentRouter from "./routes/document";
 import documentLockRoutes from "./routes/documentLock";
 import documentPublicRouter from "./routes/documentPublic";
+import shareRouter from "./routes/shareRouter";
+
 
 const app = express();
 
 app.use(morgan("dev"));
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: process.env.APP_URL, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -22,6 +24,7 @@ app.use("/api/user", userRouter);
 app.use("/api/document", documentRouter);
 app.use("/api/documentLock", documentLockRoutes);
 app.use("/public", documentPublicRouter);
+app.use("/api/share", shareRouter);
 
 app.use("/uploads", express.static("uploads"));
 
