@@ -11,7 +11,10 @@ import {
   Container
 } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 export default function PublicDocumentPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const { doc, loading, error } = useDocument(id, null); // public: no token
 
@@ -20,7 +23,7 @@ export default function PublicDocumentPage() {
       <Container maxWidth="md" sx={{ mt: 6, textAlign: "center" }}>
         <CircularProgress />
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Loading public document…
+          {t("public.loading")}
         </Typography>
       </Container>
     );
@@ -29,7 +32,7 @@ export default function PublicDocumentPage() {
   if (error || !doc) {
     return (
       <Container maxWidth="md" sx={{ mt: 6 }}>
-        <Alert severity="error">Document not found or not public.</Alert>
+        <Alert severity="error">{t("public.notFound")}</Alert>
       </Container>
     );
   }
@@ -55,7 +58,7 @@ export default function PublicDocumentPage() {
 
           <Box sx={{ mt: 4, opacity: 0.6 }}>
             <Typography variant="caption">
-              Public document — read‑only
+              {t("public.readOnly")}
             </Typography>
           </Box>
         </CardContent>

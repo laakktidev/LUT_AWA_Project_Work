@@ -1,0 +1,97 @@
+{
+  "login": {
+    "title": "Kirjaudu sisään",
+    "email": "Sähköpostiosoite",
+    "password": "Salasana",
+    "button": "Kirjaudu",
+    "noAccount": "Uusi käyttäjä?",
+    "signup": "Rekisteröidy",
+    "invalidCredentials": "Virheelliset tunnukset"
+  },
+  "signup": {
+    "title": "Luo uusi käyttäjätili",
+    "username": "Käyttäjänimi",
+    "email": "Sähköpostiosoite",
+    "password": "Salasana",
+    "button": "Rekisteröidy",
+    "haveAccount": "Onko sinulla jo tili?",
+    "login": "Kirjaudu",
+    "success": "Rekisteröinti onnistui!",
+    "error": "Rekisteröinti epäonnistui"
+  },
+  "documents": {
+    "title": "Omat dokumentit",
+    "searchPlaceholder": "Haku…",
+    "new": "Uusi",
+    "trash": "Roskakori",
+    "empty": "Ei dokumentteja vielä. Luo ensimmäinen!",
+    "mustLogin": "Sinun täytyy kirjautua sisään nähdäksesi dokumentit.",
+    "goToLogin": "Siirry kirjautumaan",
+    "lastEdited": "Muokattu",
+    "created": "Luotu",
+    "sort": {
+      "nameAsc": "Nimi (A → Ö)",
+      "nameDesc": "Nimi (Ö → A)",
+      "createdNew": "Luotu (uusin)",
+      "createdOld": "Luotu (vanhin)",
+      "updatedNew": "Muokattu (uusin)",
+      "updatedOld": "Muokattu (vanhin)"
+    }
+  },
+  "details": {
+    "notFound": "Dokumenttia ei löytynyt",
+    "backToDocuments": "Takaisin dokumentteihin",
+    "edit": "Muokkaa",
+    "download": "Lataa"
+  },
+  "create": {
+    "titlePlaceholder": "Dokumentin otsikko",
+    "button": "Luo"
+  },
+  "edit": {
+    "loading": "Ladataan…",
+    "titlePlaceholder": "Dokumentin otsikko",
+    "save": "Tallenna"
+  },
+  "public": {
+    "loading": "Julkista dokumenttia ladataan…",
+    "notFound": "Dokumenttia ei löytynyt tai se ei ole julkinen.",
+    "readOnly": "Julkinen dokumentti — vain luku"
+  },
+  "profile": {
+    "title": "Profiilini",
+    "name": "Nimi",
+    "email": "Sähköposti"
+  },
+  "trash": {
+    "title": "Roskakori",
+    "empty": "Tyhjennä",
+    "emptyMessage": "Roskakori on tyhjä.",
+    "deleted": "Poistettu",
+    "mustLogin": "Sinun täytyy kirjautua sisään nähdäksesi roskakorin.",
+    "loadError": "Roskakorin lataaminen epäonnistui",
+    "confirmEmpty": "Haluatko varmasti poistaa pysyvästi KAIKKI roskakorin kohteet?"
+  },
+  "editor": {
+    "bold": "Lihavointi",
+    "italic": "Kursivointi",
+    "bulletList": "Luettelomerkit",
+    "numberedList": "Numeroitu lista",
+    "insertImage": "Lisää kuva"
+  },
+  "profilePic": {
+    "choose": "Valitse kuva",
+    "upload": "Lataa"
+  },
+  "visibility": {
+    "public": "Julkinen dokumentti",
+    "private": "Yksityinen dokumentti",
+    "copied": "Kopioitu"
+  },
+  "share": {
+    "title": "Valitse muokkaajat",
+    "search": "Hae käyttäjiä...",
+    "cancel": "Peruuta",
+    "confirm": "Jaa"
+  }
+}

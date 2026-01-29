@@ -1,0 +1,97 @@
+{
+  "login": {
+    "title": "Log in to your account",
+    "email": "E-mail address",
+    "password": "Password",
+    "button": "Login",
+    "noAccount": "New to us?",
+    "signup": "Sign Up",
+    "invalidCredentials": "Invalid credentials"
+  },
+  "signup": {
+    "title": "Create your account",
+    "username": "Username",
+    "email": "E-mail address",
+    "password": "Password",
+    "button": "Sign Up",
+    "haveAccount": "Already have an account?",
+    "login": "Login",
+    "success": "Registration successful!",
+    "error": "Signup failed"
+  },
+  "documents": {
+    "title": "My Documents",
+    "searchPlaceholder": "Search…",
+    "new": "New",
+    "trash": "Trash",
+    "empty": "No documents yet. Create your first one!",
+    "mustLogin": "You must be logged in to view documents.",
+    "goToLogin": "Go to Login",
+    "lastEdited": "Last edited",
+    "created": "Created",
+    "sort": {
+      "nameAsc": "Name (A → Z)",
+      "nameDesc": "Name (Z → A)",
+      "createdNew": "Created (newest)",
+      "createdOld": "Created (oldest)",
+      "updatedNew": "Last edited (newest)",
+      "updatedOld": "Last edited (oldest)"
+    }
+  },
+  "details": {
+    "notFound": "Document not found",
+    "backToDocuments": "Back to documents",
+    "edit": "Edit",
+    "download": "Download"
+  },
+  "create": {
+    "titlePlaceholder": "Document title",
+    "button": "Create"
+  },
+  "edit": {
+    "loading": "Loading…",
+    "titlePlaceholder": "Document title",
+    "save": "Save"
+  },
+  "public": {
+    "loading": "Loading public document…",
+    "notFound": "Document not found or not public.",
+    "readOnly": "Public document — read‑only"
+  },
+  "profile": {
+    "title": "My Profile",
+    "name": "Name",
+    "email": "Email"
+  },
+  "trash": {
+    "title": "Trash",
+    "empty": "Empty",
+    "emptyMessage": "Trash is empty.",
+    "deleted": "Deleted",
+    "mustLogin": "You must be logged in to view trash.",
+    "loadError": "Failed to load trash",
+    "confirmEmpty": "Are you sure you want to permanently delete ALL items in Trash?"
+  },
+  "editor": {
+    "bold": "Bold",
+    "italic": "Italic",
+    "bulletList": "Bullet List",
+    "numberedList": "Numbered List",
+    "insertImage": "Insert Image"
+  },
+  "profilePic": {
+    "choose": "Choose Image",
+    "upload": "Upload"
+  },
+  "visibility": {
+    "public": "Public document",
+    "private": "Private document",
+    "copied": "Copied"
+  },
+  "share": {
+    "title": "Select editors",
+    "search": "Search users...",
+    "cancel": "Cancel",
+    "confirm": "Share"
+  }
+}

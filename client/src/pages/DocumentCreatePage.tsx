@@ -13,6 +13,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import { DocumentEditor } from "../components/DocumentEditor";
+import { useTranslation } from "react-i18next";
 
 interface PendingImage {
   localUrl: string;
@@ -20,6 +21,7 @@ interface PendingImage {
 }
 
 export default function DocumentCreatePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useAuth();
 
@@ -36,15 +38,12 @@ export default function DocumentCreatePage() {
 
     let finalContent = content;
 
-    // 1. Upload all pending images and replace local URLs with real URLs
     for (const { localUrl, file } of pendingImages) {
       const uploadedUrl = await uploadDocumentImage("new", file, token);
       finalContent = finalContent.replaceAll(localUrl, uploadedUrl);
     }
 
-    // 2. Create document with updated content
     const newDoc = await createDocument({ title, content: finalContent }, token);
-
     navigate(`/documents/${newDoc.id}`);
   }
 
@@ -67,7 +66,7 @@ export default function DocumentCreatePage() {
         <TextField
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Document title"
+          placeholder={t("create.titlePlaceholder")}
           variant="outlined"
           size="small"
           sx={{
@@ -92,7 +91,7 @@ export default function DocumentCreatePage() {
           onClick={handleCreate}
           disabled={!title.trim()}
         >
-          Create
+          {t("create.button")}
         </Button>
       </Box>
 

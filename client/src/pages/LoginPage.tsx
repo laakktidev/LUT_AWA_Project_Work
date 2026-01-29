@@ -17,8 +17,11 @@ import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import { loginUser } from "../services/userService";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -28,7 +31,7 @@ export default function LoginPage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { login } = useAuth();   // ← global login function
+  const { login } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -44,13 +47,11 @@ export default function LoginPage() {
     const data = await loginUser(email, password);
 
     if (!data) {
-      console.log("Invalid credentials");
+      console.log(t("login.invalidCredentials"));
       return;
     }
 
-    // Call global login()
     login(data.token, data.user);
-
     navigate("/");
   }
 
@@ -72,7 +73,7 @@ export default function LoginPage() {
       >
         <Box sx={{ textAlign: "center", mb: 3 }}>
           <Typography variant="h5" fontWeight="bold">
-            Log-in to your account
+            {t("login.title")}
           </Typography>
         </Box>
 
@@ -82,7 +83,7 @@ export default function LoginPage() {
 
           <TextField
             fullWidth
-            label="E-mail address"
+            label={t("login.email")}
             margin="normal"
             slotProps={{
               input: {
@@ -99,7 +100,7 @@ export default function LoginPage() {
 
           <TextField
             fullWidth
-            label="Password"
+            label={t("login.password")}
             type="password"
             margin="normal"
             slotProps={{
@@ -116,15 +117,15 @@ export default function LoginPage() {
           />
 
           <Button fullWidth variant="contained" sx={{ mt: 3 }} type="submit">
-            Login
+            {t("login.button")}
           </Button>
         </form>
 
         <Box sx={{ textAlign: "center", mt: 2 }}>
           <Typography variant="body2">
-            New to us?{" "}
-            <Link component={RouterLink} to="/signup" underline="hover" color="primary">
-              Sign Up
+            {t("login.noAccount")}{" "}
+            <Link component={RouterLink} to="/signup" underline="hover" color="inherit">
+              {t("login.signup")}
             </Link>
           </Typography>
         </Box>

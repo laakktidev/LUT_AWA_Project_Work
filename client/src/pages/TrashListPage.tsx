@@ -25,8 +25,10 @@ import {
 } from "../services/documentService";
 
 import { Document } from "../types/Document";
+import { useTranslation } from "react-i18next";
 
 export default function TrashListPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useAuth();
 
@@ -41,7 +43,7 @@ export default function TrashListPage() {
       const data = await getTrashDocuments(token);
       setDocs(data);
     } catch (err: any) {
-      setError("Failed to load trash");
+      setError(t("trash.loadError"));
     } finally {
       setLoading(false);
     }
@@ -62,9 +64,7 @@ export default function TrashListPage() {
   async function handleEmptyTrash() {
     if (!token) return;
 
-    const ok = window.confirm(
-      "Are you sure you want to permanently delete ALL items in Trash?"
-    );
+    const ok = window.confirm(t("trash.confirmEmpty"));
     if (!ok) return;
 
     await emptyTrash(token);
@@ -78,7 +78,7 @@ export default function TrashListPage() {
   if (!token) {
     return (
       <Container maxWidth="md">
-        <Alert severity="warning">You must be logged in to view trash.</Alert>
+        <Alert severity="warning">{t("trash.mustLogin")}</Alert>
       </Container>
     );
   }
@@ -107,7 +107,8 @@ export default function TrashListPage() {
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h4">Trash</Typography>
+
+        <Typography variant="h4">{t("trash.title")}</Typography>
 
         <Stack direction="row" spacing={2}>
           <Button
@@ -120,17 +121,13 @@ export default function TrashListPage() {
             }
             onClick={handleEmptyTrash}
           >
-            Empty
+            {t("trash.empty")}
           </Button>
-
-          {/*<Button variant="outlined" onClick={() => navigate("/")}>
-            Back to Documents
-          </Button>*/}
         </Stack>
       </Stack>
 
       {docs.length === 0 ? (
-        <Alert severity="info">Trash is empty.</Alert>
+        <Alert severity="info">{t("trash.emptyMessage")}</Alert>
       ) : (
         <Stack spacing={2}>
           {docs.map((doc) => (
@@ -146,7 +143,7 @@ export default function TrashListPage() {
               <Box>
                 <Typography variant="h6">{doc.title}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Deleted: {new Date(doc.deletedAt!).toLocaleString()}
+                  {t("trash.deleted")}: {new Date(doc.deletedAt!).toLocaleString()}
                 </Typography>
               </Box>
 

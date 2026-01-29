@@ -19,9 +19,10 @@ import { useDocument } from "../hooks/useDocument";
 import PublicVisibilitySection from "../components/PublicVisibilitySection";
 import { updateDocumentVisibility, downloadPdf } from "../services/documentService";
 import { useAuth } from "../context/AuthContext";
-
+import { useTranslation } from "react-i18next";
 
 export default function DocumentDetailsPage() {
+  const { t } = useTranslation();
   const { token, user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -39,7 +40,6 @@ export default function DocumentDetailsPage() {
   };
 
   async function handleDownload() {
-
     if (!token || !doc) return;
 
     const blob = await downloadPdf(doc._id, token);
@@ -52,7 +52,6 @@ export default function DocumentDetailsPage() {
 
     window.URL.revokeObjectURL(url);
   }
-
 
   if (loading) {
     return (
@@ -67,10 +66,10 @@ export default function DocumentDetailsPage() {
   if (error || !doc) {
     return (
       <Container maxWidth="md">
-        <Alert severity="error">{error || "Document not found"}</Alert>
+        <Alert severity="error">{error || t("details.notFound")}</Alert>
         <Box mt={2}>
           <Button variant="outlined" onClick={() => navigate("/")}>
-            Back to documents
+            {t("details.backToDocuments")}
           </Button>
         </Box>
       </Container>
@@ -85,13 +84,12 @@ export default function DocumentDetailsPage() {
         alignItems="center"
         mb={2}
       >
-
         {/* Full-width top bar */}
         <Box
           sx={{
             width: "100%",
             borderBottom: "1px solid #e0e0e0",
-            backgroundColor: "#f5f7fa", 
+            backgroundColor: "#f5f7fa",
             boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
             mb: 2,
           }}
@@ -123,7 +121,7 @@ export default function DocumentDetailsPage() {
             <Stack direction="row" spacing={1}>
               {canEdit && (
                 <IconButton
-                  aria-label="Edit" 
+                  aria-label={t("details.edit")}
                   onClick={() => navigate(`/edit/${doc._id}`)}
                   sx={{ border: "1px solid #ccc", borderRadius: 2 }}
                 >
@@ -134,6 +132,7 @@ export default function DocumentDetailsPage() {
               <IconButton
                 onClick={handleDownload}
                 disabled={!doc}
+                aria-label={t("details.download")}
                 sx={{ border: "1px solid #ccc", borderRadius: 2 }}
               >
                 <DownloadIcon />
@@ -141,38 +140,32 @@ export default function DocumentDetailsPage() {
             </Stack>
           </Box>
         </Box>
-
       </Stack>
 
       <Paper sx={{ p: 2 }}>
-        <Box 
+        <Box
           className="tiptap"
           sx={{
             fontSize: "1rem",
             lineHeight: 1.7,
             color: "#333",
-
             "& img": {
               maxWidth: "100%",
               borderRadius: "6px",
               margin: "16px 0",
             },
-
             "& h1, & h2, & h3, & h4, & h5, & h6": {
               fontWeight: 600,
               marginTop: "24px",
               marginBottom: "12px",
             },
-
             "& p": {
               marginBottom: "16px",
             },
-
             "& ul, & ol": {
               paddingLeft: "24px",
               marginBottom: "16px",
             },
-
             "& blockquote": {
               borderLeft: "4px solid #90caf9",
               paddingLeft: "16px",
@@ -180,7 +173,6 @@ export default function DocumentDetailsPage() {
               color: "#555",
               fontStyle: "italic",
             },
-
             "& pre": {
               background: "#f4f4f4",
               padding: "12px",
@@ -192,7 +184,6 @@ export default function DocumentDetailsPage() {
           dangerouslySetInnerHTML={{ __html: doc.content }}
         />
       </Paper>
-
 
       <PublicVisibilitySection
         isOwner={isOwner}

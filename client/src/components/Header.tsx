@@ -1,10 +1,13 @@
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Link, useNavigate } from "react-router-dom";
 import { useColorScheme } from "@mui/material/styles";
 import { useAuth } from "../context/AuthContext";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+
 
 export default function Header() {
   const { mode, setMode } = useColorScheme();
@@ -22,8 +25,8 @@ export default function Header() {
               Logged in as: <strong>{user.username}</strong>
             </Typography>
           )}
-          
-          <Button color="inherit" component={Link} to="/profile" sx={{ marginRight: 2 }}>  
+
+          <Button color="inherit" component={Link} to="/profile" sx={{ marginRight: 2 }}>
             Profile
           </Button>
 
@@ -42,6 +45,10 @@ export default function Header() {
           <Button color="inherit" component={Link} to="/create">
             Create
           </Button>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
+            <LanguageSwitcher/>
+          </Box>
+
 
           {!token && (
             <>

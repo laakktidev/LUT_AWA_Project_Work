@@ -25,7 +25,6 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import SlideshowIcon from "@mui/icons-material/Slideshow";
 import SearchIcon from "@mui/icons-material/Search";
 
-
 import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
 import {
@@ -40,8 +39,10 @@ import { ShareDialog } from "../components/ShareDialog";
 import { User } from "../types/User";
 import { Document } from "../types/Document";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "react-i18next";
 
 export default function DocumentsListPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, user } = useAuth();
 
@@ -131,10 +132,10 @@ export default function DocumentsListPage() {
   if (!token) {
     return (
       <Container maxWidth="md">
-        <Alert severity="warning">You must be logged in to view documents.</Alert>
+        <Alert severity="warning">{t("documents.mustLogin")}</Alert>
         <Box mt={2}>
           <Button variant="contained" onClick={() => navigate("/login")}>
-            Go to Login
+            {t("documents.goToLogin")}
           </Button>
         </Box>
       </Container>
@@ -184,7 +185,6 @@ export default function DocumentsListPage() {
   const end = start + pageSize;
   const paginatedDocs = docsToShow.slice(start, end);
 
-
   return (
     <Container maxWidth="md" sx={{ pt: 0, pb: 0 }}>
       <ShareDialog
@@ -200,33 +200,32 @@ export default function DocumentsListPage() {
       {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" fontWeight={600}>
-          My Documents
+          {t("documents.title")}
         </Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
           {/* Search */}
           <TextField
-  size="small"
-  placeholder="Search…"
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-  sx={{ width: 220 }}
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <SearchIcon sx={{ color: "text.secondary" }} />
-      </InputAdornment>
-    ),
-    endAdornment: search.length > 0 && (
-      <InputAdornment position="end">
-        <IconButton onClick={() => setSearch("")} edge="end">
-          <ClearIcon />
-        </IconButton>
-      </InputAdornment>
-    )
-  }}
-/>
-
+            size="small"
+            placeholder={t("documents.searchPlaceholder")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            sx={{ width: 220 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+              endAdornment: search.length > 0 && (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setSearch("")} edge="end">
+                    <ClearIcon />
+                  </IconButton>
+                </InputAdornment>
+              )
+            }}
+          />
 
           {/* Sort */}
           <TextField
@@ -236,25 +235,23 @@ export default function DocumentsListPage() {
             onChange={(e) => setSortBy(e.target.value as any)}
             sx={{ width: 180 }}
           >
-            <MenuItem value="name-asc">Name (A → Z)</MenuItem>
-            <MenuItem value="name-desc">Name (Z → A)</MenuItem>
-            <MenuItem value="created-desc">Created (newest)</MenuItem>
-            <MenuItem value="created-asc">Created (oldest)</MenuItem>
-            <MenuItem value="updated-desc">Last edited (newest)</MenuItem>
-            <MenuItem value="updated-asc">Last edited (oldest)</MenuItem>
+            <MenuItem value="name-asc">{t("documents.sort.nameAsc")}</MenuItem>
+            <MenuItem value="name-desc">{t("documents.sort.nameDesc")}</MenuItem>
+            <MenuItem value="created-desc">{t("documents.sort.createdNew")}</MenuItem>
+            <MenuItem value="created-asc">{t("documents.sort.createdOld")}</MenuItem>
+            <MenuItem value="updated-desc">{t("documents.sort.updatedNew")}</MenuItem>
+            <MenuItem value="updated-asc">{t("documents.sort.updatedOld")}</MenuItem>
           </TextField>
 
           {/* New Document */}
-          
           <Button
             variant="outlined"
             color="success"
             startIcon={<NoteAddIcon />}
             onClick={() => navigate("/create")}
           >
-            New
+            {t("documents.new")}
           </Button>
-
 
           {/* Trash */}
           {trashCount > 0 && (
@@ -264,7 +261,7 @@ export default function DocumentsListPage() {
               startIcon={<DeleteIcon />}
               onClick={() => navigate("/trash")}
             >
-              Trash
+              {t("documents.trash")}
             </Button>
           )}
         </Stack>
@@ -272,7 +269,7 @@ export default function DocumentsListPage() {
 
       {/* Document List */}
       {docsToShow.length === 0 ? (
-        <Alert severity="info">No documents yet. Create your first one!</Alert>
+        <Alert severity="info">{t("documents.empty")}</Alert>
       ) : (
         <>
           <Stack spacing={2}>
@@ -299,7 +296,6 @@ export default function DocumentsListPage() {
                   onClick={() => navigate(`/view/${doc._id}`)}
                 >
                   <Stack direction="row" spacing={2} alignItems="center">
-                    {/* Document Type Icon */}
                     {doc.type === "presentation" ? (
                       <SlideshowIcon color="primary" />
                     ) : (
@@ -310,18 +306,20 @@ export default function DocumentsListPage() {
                       <Typography variant="h6">{doc.title}</Typography>
 
                       <Typography variant="body2" color="text.secondary">
-                        Last edited: {new Date(doc.updatedAt as string).toLocaleString()}
+                        {t("documents.lastEdited")}:{" "}
+                        {new Date(doc.updatedAt as string).toLocaleString()}
                       </Typography>
 
                       <Typography variant="body2" color="text.secondary">
-                        Created: {new Date(doc.createdAt as string).toLocaleString()}
+                        {t("documents.created")}:{" "}
+                        {new Date(doc.createdAt as string).toLocaleString()}
                       </Typography>
                     </Box>
                   </Stack>
 
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <IconButton
-                      disabled={!isOwner}                      
+                      disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();
                         openShareSelection(doc);
@@ -340,7 +338,7 @@ export default function DocumentsListPage() {
                       <FileCopyOutlinedIcon />
                     </IconButton>
 
-                    <IconButton 
+                    <IconButton
                       aria-label="Delete"
                       disabled={!isOwner}
                       onClick={(e) => {

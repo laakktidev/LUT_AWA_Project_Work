@@ -4,6 +4,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { PublicVisibilityProps } from "../types/PublicVisibilityProps";
+import { useTranslation } from "react-i18next";
 
 export default function PublicVisibilitySection({
   isOwner,
@@ -11,6 +12,7 @@ export default function PublicVisibilitySection({
   documentId,
   onTogglePublic
 }: PublicVisibilityProps) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   if (!isOwner) return null;
@@ -36,7 +38,7 @@ export default function PublicVisibilitySection({
         {isPublic ? <PublicIcon color="success" /> : <LockIcon color="action" />}
 
         <Typography variant="h6">
-          {isPublic ? "Public document" : "Private document"}
+          {isPublic ? t("visibility.public") : t("visibility.private")}
         </Typography>
 
         <Switch
@@ -66,7 +68,7 @@ export default function PublicVisibilitySection({
 
             {copied && (
               <Typography variant="body2" color="success.main">
-                Copied
+                {t("visibility.copied")}
               </Typography>
             )}
           </Box>

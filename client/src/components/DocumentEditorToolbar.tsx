@@ -7,12 +7,16 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import ImageIcon from "@mui/icons-material/Image";
 
+import { useTranslation } from "react-i18next";
+
 interface Props {
   editor: Editor | null;
-  onImageAddRequest: () => void; // NEW callback name
+  onImageAddRequest: () => void;
 }
 
 export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
+  const { t } = useTranslation();
+
   if (!editor) return null;
 
   return (
@@ -27,7 +31,7 @@ export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
         backgroundColor: "#fafafa",
       }}
     >
-      <Tooltip title="Bold">
+      <Tooltip title={t("editor.bold")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           color={editor.isActive("bold") ? "primary" : "default"}
@@ -36,7 +40,7 @@ export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Italic">
+      <Tooltip title={t("editor.italic")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
           color={editor.isActive("italic") ? "primary" : "default"}
@@ -45,7 +49,7 @@ export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Bullet List">
+      <Tooltip title={t("editor.bulletList")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           color={editor.isActive("bulletList") ? "primary" : "default"}
@@ -54,7 +58,7 @@ export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
         </IconButton>
       </Tooltip>
 
-      <Tooltip title="Numbered List">
+      <Tooltip title={t("editor.numberedList")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           color={editor.isActive("orderedList") ? "primary" : "default"}
@@ -63,8 +67,7 @@ export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
         </IconButton>
       </Tooltip>
 
-      {/* Image button */}
-      <Tooltip title="Insert Image">
+      <Tooltip title={t("editor.insertImage")}>
         <IconButton onClick={onImageAddRequest}>
           <ImageIcon />
         </IconButton>

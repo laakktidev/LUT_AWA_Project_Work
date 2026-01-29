@@ -12,6 +12,7 @@ import {
   TextField
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useTranslation } from "react-i18next";
 
 interface PendingImage {
   localUrl: string;
@@ -19,6 +20,7 @@ interface PendingImage {
 }
 
 export default function DocumentEditPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
@@ -27,7 +29,6 @@ export default function DocumentEditPage() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Store images added during editing
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
 
   useEffect(() => {
@@ -43,7 +44,6 @@ export default function DocumentEditPage() {
     load();
   }, [id, token]);
 
-  // Called by DocumentEditor when user inserts an image
   function handleImageAdd(localUrl: string, file: File) {
     setPendingImages((prev) => [...prev, { localUrl, file }]);
   }
@@ -53,23 +53,20 @@ export default function DocumentEditPage() {
 
     let finalContent = content;
 
-    // 1. Upload all pending images and replace blob URLs
     for (const { localUrl, file } of pendingImages) {
       const uploadedUrl = await uploadDocumentImage(id, file, token);
       finalContent = finalContent.replaceAll(localUrl, uploadedUrl);
     }
 
-    // 2. Save updated document
     await updateDocument(id, { title, content: finalContent }, token);
 
     navigate(`/documents/${id}`);
   }
 
-  if (loading) return <div>Loading…</div>;
+  if (loading) return <div>{t("edit.loading")}</div>;
 
   return (
     <Container maxWidth="md">
-      {/* Sticky top bar */}
       <Box
         display="flex"
         alignItems="center"
@@ -90,7 +87,7 @@ export default function DocumentEditPage() {
         <TextField
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Document title"
+          placeholder={t("edit.titlePlaceholder")}
           variant="outlined"
           size="small"
           sx={{
@@ -111,11 +108,10 @@ export default function DocumentEditPage() {
         />
 
         <Button variant="contained" onClick={handleSave}>
-          Save
+          {t("edit.save")}
         </Button>
       </Box>
 
-      {/* Editor */}
       <Box p={1}>
         <DocumentEditor
           value={content}

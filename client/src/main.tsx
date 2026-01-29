@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
+import "./i18n";
+
 
 const Root = () => {
   const theme = createTheme({
