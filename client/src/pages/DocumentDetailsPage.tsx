@@ -189,8 +189,8 @@ export default function DocumentDetailsPage() {
         isOwner={isOwner}
         isPublic={doc.isPublic}
         documentId={doc._id}
-        onTogglePublic={handleTogglePublic}
-        token={token}
+        docTitle={doc.title}
+        onTogglePublic={handleTogglePublic}        
       />
     </Container>
   );

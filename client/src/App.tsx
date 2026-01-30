@@ -14,6 +14,11 @@ import ProfilePage from "./pages//ProfilePage";
 import { useAuth } from "./context/AuthContext";
 import TrashListPage from "./pages/TrashListPage";
 
+import SlideShowPage from "./pages/SlideShowPage";
+import SlideEditorPage from "./pages/SlideEditorPage";
+
+
+
 export default function App() {
   const { token, loading } = useAuth();
 
@@ -42,6 +47,12 @@ export default function App() {
           <Route path="/edit/:id" element={<DocumentEditPage />} />
           <Route path="/trash" element={<TrashListPage />} />
           <Route path="/profile" element={<ProfilePage />} />
+          
+          
+          <Route path="/slides/new" element={<SlideEditorPage />} />
+          <Route path="/slides/:id/edit" element={<SlideEditorPage />} />
+          <Route path="/slides/:id/show" element={<SlideShowPage />} />
+
         </Route>
 
         {/* FALLBACK */}

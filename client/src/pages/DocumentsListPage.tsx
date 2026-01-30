@@ -253,6 +253,16 @@ export default function DocumentsListPage() {
             {t("documents.new")}
           </Button>
 
+          {/* New SlideShow */}
+          <Button
+            variant="outlined"
+            color="success"
+            startIcon={<NoteAddIcon />}
+            onClick={() => navigate("/slides/new")}
+          >
+            {t("documents.new")}
+          </Button>
+
           {/* Trash */}
           {trashCount > 0 && (
             <Button

@@ -4,25 +4,26 @@ import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import { SendEmailDialog } from "./SendEmailDialog";
+import SendEmailDialog from "./SendEmailDialog";
 
 import { PublicVisibilityProps } from "../types/PublicVisibilityProps";
 import { useTranslation } from "react-i18next";
-import { sendPublicLink } from "../services/shareService";
+//import { sendPublicLink } from "../services/shareService";
 
 export default function PublicVisibilitySection({
   isOwner,
   isPublic,
   documentId,
+  docTitle,
   onTogglePublic,
-  token
+  //token
 }: PublicVisibilityProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
-  
+
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+  //const [loading, setLoading] = useState(false);
 
 
   if (!isOwner) return null;
@@ -33,19 +34,6 @@ export default function PublicVisibilitySection({
     navigator.clipboard.writeText(publicUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
-  };
-
-  
-  const handleSendEmail = async (email: string) => {
-    try {
-      setLoading(true);
-      await sendPublicLink(documentId, email, token);
-      setEmailDialogOpen(false);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
 
@@ -108,9 +96,10 @@ export default function PublicVisibilitySection({
       <SendEmailDialog
         open={emailDialogOpen}
         onClose={() => setEmailDialogOpen(false)}
-        onSend={handleSendEmail}
-        loading={loading}
+        publicUrl={publicUrl}
+        documentTitle={docTitle}
       />
+
     </Box>
   );
 }
