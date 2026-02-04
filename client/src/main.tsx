@@ -23,10 +23,10 @@ const Root = () => {
 
       dark: {
         palette: {
-          primary: { main: "#0000FF" },
+          primary: { main: "#2dd4bf" },
           background: {
             default: "#0d1117",
-            paper: "#161b22",
+            paper:  "#161b22",
           },
         },
       },
@@ -60,8 +60,6 @@ const Root = () => {
       },
     },
   });
-
-
 
   return (
     <AuthProvider>

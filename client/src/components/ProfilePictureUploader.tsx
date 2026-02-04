@@ -41,13 +41,13 @@ export function ProfilePictureUploader({ token, currentPicture, onUploaded }) {
                 sx={{ width: 120, height: 120 }}
             />
 
-            <Button variant="outlined" component="label">
+            <Button variant="outlined"  color="inherit" component="label">
                 {t("profilePic.choose")}
                 <input type="file" hidden accept="image/*" onChange={handleSelect} />
             </Button>
 
             {file && (
-                <Button variant="contained" onClick={handleUpload}>
+                <Button variant="contained"onClick={handleUpload}>
                     {t("profilePic.upload")}
                 </Button>
             )}

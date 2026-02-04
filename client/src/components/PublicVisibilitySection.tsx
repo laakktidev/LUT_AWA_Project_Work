@@ -1,14 +1,21 @@
 import { useState } from "react";
-import { Box, Switch, Typography, IconButton, Tooltip } from "@mui/material";
+import {
+  Box,
+  Switch,
+  Typography,
+  IconButton,
+  Tooltip,
+  Paper,
+} from "@mui/material";
+
 import PublicIcon from "@mui/icons-material/Public";
 import LockIcon from "@mui/icons-material/Lock";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
-import SendEmailDialog from "./SendEmailDialog";
 
+import SendEmailDialog from "./SendEmailDialog";
 import { PublicVisibilityProps } from "../types/PublicVisibilityProps";
 import { useTranslation } from "react-i18next";
-//import { sendPublicLink } from "../services/shareService";
 
 export default function PublicVisibilitySection({
   isOwner,
@@ -16,15 +23,10 @@ export default function PublicVisibilitySection({
   documentId,
   docTitle,
   onTogglePublic,
-  //token
 }: PublicVisibilityProps) {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
-
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
-
-  //const [loading, setLoading] = useState(false);
-
 
   if (!isOwner) return null;
 
@@ -36,18 +38,28 @@ export default function PublicVisibilitySection({
     setTimeout(() => setCopied(false), 1500);
   };
 
-
   return (
-    <Box sx={{ border: "1px solid #ddd", borderRadius: 2, p: 2, mt: 2 }}>
+    <Paper
+      elevation={1}
+      sx={{
+        p: 2,
+        mt: 2,
+        borderRadius: 2,
+      }}
+    >
       <Box
         sx={{
           display: "flex",
           alignItems: "center",
           gap: 1,
-          flexWrap: "wrap"
+          flexWrap: "wrap",
         }}
       >
-        {isPublic ? <PublicIcon color="success" /> : <LockIcon color="action" />}
+        {isPublic ? (
+          <PublicIcon color="success" />
+        ) : (
+          <LockIcon color="action" />
+        )}
 
         <Typography variant="h6">
           {isPublic ? t("visibility.public") : t("visibility.private")}
@@ -59,18 +71,22 @@ export default function PublicVisibilitySection({
         />
 
         {isPublic && (
-          <Box
+          <Paper
+            variant="outlined"
             sx={{
               display: "flex",
               alignItems: "center",
               gap: 1,
-              backgroundColor: "#fafafa",
+              px: 1,
+              py: 0.5,
+              ml: 1,
               borderRadius: 1,
-              padding: "4px 8px",
-              ml: 1
             }}
           >
-            <Typography variant="body2" sx={{ wordBreak: "break-all" }}>
+            <Typography
+              variant="body2"
+              sx={{ wordBreak: "break-all" }}
+            >
               {publicUrl}
             </Typography>
 
@@ -89,7 +105,7 @@ export default function PublicVisibilitySection({
                 {t("visibility.copied")}
               </Typography>
             )}
-          </Box>
+          </Paper>
         )}
       </Box>
 
@@ -99,8 +115,6 @@ export default function PublicVisibilitySection({
         publicUrl={publicUrl}
         documentTitle={docTitle}
       />
-
-    </Box>
+    </Paper>
   );
 }
-

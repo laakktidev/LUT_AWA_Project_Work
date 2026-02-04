@@ -1,0 +1,53 @@
+/* Editor content */
+.tiptap.ProseMirror {
+  background: transparent !important;
+  color: var(--mui-text-primary) !important;
+}
+
+/* Paragraphs, lists, headings */
+.tiptap.ProseMirror p,
+.tiptap.ProseMirror li,
+.tiptap.ProseMirror h1,
+.tiptap.ProseMirror h2,
+.tiptap.ProseMirror h3,
+.tiptap.ProseMirror h4,
+.tiptap.ProseMirror h5,
+.tiptap.ProseMirror h6 {
+  color: var(--mui-text-primary) !important;
+}
+
+/* Code blocks */
+.tiptap.ProseMirror pre {
+  background: var(--mui-background-paper) !important;
+  color: var(--mui-text-primary) !important;
+}
+
+/* Blockquote */
+.tiptap.ProseMirror blockquote {
+  border-left: 4px solid var(--mui-primary-light) !important;
+  color: var(--mui-text-secondary) !important;
+}
+
+/* Toolbar container */
+.tiptap-toolbar {
+  background: var(--mui-background-paper) !important;
+  border: 1px solid var(--mui-divider) !important;
+}
+
+/* Toolbar buttons */
+.tiptap-toolbar button {
+  color: var(--mui-text-primary) !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Active button */
+.tiptap-toolbar button.is-active {
+  background: var(--mui-primary-light) !important;
+  color: var(--mui-background-paper) !important;
+}
+
+/* Hover */
+.tiptap-toolbar button:hover {
+  background: var(--mui-action-hover) !important;
+}

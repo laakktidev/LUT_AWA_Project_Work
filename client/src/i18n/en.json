@@ -93,5 +93,35 @@
     "search": "Search users...",
     "cancel": "Cancel",
     "confirm": "Share"
+  },
+  "presentations": {
+    "title": "Presentations",
+    "new": "New Presentation",
+    "empty": "No presentations yet.",
+    "searchPlaceholder": "Search presentations...",
+    "sort": {
+      "nameAsc": "Name (A–Z)",
+      "nameDesc": "Name (Z–A)",
+      "createdNew": "Created (newest first)",
+      "createdOld": "Created (oldest first)",
+      "updatedNew": "Updated (newest first)",
+      "updatedOld": "Updated (oldest first)"
+    },
+    "edit": {
+      "title": "Edit Presentation",
+      "back": "Back to list",
+      "titleLabel": "Presentation Title",
+      "loading": "Loading presentation…",
+      "saving": "Saving...",
+      "saveChanges": "Save Changes"
+    },
+    "editor": {
+      "slideCounter": "Slide {{current}} / {{total}}",
+      "slideTitle": "Slide Title",
+      "bulletLabel": "Bullet {{number}}",
+      "addBullet": "Add Bullet",
+      "deleteSlide": "Delete Slide",
+      "addSlide": "Add Slide"
+    }
   }
 }

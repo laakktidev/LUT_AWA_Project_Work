@@ -31,25 +31,25 @@ const SlideSchema = new Schema<ISlide>({
   },
 });
 
-const SlideDeckSchema = new Schema<ISlideDeck>({
-  title: {
-    type: String,
-    required: true,
+const SlideDeckSchema = new Schema<ISlideDeck>(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    slides: {
+      type: [SlideSchema],
+      default: [],
+    },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    }
   },
-  slides: {
-    type: [SlideSchema],
-    default: [],
-  },
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true }   // ⭐ enables createdAt + updatedAt automatically
+);
+
 
 /* -----------------------------
    3. Export Model

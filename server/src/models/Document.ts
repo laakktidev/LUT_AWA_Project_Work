@@ -5,7 +5,7 @@ interface IDocument extends Document {
   editors: mongoose.Types.ObjectId[];
   title: string;
   content: string;
-  type: "text" | "presentation";
+  type: "presentation" | "document";
   createdAt: Date;
   updatedAt: Date;
   isPublic: boolean;
@@ -16,7 +16,6 @@ interface IDocument extends Document {
     lockedBy: mongoose.Types.ObjectId | null;
   };
 }
-
 
 const DocumentSchema = new Schema<IDocument>(
   {
@@ -44,9 +43,8 @@ const DocumentSchema = new Schema<IDocument>(
     },
     type: {
       type: String,
-      enum: ["text", "presentation"],
-      required: true,
-      default: "text"
+      enum: ["presentation", "document"],
+      default: "document",
     },
 
     lock: {

@@ -3,11 +3,12 @@ import cors from "cors";
 import morgan from "morgan";
 
 import userRouter from "./routes/user";
-import documentRouter from "./routes/document";
+import documentRouter from "./routes/documentRouter";
 import documentLockRoutes from "./routes/documentLock";
 import documentPublicRouter from "./routes/documentPublic";
 import shareRouter from "./routes/shareRouter";
-
+import presentationRouter from "./routes/presentationRouter";
+import itemRouter from "./routes/itemRouter";
 
 const app = express();
 
@@ -25,6 +26,10 @@ app.use("/api/document", documentRouter);
 app.use("/api/documentLock", documentLockRoutes);
 app.use("/public", documentPublicRouter);
 app.use("/api/share", shareRouter);
+
+app.use("/api/presentation", presentationRouter);
+
+app.use("/api/items", itemRouter);
 
 app.use("/uploads", express.static("uploads"));
 

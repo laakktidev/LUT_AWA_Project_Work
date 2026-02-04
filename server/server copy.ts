@@ -7,7 +7,7 @@ import mongoose, { Connection } from 'mongoose'
 import dotenv from "dotenv"
 
 import userRouter from "./src/routes/user"
-import documentRouter from "./src/routes/document"; 
+import documentRouter from "./src/routes/documentRouter"; 
 import documentLockRoutes from "./src/routes/documentLock";
 //import publicRoutes from "./src/routes/public";
 

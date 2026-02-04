@@ -1,5 +1,5 @@
 // src/services/slideService.ts
-import { ISlideDeck } from "../types/slides";
+import { ISlideDeck } from "../types/Slides";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 

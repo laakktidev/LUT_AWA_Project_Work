@@ -9,7 +9,7 @@
 | [x] | [2] | Profile picture upload |
 | [ ] | [ ] | Commenting parts of document |
 | [ ] | [ ] | Spreadsheets (SUM + cells) |
-| [ ] | [3] | **Presentation slides** |
+| [x] | [3] | Presentation slides |
 | [ ] | [ ] | Folder hierarchy |
 | [x] | [1] | Dark/bright modes |
 | [x] | [2] | Recycle bin |
@@ -20,8 +20,7 @@
 | [x] | [4] | Unit + automated tests |
 | [x] | [2] | Search functionality |
 | [x] | [2] | Pagination |
-
-| [] | [] | **Send public document link via email** |  
+| [x] | [] | Send public document link via email |  
 
 
 **TESTS** 

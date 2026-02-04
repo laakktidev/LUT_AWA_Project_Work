@@ -9,13 +9,17 @@ import DocumentsListPage from "./pages/DocumentsListPage";
 import DocumentEditPage from "./pages/DocumentEditPage";
 import PublicDocumentPage from "./pages/PublicDocumentPage";
 import ProfilePage from "./pages//ProfilePage";
+import PresentationsListPage from "./pages/PresentationsListPage";
+import PresentationPage from "./pages/PresentationPage";
+import PresentationEditPage from "./pages/PresentationEditPage";
 
 
 import { useAuth } from "./context/AuthContext";
 import TrashListPage from "./pages/TrashListPage";
 
-import SlideShowPage from "./pages/SlideShowPage";
-import SlideEditorPage from "./pages/SlideEditorPage";
+//import SlideShowPage from "./pages/SlideShowPage";
+//import SlideEditorPage from "./pages/PresentationCreatePage";
+import PresentationCreatePage from "./pages/PresentationCreatePage";
 
 
 
@@ -48,10 +52,11 @@ export default function App() {
           <Route path="/trash" element={<TrashListPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           
-          
-          <Route path="/slides/new" element={<SlideEditorPage />} />
-          <Route path="/slides/:id/edit" element={<SlideEditorPage />} />
-          <Route path="/slides/:id/show" element={<SlideShowPage />} />
+          <Route path="/presentations" element={<PresentationsListPage />} />
+          <Route path="/presentation/new" element={<PresentationCreatePage />} />
+          <Route path="/presentation/:id" element={<PresentationPage />} />
+          <Route path="/presentation/:id/edit" element={<PresentationEditPage />} />
+  {/*        <Route path="/presentation/:id/show" element={<SlideShowPage />} />*/}
 
         </Route>
 

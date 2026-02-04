@@ -1,5 +1,7 @@
+
 import { Request, Response } from "express";
 import { searchDocumentsInDb } from "../services/documentSearchService";
+
 
 export const searchDocuments = async (req: Request, res: Response) => {
   try {

@@ -1,9 +1,8 @@
 export interface Document {
   _id: string;
   title: string;
-  type: "text" | "presentation";
-  content?: string;
-  slides?: Slide[];
+  type: "document";
+  content: string;
   userId: string;
   editors: string[];
   isPublic: boolean;
@@ -11,9 +10,4 @@ export interface Document {
   deletedAt?: string;
   createdAt?: string;
   updatedAt?: string;
-}
-
-export interface Slide {
-  title: string;
-  bullets: string[];
 }

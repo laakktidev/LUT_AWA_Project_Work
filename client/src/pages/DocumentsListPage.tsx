@@ -21,8 +21,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import DescriptionIcon from "@mui/icons-material/Description";
-import SlideshowIcon from "@mui/icons-material/Slideshow";
+//import DescriptionIcon from "@mui/icons-material/Description";
+//import SlideshowIcon from "@mui/icons-material/Slideshow";
 import SearchIcon from "@mui/icons-material/Search";
 
 import { useDocuments } from "../hooks/useDocuments";
@@ -252,17 +252,7 @@ export default function DocumentsListPage() {
           >
             {t("documents.new")}
           </Button>
-
-          {/* New SlideShow */}
-          <Button
-            variant="outlined"
-            color="success"
-            startIcon={<NoteAddIcon />}
-            onClick={() => navigate("/slides/new")}
-          >
-            {t("documents.new")}
-          </Button>
-
+          
           {/* Trash */}
           {trashCount > 0 && (
             <Button
@@ -306,11 +296,11 @@ export default function DocumentsListPage() {
                   onClick={() => navigate(`/view/${doc._id}`)}
                 >
                   <Stack direction="row" spacing={2} alignItems="center">
-                    {doc.type === "presentation" ? (
+                    {/*{doc.type === "presentation" ? (
                       <SlideshowIcon color="primary" />
                     ) : (
                       <DescriptionIcon color="primary" />
-                    )}
+                    )}*/}
 
                     <Box>
                       <Typography variant="h6">{doc.title}</Typography>

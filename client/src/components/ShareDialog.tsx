@@ -94,7 +94,7 @@ export function ShareDialog({ open, onClose, users, onShare }: ShareDialogProps)
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose}>{t("share.cancel")}</Button>
+                <Button color="inherit" onClick={onClose}>{t("share.cancel")}</Button>
                 <Button
                     variant="contained"
                     onClick={() => onShare(selected)}

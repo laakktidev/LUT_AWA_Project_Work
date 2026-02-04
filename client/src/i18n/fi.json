@@ -93,5 +93,35 @@
     "search": "Hae käyttäjiä...",
     "cancel": "Peruuta",
     "confirm": "Jaa"
+  },
+  "presentations": {
+    "title": "Esitykset",
+    "new": "Uusi esitys",
+    "empty": "Ei esityksiä vielä.",
+    "searchPlaceholder": "Hae esityksiä...",
+    "sort": {
+      "nameAsc": "Nimi (A–Ö)",
+      "nameDesc": "Nimi (Ö–A)",
+      "createdNew": "Luotu (uusin ensin)",
+      "createdOld": "Luotu (vanhin ensin)",
+      "updatedNew": "Muokattu (uusin ensin)",
+      "updatedOld": "Muokattu (vanhin ensin)"
+    },
+    "edit": {
+      "title": "Muokkaa esitystä",
+      "back": "Takaisin listaan",
+      "titleLabel": "Esityksen otsikko",
+      "loading": "Ladataan esitystä…",
+      "saving": "Tallennetaan...",
+      "saveChanges": "Tallenna muutokset"
+    },
+    "editor": {
+      "slideCounter": "Dia {{current}} / {{total}}",
+      "slideTitle": "Dian otsikko",
+      "bulletLabel": "Kohta {{number}}",
+      "addBullet": "Lisää kohta",
+      "deleteSlide": "Poista dia",
+      "addSlide": "Lisää dia"
+    }
   }
 }
