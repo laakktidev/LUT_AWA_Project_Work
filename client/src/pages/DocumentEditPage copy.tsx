@@ -14,9 +14,6 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useTranslation } from "react-i18next";
 
-import { isTokenExpired } from "../utils/isTokenExpired";
-import { Toast } from "../components/Toast";
-
 interface PendingImage {
   localUrl: string;
   file: File;
@@ -26,35 +23,13 @@ export default function DocumentEditPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  
-  const { token, logout } = useAuth();
+  const { token } = useAuth();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
 
   const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
-
-
-  if (token) {
-    const sessionExpired = isTokenExpired(token);
-    if (sessionExpired) {
-      console.log("Session expired. Logging out...");
-      return (
-        <Container maxWidth="md">
-          <Toast
-            open={sessionExpired}
-            message="Session expired. Please log in again."
-            severity="warning"
-            autoHideDuration={5000}
-            onClose={() => logout()}
-          />
-        </Container>
-      );
-    }
-  }
-
-
 
   useEffect(() => {
     async function load() {

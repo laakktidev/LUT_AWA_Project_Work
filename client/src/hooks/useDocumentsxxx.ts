@@ -4,8 +4,7 @@ import { Document } from "../types/Document";
 import { useAuthGuard } from "./useAuthGuard";
 
 export function useDocuments(
-  token: string | null,
-  onSessionExpired?: () => void
+  token: string | null  §
 ) {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
@@ -14,12 +13,7 @@ export function useDocuments(
   const guard = useAuthGuard();
 
   const fetchDocuments = useCallback(async () => {
-    /*if (!token) {
-      setLoading(false);
-      setError("Not authenticated");
-      return;
-    }*/
-
+    
     try {
       setLoading(true);
       setError(null);
@@ -45,7 +39,8 @@ export function useDocuments(
       }*/
 
       if (err.message === "TOKEN_EXPIRED") {
-        onSessionExpired?.();
+        onSessionExpired?: () => void
+        setError(err);
         return; // ❗ IMPORTANT: do NOT set error
       }  
       setError("Failed to load documents"); 

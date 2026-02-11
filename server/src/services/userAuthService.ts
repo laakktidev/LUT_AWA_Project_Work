@@ -29,6 +29,7 @@ export function createJwtToken(user: any) {
       username: user.username
     },
     process.env.SECRET as string,
-    { expiresIn: "1h" }
+    { expiresIn: "0.5m" }
   );
 }
+// { expiresIn: "1h" }

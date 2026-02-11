@@ -1,4 +1,6 @@
+DocumentDetailsPage.tsx
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   Container,
   Typography,
@@ -23,17 +25,112 @@ import {
 } from "../services/documentService";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import { Toast } from "../components/Toast";
 
 export default function DocumentDetailsPage() {
+  // -----------------------------
+  // HOOKS (must be at the top)
+  // -----------------------------
+  const [toastOpen, setToastOpen] = useState(false);
+  const [sessionExpired, setSessionExpired] = useState(false);
+
   const { t } = useTranslation();
-  const { token, user } = useAuth();
+  const { token, user, logout } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { doc, loading, error, refetch } = useDocument(id, token);
+  const { doc, loading, error, refetch } = useDocument(id, token, () => {
+    setSessionExpired(true);
+    //setToastOpen(true);
+  });
 
-  const isOwner = user?.id === doc?.userId;
-  const isEditor = doc?.editors?.includes(user?.id as string);
+  // -----------------------------
+  // SESSION EXPIRED → show toast only
+  // -----------------------------
+    
+  /////////////////////////////
+   useEffect(() => {
+    if (!sessionExpired) return;
+
+    setToastOpen(true);
+
+    const timer = setTimeout(() => {
+      logout();
+      navigate("/login", { replace: true });
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [sessionExpired, logout, navigate]);
+  /////////////////////////////
+  
+  /*
+  if (sessionExpired) {
+    return (
+      <Container maxWidth="md">
+        <Toast
+          open={toastOpen}
+          message="Session expired. Please log in again."
+          severity="warning"
+          autoHideDuration={3000}
+          onClose={() => {
+            setToastOpen(false);
+            logout();
+            //navigate("/login");
+          }}
+        />
+      </Container>
+    );
+  }*/
+
+if (sessionExpired || !token) {
+    return (
+      <Container maxWidth="md">
+        <Toast
+          open={toastOpen}
+          message="Session expired. Please log in again."
+          severity="warning"
+          autoHideDuration={3000}
+          onClose={() => setToastOpen(false)}
+        />
+      </Container>
+    );
+  }
+
+
+  // -----------------------------
+  // LOADING
+  // -----------------------------
+  if (loading) {
+    return (
+      <Container maxWidth="md">
+        <Box sx={{ textAlign: "center", mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      </Container>
+    );
+  }
+
+  // -----------------------------
+  // ERROR OR NOT FOUND
+  // -----------------------------
+  if (error || !doc) {
+    return (
+      <Container maxWidth="md">
+        <Alert severity="error">{error || t("details.notFound")}</Alert>
+        <Box mt={2}>
+          <Button variant="outlined" onClick={() => navigate("/")}>
+            {t("details.backToDocuments")}
+          </Button>
+        </Box>
+      </Container>
+    );
+  }
+
+  // -----------------------------
+  // NORMAL RENDER
+  // -----------------------------
+  const isOwner = user?.id === doc.userId;
+  const isEditor = doc.editors?.includes(user?.id as string);
   const canEdit = isOwner || isEditor;
 
   const handleTogglePublic = async (value: boolean) => {
@@ -54,29 +151,6 @@ export default function DocumentDetailsPage() {
     a.click();
 
     window.URL.revokeObjectURL(url);
-  }
-
-  if (loading) {
-    return (
-      <Container maxWidth="md">
-        <Box sx={{ textAlign: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
-    );
-  }
-
-  if (error || !doc) {
-    return (
-      <Container maxWidth="md">
-        <Alert severity="error">{error || t("details.notFound")}</Alert>
-        <Box mt={2}>
-          <Button variant="outlined" onClick={() => navigate("/")}>
-            {t("details.backToDocuments")}
-          </Button>
-        </Box>
-      </Container>
-    );
   }
 
   return (
@@ -105,12 +179,10 @@ export default function DocumentDetailsPage() {
             justifyContent: "space-between",
           }}
         >
-          {/* Back arrow */}
           <IconButton onClick={() => navigate("/")}>
             <ArrowBackIcon />
           </IconButton>
 
-          {/* Title */}
           <Typography
             variant="h5"
             sx={{ flexGrow: 1, mx: 2, fontWeight: 600 }}
@@ -118,7 +190,6 @@ export default function DocumentDetailsPage() {
             {doc.title}
           </Typography>
 
-          {/* Right side actions */}
           <Stack direction="row" spacing={1}>
             {canEdit && (
               <IconButton
@@ -132,7 +203,6 @@ export default function DocumentDetailsPage() {
 
             <IconButton
               onClick={handleDownload}
-              disabled={!doc}
               aria-label={t("details.download")}
               sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}
             >
@@ -149,33 +219,26 @@ export default function DocumentDetailsPage() {
           sx={(theme) => ({
             fontSize: "1rem",
             lineHeight: 1.7,
-
-            // ⭐ Force ALL text inside to follow theme colors
             "&, & *": {
               color: `${theme.palette.text.primary} !important`,
             },
-
             "& img": {
               maxWidth: "100%",
               borderRadius: "6px",
               margin: "16px 0",
             },
-
             "& h1, & h2, & h3, & h4, & h5, & h6": {
               fontWeight: 600,
               marginTop: "24px",
               marginBottom: "12px",
             },
-
             "& p": {
               marginBottom: "16px",
             },
-
             "& ul, & ol": {
               paddingLeft: "24px",
               marginBottom: "16px",
             },
-
             "& blockquote": {
               borderLeft: "4px solid",
               borderColor: theme.palette.primary.light,
@@ -183,7 +246,6 @@ export default function DocumentDetailsPage() {
               margin: "16px 0",
               fontStyle: "italic",
             },
-
             "& pre": {
               background: theme.palette.background.default,
               padding: "12px",
@@ -203,6 +265,19 @@ export default function DocumentDetailsPage() {
         docTitle={doc.title}
         onTogglePublic={handleTogglePublic}
       />
+
+      {/* Toast stays mounted */}
+      {/*<Toast
+        open={toastOpen}
+        message="Session expired. Please log in again."
+        severity="warning"
+        autoHideDuration={3000}
+        onClose={() => {
+          setToastOpen(false);
+          logout();
+          //navigate("/login");
+        }}
+      />*/}
     </Container>
   );
 }

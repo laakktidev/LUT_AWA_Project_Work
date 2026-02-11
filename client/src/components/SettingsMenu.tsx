@@ -18,7 +18,7 @@ import LanguageIcon from "@mui/icons-material/Language";
 import LogoutIcon from "@mui/icons-material/Logout";
 
 import { useColorScheme } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 //import AboutDialog from "./About";
 import About from "./About";
@@ -29,14 +29,14 @@ export default function SettingsMenu() {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     //const [aboutOpen, setAboutOpen] = useState(false);
     const [showAbout, setShowAbout] = useState(false);
-    const [languageOpen, setLanguageOpen] = useState(false);
+    //const [languageOpen, setLanguageOpen] = useState(false);
 
 
 
     const open = Boolean(anchorEl);
 
     const { mode, setMode } = useColorScheme();
-    const navigate = useNavigate();
+    //const navigate = useNavigate();
     const { logout } = useAuth();
 
     const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) =>

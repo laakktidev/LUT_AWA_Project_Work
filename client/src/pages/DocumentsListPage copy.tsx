@@ -46,43 +46,48 @@ export default function DocumentsListPage() {
   const { token, user, logout } = useAuth();
 
   // -----------------------------
-  // SESSION EXPIRED STATE
+  // SESSION EXPIRED HANDLING
   // -----------------------------
   const [sessionExpired, setSessionExpired] = useState(false);
   const [toastOpen, setToastOpen] = useState(false);
 
-  // -----------------------------
-  // DOCUMENTS
-  // -----------------------------
   const { documents, loading, error, refetch } = useDocuments(
     token,
-    () => setSessionExpired(true)
+    () => {
+      setSessionExpired(true);
+      setToastOpen(true);
+    }
   );
 
   // -----------------------------
-  // SIDE EFFECT: LOGOUT + REDIRECT
+  // EARLY RETURN: SESSION EXPIRED
   // -----------------------------
+  if (sessionExpired) {
+    console.warn("Session expired. Please log in again.");
+    return (
+      <Container maxWidth="md">
+        <Toast
+          open={toastOpen}
+          message="Session expired. Please log in again."
+          severity="warning"
+          autoHideDuration={3}
+          onClose={() => {
+            setToastOpen(false);
+            logout();
+            //navigate("/login");
+          }}
+        />
+      </Container>
+    );
+  }
 
-/*
-  useEffect(() => {
-    if (!sessionExpired) return;
-
-    //setToastOpen(true);
-
-    const timer = setTimeout(() => {
-      logout();
-      navigate("/login", { replace: true });
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [sessionExpired, logout, navigate]);
-  */
-
-
+ if (sessionExpired) { 
+    return null;
+ }
 
 
   // -----------------------------
-  // PAGE STATE (ALL HOOKS FIRST)
+  // NORMAL PAGE STATE
   // -----------------------------
   const [shareOpen, setShareOpen] = useState(false);
   const [docId, setDocId] = useState("");
@@ -93,43 +98,24 @@ export default function DocumentsListPage() {
   const [searchResults, setSearchResults] = useState<Document[] | null>(null);
 
   const [sortBy, setSortBy] = useState<
-    | "name-asc"
-    | "name-desc"
-    | "created-asc"
-    | "created-desc"
-    | "updated-asc"
-    | "updated-desc"
+    "name-asc" | "name-desc" |
+    "created-asc" | "created-desc" |
+    "updated-asc" | "updated-desc"
   >("updated-desc");
 
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
-  // -----------------------------
-  // TRASH COUNT
-  // -----------------------------
   async function refreshTrashCount() {
     if (!token) return;
     const count = await getTrashCount(token);
     setTrashCount(count);
   }
 
-  
-  
   useEffect(() => {
-    if(documents.length > 0 || error || sessionExpired) {
-      console.log("documents", documents);
-      console.log("error", error);
-      console.log("sessionExpired", sessionExpired);
-
-       refreshTrashCount();
-    }
+    refreshTrashCount();
   }, [token]);
-  
 
-
-  // -----------------------------
-  // SEARCH
-  // -----------------------------
   useEffect(() => {
     if (!token) return;
 
@@ -150,31 +136,9 @@ export default function DocumentsListPage() {
     setPage(1);
   }, [search, sortBy]);
 
-
-
-if (sessionExpired || !token) {
-    console.log("Session expired. Logging out...");
-    return (
-      <Container maxWidth="md">
-        <Toast
-          open={sessionExpired}
-          message="Session expired. Please log in again."
-          severity="warning"
-          autoHideDuration={5000}
-          onClose={() => logout()}
-        />
-      </Container>
-    );
-  }
-
-
-
-  // -----------------------------
-  // ACTIONS
-  // -----------------------------
-  async function handleShareDocument(userIds: string[]) {
+  async function handleShareDocument(selectedUserIds: string[]) {
     if (!token) return;
-    await shareDocument(docId, userIds, token);
+    await shareDocument(docId, selectedUserIds, token);
     refetch();
   }
 
@@ -182,17 +146,18 @@ if (sessionExpired || !token) {
     if (!token) return;
 
     const allUsers = await getUsers(token);
-    const filtered = allUsers.filter(
+    const filteredUsers = allUsers.filter(
       (u) => u.id !== doc.userId && !doc.editors.includes(u.id)
     );
 
     setDocId(doc._id);
-    setUsers(filtered);
+    setUsers(filteredUsers);
     setShareOpen(true);
   }
 
   async function handleDelete(id: string) {
     if (!token) return;
+
     await softDeleteDocument(id, token);
     await refetch();
     await refreshTrashCount();
@@ -200,40 +165,27 @@ if (sessionExpired || !token) {
 
   async function handleClone(id: string) {
     if (!token) return;
+
     await cloneDocument(id, token);
     await refetch();
   }
 
   // -----------------------------
-  // BLOCK PAGE IF SESSION DEAD
-  // -----------------------------
-  if (sessionExpired || !token) {
-    return (
-      <Container maxWidth="md">
-        <Toast
-          open={sessionExpired}
-          message="Session expired. Please log in again."
-          severity="warning"
-          autoHideDuration={3000}
-          onClose={() => setToastOpen(false)}
-        />
-      </Container>
-    );
-  }
-
-  // -----------------------------
-  // LOADING / ERROR
+  // LOADING
   // -----------------------------
   if (loading) {
     return (
       <Container maxWidth="md">
-        <Box textAlign="center" mt={4}>
+        <Box sx={{ textAlign: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
       </Container>
     );
   }
 
+  // -----------------------------
+  // ERROR
+  // -----------------------------
   if (error) {
     return (
       <Container maxWidth="md">
@@ -252,45 +204,47 @@ if (sessionExpired || !token) {
       case "name-desc":
         return b.title.localeCompare(a.title);
       case "created-asc":
-        return +new Date(a.createdAt!) - +new Date(b.createdAt!);
+        return new Date(a.createdAt as string).getTime() - new Date(b.createdAt as string).getTime();
       case "created-desc":
-        return +new Date(b.createdAt!) - +new Date(a.createdAt!);
+        return new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime();
       case "updated-asc":
-        return +new Date(a.updatedAt!) - +new Date(b.updatedAt!);
+        return new Date(a.updatedAt as string).getTime() - new Date(b.updatedAt as string).getTime();
       case "updated-desc":
-        return +new Date(b.updatedAt!) - +new Date(a.updatedAt!);
+        return new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime();
       default:
         return 0;
     }
   });
 
   const docsToShow = searchResults ?? sortedDocs;
+
   const start = (page - 1) * pageSize;
-  const paginatedDocs = docsToShow.slice(start, start + pageSize);
+  const end = start + pageSize;
+  const paginatedDocs = docsToShow.slice(start, end);
 
   // -----------------------------
   // RENDER
   // -----------------------------
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ pt: 0, pb: 0 }}>
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
         users={users}
-        onShare={(ids) => {
+        onShare={(selectedUserIds) => {
           setShareOpen(false);
-          handleShareDocument(ids);
+          handleShareDocument(selectedUserIds);
         }}
       />
 
-      {/* HEADER */}
+      {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" fontWeight={600}>
           {t("documents.title")}
         </Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          {/* SEARCH */}
+          {/* Search */}
           <TextField
             size="small"
             placeholder={t("documents.searchPlaceholder")}
@@ -300,12 +254,12 @@ if (sessionExpired || !token) {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon />
+                  <SearchIcon sx={{ color: "text.secondary" }} />
                 </InputAdornment>
               ),
-              endAdornment: search && (
+              endAdornment: search.length > 0 && (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setSearch("")}>
+                  <IconButton onClick={() => setSearch("")} edge="end">
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
@@ -313,7 +267,7 @@ if (sessionExpired || !token) {
             }}
           />
 
-          {/* SORT */}
+          {/* Sort */}
           <TextField
             select
             size="small"
@@ -329,7 +283,7 @@ if (sessionExpired || !token) {
             <MenuItem value="updated-asc">{t("documents.sort.updatedOld")}</MenuItem>
           </TextField>
 
-          {/* NEW */}
+          {/* New Document */}
           <Button
             variant="outlined"
             color="success"
@@ -339,7 +293,7 @@ if (sessionExpired || !token) {
             {t("documents.new")}
           </Button>
 
-          {/* TRASH */}
+          {/* Trash */}
           {trashCount > 0 && (
             <Button
               variant="outlined"
@@ -353,7 +307,7 @@ if (sessionExpired || !token) {
         </Stack>
       </Stack>
 
-      {/* LIST */}
+      {/* Document List */}
       {docsToShow.length === 0 ? (
         <Alert severity="info">{t("documents.empty")}</Alert>
       ) : (
@@ -365,26 +319,37 @@ if (sessionExpired || !token) {
               return (
                 <Paper
                   key={doc._id}
+                  elevation={1}
                   sx={{
                     p: 1,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    borderRadius: 2,
+                    transition: "0.2s",
+                    "&:hover": {
+                      boxShadow: 4,
+                      transform: "translateY(-2px)"
+                    }
                   }}
                   onClick={() => navigate(`/view/${doc._id}`)}
                 >
-                  <Box>
-                    <Typography variant="h6">{doc.title}</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t("documents.lastEdited")}:{" "}
-                      {new Date(doc.updatedAt!).toLocaleString()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t("documents.created")}:{" "}
-                      {new Date(doc.createdAt!).toLocaleString()}
-                    </Typography>
-                  </Box>
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Box>
+                      <Typography variant="h6">{doc.title}</Typography>
+
+                      <Typography variant="body2" color="text.secondary">
+                        {t("documents.lastEdited")}:{" "}
+                        {new Date(doc.updatedAt as string).toLocaleString()}
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary">
+                        {t("documents.created")}:{" "}
+                        {new Date(doc.createdAt as string).toLocaleString()}
+                      </Typography>
+                    </Box>
+                  </Stack>
 
                   <Box sx={{ display: "flex", gap: 1 }}>
                     <IconButton
@@ -408,6 +373,7 @@ if (sessionExpired || !token) {
                     </IconButton>
 
                     <IconButton
+                      aria-label="Delete"
                       disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -422,11 +388,13 @@ if (sessionExpired || !token) {
             })}
           </Stack>
 
+          {/* Pagination */}
           <Box mt={3} display="flex" justifyContent="center">
             <Pagination
               count={Math.ceil(docsToShow.length / pageSize)}
               page={page}
               onChange={(_, value) => setPage(value)}
+              color="primary"
             />
           </Box>
         </>

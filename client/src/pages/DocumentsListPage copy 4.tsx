@@ -21,13 +21,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ShareIcon from "@mui/icons-material/Share";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
-import DescriptionIcon from "@mui/icons-material/Description";
-import SlideshowIcon from "@mui/icons-material/Slideshow";
 import SearchIcon from "@mui/icons-material/Search";
 
-
-//import { useDocuments } from "../hooks/useDocuments";
-import { useItems } from "../hooks/useItems";
+import { useDocuments } from "../hooks/useDocuments";
 import { getUsers } from "../services/userService";
 import {
   softDeleteDocument,
@@ -42,15 +38,50 @@ import { User } from "../types/User";
 import { Document } from "../types/Document";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
+import { Toast } from "../components/Toast";
 
 export default function DocumentsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { token, user } = useAuth();
+  const { token, user, logout } = useAuth();
 
-  //const { documents, loading, error, refetch } = useDocuments(token);
-  const { items, loading, error, refetch } = useItems(token);
+  // -----------------------------
+  // SESSION EXPIRED STATE
+  // -----------------------------
+  const [sessionExpired, setSessionExpired] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
 
+  // -----------------------------
+  // DOCUMENTS
+  // -----------------------------
+  const { documents, loading, error, refetch } = useDocuments(
+    token,
+    () => setSessionExpired(true)
+  );
+
+  // -----------------------------
+  // SIDE EFFECT: LOGOUT + REDIRECT
+  // -----------------------------
+
+
+  useEffect(() => {
+    if (!sessionExpired) return;
+
+    //setToastOpen(true);
+
+    const timer = setTimeout(() => {
+      logout();
+      navigate("/login", { replace: true });
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [sessionExpired, logout, navigate]);
+  
+
+
+  // -----------------------------
+  // PAGE STATE (ALL HOOKS FIRST)
+  // -----------------------------
   const [shareOpen, setShareOpen] = useState(false);
   const [docId, setDocId] = useState("");
   const [users, setUsers] = useState<User[]>([]);
@@ -60,24 +91,43 @@ export default function DocumentsListPage() {
   const [searchResults, setSearchResults] = useState<Document[] | null>(null);
 
   const [sortBy, setSortBy] = useState<
-    "name-asc" | "name-desc" |
-    "created-asc" | "created-desc" |
-    "updated-asc" | "updated-desc"
+    | "name-asc"
+    | "name-desc"
+    | "created-asc"
+    | "created-desc"
+    | "updated-asc"
+    | "updated-desc"
   >("updated-desc");
 
   const [page, setPage] = useState(1);
   const pageSize = 5;
 
+  // -----------------------------
+  // TRASH COUNT
+  // -----------------------------
   async function refreshTrashCount() {
     if (!token) return;
     const count = await getTrashCount(token);
     setTrashCount(count);
   }
 
+  
+  
   useEffect(() => {
-    refreshTrashCount();
-  }, [token]);
+    if(documents.length > 0 || error || sessionExpired) {
+      console.log("documents", documents);
+      console.log("error", error);
+      console.log("sessionExpired", sessionExpired);
 
+       refreshTrashCount();
+    }
+  }, [token]);
+  
+
+
+  // -----------------------------
+  // SEARCH
+  // -----------------------------
   useEffect(() => {
     if (!token) return;
 
@@ -98,9 +148,31 @@ export default function DocumentsListPage() {
     setPage(1);
   }, [search, sortBy]);
 
-  async function handleShareDocument(selectedUserIds: string[]) {
+
+
+if (sessionExpired || !token) {
+    console.log("Session expired. Logging out...");
+    return (
+      <Container maxWidth="md">
+        <Toast
+          open={sessionExpired}
+          message="Session expired. Please log in again."
+          severity="warning"
+          autoHideDuration={5000}
+          onClose={() => logout()}
+        />
+      </Container>
+    );
+  }
+
+
+
+  // -----------------------------
+  // ACTIONS
+  // -----------------------------
+  async function handleShareDocument(userIds: string[]) {
     if (!token) return;
-    await shareDocument(docId, selectedUserIds, token);
+    await shareDocument(docId, userIds, token);
     refetch();
   }
 
@@ -108,18 +180,17 @@ export default function DocumentsListPage() {
     if (!token) return;
 
     const allUsers = await getUsers(token);
-    const filteredUsers = allUsers.filter(
+    const filtered = allUsers.filter(
       (u) => u.id !== doc.userId && !doc.editors.includes(u.id)
     );
 
     setDocId(doc._id);
-    setUsers(filteredUsers);
+    setUsers(filtered);
     setShareOpen(true);
   }
 
   async function handleDelete(id: string) {
     if (!token) return;
-
     await softDeleteDocument(id, token);
     await refetch();
     await refreshTrashCount();
@@ -127,28 +198,34 @@ export default function DocumentsListPage() {
 
   async function handleClone(id: string) {
     if (!token) return;
-
     await cloneDocument(id, token);
     await refetch();
   }
 
-  if (!token) {
+  // -----------------------------
+  // BLOCK PAGE IF SESSION DEAD
+  // -----------------------------
+  if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">
-        <Alert severity="warning">{t("documents.mustLogin")}</Alert>
-        <Box mt={2}>
-          <Button variant="contained" onClick={() => navigate("/login")}>
-            {t("documents.goToLogin")}
-          </Button>
-        </Box>
+        <Toast
+          open={sessionExpired}
+          message="Session expired. Please log in again."
+          severity="warning"
+          autoHideDuration={3000}
+          onClose={() => setToastOpen(false)}
+        />
       </Container>
     );
   }
 
+  // -----------------------------
+  // LOADING / ERROR
+  // -----------------------------
   if (loading) {
     return (
       <Container maxWidth="md">
-        <Box sx={{ textAlign: "center", mt: 4 }}>
+        <Box textAlign="center" mt={4}>
           <CircularProgress />
         </Box>
       </Container>
@@ -163,52 +240,55 @@ export default function DocumentsListPage() {
     );
   }
 
-//  const sortedDocs = [...documents].sort((a, b) => {
-  const sortedDocs = [...items].sort((a, b) => {
+  // -----------------------------
+  // SORTING + PAGINATION
+  // -----------------------------
+  const sortedDocs = [...documents].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
         return a.title.localeCompare(b.title);
       case "name-desc":
         return b.title.localeCompare(a.title);
       case "created-asc":
-        return new Date(a.createdAt as string).getTime() - new Date(b.createdAt as string).getTime();
+        return +new Date(a.createdAt!) - +new Date(b.createdAt!);
       case "created-desc":
-        return new Date(b.createdAt as string).getTime() - new Date(a.createdAt as string).getTime();
+        return +new Date(b.createdAt!) - +new Date(a.createdAt!);
       case "updated-asc":
-        return new Date(a.updatedAt as string).getTime() - new Date(b.updatedAt as string).getTime();
+        return +new Date(a.updatedAt!) - +new Date(b.updatedAt!);
       case "updated-desc":
-        return new Date(b.updatedAt as string).getTime() - new Date(a.updatedAt as string).getTime();
+        return +new Date(b.updatedAt!) - +new Date(a.updatedAt!);
       default:
         return 0;
     }
   });
 
   const docsToShow = searchResults ?? sortedDocs;
-
   const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  const paginatedDocs = docsToShow.slice(start, end);
+  const paginatedDocs = docsToShow.slice(start, start + pageSize);
 
+  // -----------------------------
+  // RENDER
+  // -----------------------------
   return (
-    <Container maxWidth="md" sx={{ pt: 0, pb: 0 }}>
+    <Container maxWidth="md">
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
         users={users}
-        onShare={(selectedUserIds) => {
+        onShare={(ids) => {
           setShareOpen(false);
-          handleShareDocument(selectedUserIds);
+          handleShareDocument(ids);
         }}
       />
 
-      {/* Header */}
+      {/* HEADER */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5" fontWeight={600}>
           {t("documents.title")}
         </Typography>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          {/* Search */}
+          {/* SEARCH */}
           <TextField
             size="small"
             placeholder={t("documents.searchPlaceholder")}
@@ -218,12 +298,12 @@ export default function DocumentsListPage() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <SearchIcon sx={{ color: "text.secondary" }} />
+                  <SearchIcon />
                 </InputAdornment>
               ),
-              endAdornment: search.length > 0 && (
+              endAdornment: search && (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setSearch("")} edge="end">
+                  <IconButton onClick={() => setSearch("")}>
                     <ClearIcon />
                   </IconButton>
                 </InputAdornment>
@@ -231,7 +311,7 @@ export default function DocumentsListPage() {
             }}
           />
 
-          {/* Sort */}
+          {/* SORT */}
           <TextField
             select
             size="small"
@@ -247,7 +327,7 @@ export default function DocumentsListPage() {
             <MenuItem value="updated-asc">{t("documents.sort.updatedOld")}</MenuItem>
           </TextField>
 
-          {/* New Document */}
+          {/* NEW */}
           <Button
             variant="outlined"
             color="success"
@@ -257,17 +337,7 @@ export default function DocumentsListPage() {
             {t("documents.new")}
           </Button>
 
-                    {/* New Document */}
-          <Button
-            variant="outlined"
-            color="success"
-            startIcon={<SlideshowIcon/>}
-            onClick={() => navigate("/presentation/new")}
-          >
-            {t("documents.new")}
-          </Button>
-
-          {/* Trash */}
+          {/* TRASH */}
           {trashCount > 0 && (
             <Button
               variant="outlined"
@@ -281,7 +351,7 @@ export default function DocumentsListPage() {
         </Stack>
       </Stack>
 
-      {/* Document + Presentation List */}
+      {/* LIST */}
       {docsToShow.length === 0 ? (
         <Alert severity="info">{t("documents.empty")}</Alert>
       ) : (
@@ -289,59 +359,34 @@ export default function DocumentsListPage() {
           <Stack spacing={2}>
             {paginatedDocs.map((doc) => {
               const isOwner = user?.id === doc.userId;
-              const isPresentation = doc.type === "presentation";
 
               return (
                 <Paper
                   key={doc._id}
-                  elevation={1}
                   sx={{
                     p: 1,
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    cursor: "pointer",
-                    borderRadius: 2,
-                    transition: "0.2s",
-                    "&:hover": {
-                      boxShadow: 4,
-                      transform: "translateY(-2px)"
-                    }
+                    cursor: "pointer"
                   }}
-                  onClick={() => {
-                    if (isPresentation) {
-                      navigate(`/presentations/${doc._id}`);
-                    } else {
-                      navigate(`/view/${doc._id}`);
-                    }
-                  }}
+                  onClick={() => navigate(`/view/${doc._id}`)}
                 >
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    {isPresentation ? (
-                      <SlideshowIcon color="primary" />
-                    ) : (
-                      <DescriptionIcon color="primary" />
-                    )}
-
-                    <Box>
-                      <Typography variant="h6">{doc.title}</Typography>
-
-                      <Typography variant="body2" color="text.secondary">
-                        {t("documents.lastEdited")}:{" "}
-                        {new Date(doc.updatedAt as string).toLocaleString()}
-                      </Typography>
-
-                      <Typography variant="body2" color="text.secondary">
-                        {t("documents.created")}:{" "}
-                        {new Date(doc.createdAt as string).toLocaleString()}
-                      </Typography>
-                    </Box>
-                  </Stack>
+                  <Box>
+                    <Typography variant="h6">{doc.title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t("documents.lastEdited")}:{" "}
+                      {new Date(doc.updatedAt!).toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {t("documents.created")}:{" "}
+                      {new Date(doc.createdAt!).toLocaleString()}
+                    </Typography>
+                  </Box>
 
                   <Box sx={{ display: "flex", gap: 1 }}>
-                    {/* Disable actions for presentations */}
                     <IconButton
-                      disabled={!isOwner || isPresentation}
+                      disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();
                         openShareSelection(doc);
@@ -351,7 +396,7 @@ export default function DocumentsListPage() {
                     </IconButton>
 
                     <IconButton
-                      disabled={!isOwner || isPresentation}
+                      disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleClone(doc._id);
@@ -361,8 +406,7 @@ export default function DocumentsListPage() {
                     </IconButton>
 
                     <IconButton
-                      aria-label="Delete"
-                      disabled={!isOwner || isPresentation}
+                      disabled={!isOwner}
                       onClick={(e) => {
                         e.stopPropagation();
                         handleDelete(doc._id);
@@ -376,13 +420,11 @@ export default function DocumentsListPage() {
             })}
           </Stack>
 
-          {/* Pagination */}
           <Box mt={3} display="flex" justifyContent="center">
             <Pagination
               count={Math.ceil(docsToShow.length / pageSize)}
               page={page}
               onChange={(_, value) => setPage(value)}
-              color="primary"
             />
           </Box>
         </>

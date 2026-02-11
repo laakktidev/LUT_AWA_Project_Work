@@ -41,6 +41,28 @@ import { useTranslation } from "react-i18next";
 import { Toast } from "../components/Toast";
 
 export default function DocumentsListPage() {
+  
+  const [shareOpen, setShareOpen] = useState(false);
+  const [docId, setDocId] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [trashCount, setTrashCount] = useState(0);
+
+  const [search, setSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<Document[] | null>(null);
+
+  const [sortBy, setSortBy] = useState<
+    | "name-asc"
+    | "name-desc"
+    | "created-asc"
+    | "created-desc"
+    | "updated-asc"
+    | "updated-desc"
+  >("updated-desc");
+
+  const [page, setPage] = useState(1);
+  const pageSize = 5;
+
+  
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, user, logout } = useAuth();
@@ -62,70 +84,24 @@ export default function DocumentsListPage() {
   // -----------------------------
   // SIDE EFFECT: LOGOUT + REDIRECT
   // -----------------------------
-
-/*
   useEffect(() => {
     if (!sessionExpired) return;
 
-    //setToastOpen(true);
+    setToastOpen(true);
 
     const timer = setTimeout(() => {
       logout();
       navigate("/login", { replace: true });
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [sessionExpired, logout, navigate]);
-  */
 
-
-
-
-  // -----------------------------
-  // PAGE STATE (ALL HOOKS FIRST)
-  // -----------------------------
-  const [shareOpen, setShareOpen] = useState(false);
-  const [docId, setDocId] = useState("");
-  const [users, setUsers] = useState<User[]>([]);
-  const [trashCount, setTrashCount] = useState(0);
-
-  const [search, setSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<Document[] | null>(null);
-
-  const [sortBy, setSortBy] = useState<
-    | "name-asc"
-    | "name-desc"
-    | "created-asc"
-    | "created-desc"
-    | "updated-asc"
-    | "updated-desc"
-  >("updated-desc");
-
-  const [page, setPage] = useState(1);
-  const pageSize = 5;
-
-  // -----------------------------
-  // TRASH COUNT
-  // -----------------------------
-  async function refreshTrashCount() {
-    if (!token) return;
-    const count = await getTrashCount(token);
-    setTrashCount(count);
-  }
-
-  
-  
   useEffect(() => {
-    if(documents.length > 0 || error || sessionExpired) {
-      console.log("documents", documents);
-      console.log("error", error);
-      console.log("sessionExpired", sessionExpired);
-
-       refreshTrashCount();
-    }
-  }, [token]);
-  
-
+    if (!token) return;
+    console.log("################################ 1 Refreshing trash count...", sessionExpired);
+    refreshTrashCount();
+  }, [token, sessionExpired]);
 
   // -----------------------------
   // SEARCH
@@ -133,6 +109,7 @@ export default function DocumentsListPage() {
   useEffect(() => {
     if (!token) return;
 
+    
     if (search.trim().length < 3) {
       setSearchResults(null);
       return;
@@ -147,28 +124,42 @@ export default function DocumentsListPage() {
   }, [search, token]);
 
   useEffect(() => {
+    if(!token) return;
     setPage(1);
-  }, [search, sortBy]);
+  }, [search, sortBy, token]);
 
 
 
-if (sessionExpired || !token) {
+  if (sessionExpired || !token) {
     console.log("Session expired. Logging out...");
     return (
       <Container maxWidth="md">
         <Toast
-          open={sessionExpired}
+          open={toastOpen}
           message="Session expired. Please log in again."
           severity="warning"
-          autoHideDuration={5000}
-          onClose={() => logout()}
+          autoHideDuration={2000}
+          onClose={() => setToastOpen(false)}
         />
       </Container>
     );
   }
 
 
+  // -----------------------------
+  // PAGE STATE (ALL HOOKS FIRST)
+  // -----------------------------
+  
+  // -----------------------------
+  // TRASH COUNT
+  // -----------------------------
+  async function refreshTrashCount() {
+    if (!token) return;
+    const count = await getTrashCount(token);
+    setTrashCount(count);
+  }
 
+  
   // -----------------------------
   // ACTIONS
   // -----------------------------
@@ -207,19 +198,19 @@ if (sessionExpired || !token) {
   // -----------------------------
   // BLOCK PAGE IF SESSION DEAD
   // -----------------------------
-  if (sessionExpired || !token) {
+/*  if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">
         <Toast
-          open={sessionExpired}
+          open={toastOpen}
           message="Session expired. Please log in again."
           severity="warning"
-          autoHideDuration={3000}
+          autoHideDuration={2000}
           onClose={() => setToastOpen(false)}
         />
       </Container>
     );
-  }
+  }*/
 
   // -----------------------------
   // LOADING / ERROR

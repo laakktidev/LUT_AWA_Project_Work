@@ -2,6 +2,7 @@ import axios from "axios";
 import { Document } from "../types/Document";
 import { BASE_URL } from "./config";
 
+
 export interface CreateDocumentInput {
   title: string;
   content: string;
@@ -14,6 +15,7 @@ export async function createDocument(
   data: CreateDocumentInput,
   token: string
 ): Promise<Document> {
+
   const response = await axios.post<Document>(
     `${BASE_URL}/document`,
     data,
@@ -179,7 +181,7 @@ export async function restoreDocument(id: string, token: string) {
     `${BASE_URL}/document/${id}/restore`,
     {},
     {
-      headers: {  
+      headers: {
         Authorization: `Bearer ${token}`,
       },
     }
@@ -213,7 +215,7 @@ export async function getTrashCount(token: string) {
 }
 
 export async function cloneDocument(id: string, token: string) {
-  
+
   const res = await axios.post(
     `${BASE_URL}/document/${id}/clone`,
     {},
@@ -245,7 +247,7 @@ export async function searchDocuments(search: string, token: string) {
   const res = await axios.get(
     `${BASE_URL}/document/search`,
     {
-      params: { q:search },
+      params: { q: search },
       headers: {
         Authorization: `Bearer ${token}`,
       },

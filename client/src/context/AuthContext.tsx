@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User } from "../types/User";
+import { isTokenExpired } from "../utils/isTokenExpired";
+
 
 interface AuthContextType {
   token: string | null;
@@ -19,12 +21,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   // Restore session on refresh
-  useEffect(() => {
+  /*useEffect(() => {
     const savedToken = localStorage.getItem("token");
     const savedUser = localStorage.getItem("user");
 
     if (savedToken) setToken(savedToken);
     if (savedUser) setUser(JSON.parse(savedUser));
+
+    setLoading(false);
+  }, []);*/
+
+  // Restore session on refresh
+  useEffect(() => {
+    const savedToken = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    if (!savedToken || isTokenExpired(savedToken)) {
+      // No token or expired token → ensure clean state
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setToken(null);
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
+    // Token exists and is valid
+    setToken(savedToken);
+
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
 
     setLoading(false);
   }, []);

@@ -62,23 +62,33 @@ export default function DocumentsListPage() {
   // -----------------------------
   // SIDE EFFECT: LOGOUT + REDIRECT
   // -----------------------------
-
-/*
   useEffect(() => {
     if (!sessionExpired) return;
 
-    //setToastOpen(true);
+    setToastOpen(true);
 
     const timer = setTimeout(() => {
       logout();
       navigate("/login", { replace: true });
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [sessionExpired, logout, navigate]);
-  */
 
-
+  if (sessionExpired || !token) {
+    console.log("Session expired. Logging out...");
+    return (
+      <Container maxWidth="md">
+        <Toast
+          open={toastOpen}
+          message="Session expired. Please log in again."
+          severity="warning"
+          autoHideDuration={2000}
+          onClose={() => setToastOpen(false)}
+        />
+      </Container>
+    );
+  }
 
 
   // -----------------------------
@@ -113,19 +123,9 @@ export default function DocumentsListPage() {
     setTrashCount(count);
   }
 
-  
-  
   useEffect(() => {
-    if(documents.length > 0 || error || sessionExpired) {
-      console.log("documents", documents);
-      console.log("error", error);
-      console.log("sessionExpired", sessionExpired);
-
-       refreshTrashCount();
-    }
+    refreshTrashCount();
   }, [token]);
-  
-
 
   // -----------------------------
   // SEARCH
@@ -149,25 +149,6 @@ export default function DocumentsListPage() {
   useEffect(() => {
     setPage(1);
   }, [search, sortBy]);
-
-
-
-if (sessionExpired || !token) {
-    console.log("Session expired. Logging out...");
-    return (
-      <Container maxWidth="md">
-        <Toast
-          open={sessionExpired}
-          message="Session expired. Please log in again."
-          severity="warning"
-          autoHideDuration={5000}
-          onClose={() => logout()}
-        />
-      </Container>
-    );
-  }
-
-
 
   // -----------------------------
   // ACTIONS
@@ -207,19 +188,19 @@ if (sessionExpired || !token) {
   // -----------------------------
   // BLOCK PAGE IF SESSION DEAD
   // -----------------------------
-  if (sessionExpired || !token) {
+/*  if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">
         <Toast
-          open={sessionExpired}
+          open={toastOpen}
           message="Session expired. Please log in again."
           severity="warning"
-          autoHideDuration={3000}
+          autoHideDuration={2000}
           onClose={() => setToastOpen(false)}
         />
       </Container>
     );
-  }
+  }*/
 
   // -----------------------------
   // LOADING / ERROR

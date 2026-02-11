@@ -19,6 +19,8 @@ import { loginUser } from "../services/userService";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 
+import { User } from "../types/User";
+
 export default function LoginPage() {
   const { t } = useTranslation();
 
@@ -51,7 +53,7 @@ export default function LoginPage() {
       return;
     }
 
-    login(data.token, data.user);
+    login(data.token, data.user as User);
     navigate("/");
   }
 
