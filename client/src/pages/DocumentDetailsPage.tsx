@@ -31,7 +31,7 @@ export default function DocumentDetailsPage() {
   // -----------------------------
   // HOOKS (must be at the top)
   // -----------------------------
-  const [toastOpen, setToastOpen] = useState(false);
+  //const [toastOpen, setToastOpen] = useState(false);
   const [sessionExpired, setSessionExpired] = useState(false);
 
   const { t } = useTranslation();
@@ -49,7 +49,7 @@ export default function DocumentDetailsPage() {
   // -----------------------------
     
   /////////////////////////////
-   useEffect(() => {
+   /*useEffect(() => {
     if (!sessionExpired) return;
 
     setToastOpen(true);
@@ -60,7 +60,7 @@ export default function DocumentDetailsPage() {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [sessionExpired, logout, navigate]);
+  }, [sessionExpired, logout, navigate]);*/
   /////////////////////////////
   
   /*
@@ -86,11 +86,11 @@ if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">
         <Toast
-          open={toastOpen}
+          open={sessionExpired}
           message="Session expired. Please log in again."
           severity="warning"
           autoHideDuration={3000}
-          onClose={() => setToastOpen(false)}
+          onClose={() => logout()}
         />
       </Container>
     );

@@ -164,7 +164,7 @@ const SignUpPage: React.FC = () => {
             : t("signup.error")
         }
         severity={toast === "success" ? "success" : "error"}
-        autoHideDuration={toast === "error" ? 5000 : 0}
+        autoHideDuration={toast === "error" ? 5000 : 3000}
         onClose={() => setToast(null)}
       />
     </Grid>

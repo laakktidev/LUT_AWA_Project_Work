@@ -9,6 +9,7 @@ import {
   InputAdornment,
   useMediaQuery,
   useTheme,
+  Container,
 } from "@mui/material";
 
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
@@ -21,11 +22,15 @@ import { useTranslation } from "react-i18next";
 
 import { User } from "../types/User";
 
+import { Toast } from "../components/Toast";
+
 export default function LoginPage() {
   const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const [toastOpen, setToastOpen] = useState(false);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -50,6 +55,7 @@ export default function LoginPage() {
 
     if (!data) {
       console.log(t("login.invalidCredentials"));
+      setToastOpen(true);
       return;
     }
 
@@ -132,6 +138,17 @@ export default function LoginPage() {
           </Typography>
         </Box>
       </Box>
+      <Container maxWidth="md">
+        <Toast
+          open={toastOpen}
+          message={t("login.invalidCredentials")}
+          severity="warning"
+          autoHideDuration={3000}
+          onClose={() => setToastOpen(false)}
+        />
+      </Container>
+
     </Grid>
+
   );
 }

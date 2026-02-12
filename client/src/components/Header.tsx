@@ -57,6 +57,7 @@ export default function Header() {
             </Typography>
           )}
 
+{/*
           <Button color="inherit" component={Link} to="/profile" sx={{ marginRight: 2 }}>
             Profile
           </Button>
@@ -64,6 +65,7 @@ export default function Header() {
           <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 1 }}>
             <LanguageSwitcher />
           </Box>
+
 
           {!token && (
             <>
@@ -75,7 +77,8 @@ export default function Header() {
               </Button>
             </>
           )}
-
+*/}
+{/*
           {token && (
             <Button
               color="inherit"
@@ -87,22 +90,22 @@ export default function Header() {
               Logout
             </Button>
           )}
-
-          <Button
+*/}
+          {/*<Button
             color="inherit"
             onClick={() => setMode(mode === "light" ? "dark" : "light")}
           >
             Toggle
-          </Button>
+          </Button>*/}
 
           <>
             {/* Button that opens the dialog */}
-            <Button variant="contained" onClick={() => setShowAbout(true)}>
+            {/*<Button variant="contained" onClick={() => setShowAbout(true)}>
               Open About
-            </Button>
+            </Button>*/}
 
             {/* The dialog */}
-            <About show={showAbout} onHide={() => setShowAbout(false)} />
+            {/*<About show={showAbout} onHide={() => setShowAbout(false)} />*/}
 
             <SettingsMenu />  
           </>
