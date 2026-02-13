@@ -7,6 +7,8 @@ import {
   TextField,
   Fade,
   Stack,
+  IconButton,
+  Container
 } from "@mui/material";
 
 import SlideEditor from "../components/SlideEditor";
@@ -14,15 +16,21 @@ import { Presentation } from "../types/Presentation";
 import { createPresentation } from "../services/presentationService";
 import { useAuth } from "../context/AuthContext";
 
+import { isTokenExpired } from "../utils/isTokenExpired";
+import { Toast } from "../components/Toast";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
 export default function PresentationCreatePage() {
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
 
   // Full presentation object (title included)
   const [presentation, setPresentation] = useState<Presentation>({
     _id: "",
     title: "",
     type: "presentation",
+    editors: [],
     slides: [
       {
         title: "",
@@ -32,10 +40,29 @@ export default function PresentationCreatePage() {
     userId: "",
   });
 
+
   const [saving, setSaving] = useState(false);
 
   // Parent‑controlled slide index
   const [index, setIndex] = useState(0);
+
+  if (token) {
+    const sessionExpired = isTokenExpired(token);
+    if (sessionExpired) {
+      console.log("Session expired. Logging out...");
+      return (
+        <Container maxWidth="md">
+          <Toast
+            open={sessionExpired}
+            message="Session expired. Please log in again."
+            severity="warning"
+            autoHideDuration={5000}
+            onClose={() => logout()}
+          />
+        </Container>
+      );
+    }
+  }
 
   // Navigation callbacks
   const next = useCallback(() => {
@@ -98,17 +125,24 @@ export default function PresentationCreatePage() {
   return (
     <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
       {/* Header */}
-      <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Typography variant="h4">Create New Presentation</Typography>
+      <Stack direction="row" alignItems="center" mb={2} sx={{ position: "relative" }}>
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
 
-        <Button
-          variant="outlined"
-          color="inherit"
-          onClick={() => navigate("/presentations")}
+        <Box
+          sx={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            pointerEvents: "none" // <-- important!
+          }}
         >
-          Back to list
-        </Button>
+          <Typography variant="h4">Create New Presentation</Typography>
+        </Box>
       </Stack>
+
 
       {/* Title input */}
       <TextField

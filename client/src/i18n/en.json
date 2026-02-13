@@ -96,7 +96,7 @@
   },
   "presentations": {
     "title": "Presentations",
-    "new": "New Presentation",
+    "new": "New",
     "empty": "No presentations yet.",
     "searchPlaceholder": "Search presentations...",
     "sort": {

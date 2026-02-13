@@ -4,10 +4,14 @@ import {
   Box,
   Typography,
   Button,
+  IconButton,
   TextField,
   Fade,
   Stack,
+  Container
 } from "@mui/material";
+
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 import SlideEditor from "../components/SlideEditor";
 import { Presentation } from "../types/Presentation";
@@ -18,16 +22,39 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 
+import { isTokenExpired } from "../utils/isTokenExpired";
+import { Toast } from "../components/Toast";
+
 export default function PresentationEditPage() {
   const navigate = useNavigate();
   const { id } = useParams();
-  const { token } = useAuth();
+  const { token, logout } = useAuth();
   const { t } = useTranslation();
 
   const [presentation, setPresentation] = useState<Presentation | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [index, setIndex] = useState(0);
+
+
+  if (token) {
+    const sessionExpired = isTokenExpired(token);
+    if (sessionExpired) {
+      console.log("Session expired. Logging out...");
+      return (
+        <Container maxWidth="md">
+          <Toast
+            open={sessionExpired}
+            message="Session expired. Please log in again."
+            severity="warning"
+            autoHideDuration={5000}
+            onClose={() => logout()}
+          />
+        </Container>
+      );
+    }
+  }
+
 
   useEffect(() => {
     if (!token || !id) return;
@@ -110,18 +137,28 @@ export default function PresentationEditPage() {
   return (
     <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
       {/* Header */}
-      <Stack direction="row" justifyContent="space-between" mb={2}>
-        <Typography variant="h4">
+      <Stack
+        direction="row"
+        alignItems="center"
+        mb={2}
+        sx={{ position: "relative" }}
+      >
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
+
+        <Typography
+          variant="h4"
+          sx={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            textAlign: "center",
+            pointerEvents: "none" // ensures the button stays clickable
+          }}
+        >
           {t("presentations.edit.title")}
         </Typography>
-
-        <Button
-          variant="outlined"
-          color="inherit"
-          onClick={() => navigate("/presentations")}
-        >
-          {t("presentations.edit.back")}
-        </Button>
       </Stack>
 
       {/* Title input */}

@@ -54,8 +54,6 @@ export default function DocumentEditPage() {
     }
   }
 
-
-
   useEffect(() => {
     async function load() {
       if (!id || !token) return;

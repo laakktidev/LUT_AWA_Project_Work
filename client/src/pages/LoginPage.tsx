@@ -138,15 +138,14 @@ export default function LoginPage() {
           </Typography>
         </Box>
       </Box>
-      <Container maxWidth="md">
+      
         <Toast
           open={toastOpen}
           message={t("login.invalidCredentials")}
           severity="warning"
           autoHideDuration={3000}
           onClose={() => setToastOpen(false)}
-        />
-      </Container>
+        />      
 
     </Grid>
 

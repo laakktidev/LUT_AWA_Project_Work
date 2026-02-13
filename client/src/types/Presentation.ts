@@ -4,6 +4,7 @@ export interface Presentation {
   type: "presentation";
   slides: Slide[];
   userId: string;
+  editors: string[];
   createdAt?: string;
   updatedAt?: string;
 }

@@ -30,7 +30,7 @@ import { useTranslation } from "react-i18next";
 import { ShareDialog } from "../components/ShareDialog";
 import { User } from "../types/User";
 
-import {  
+import {
   deletePresentation,
   searchPresentations,
   sharePresentation
@@ -38,10 +38,16 @@ import {
 
 import { getUsers } from "../services/userService";
 
+import { isTokenExpired } from "../utils/isTokenExpired";
+import { Toast } from "../components/Toast";
+
+
+
 export default function PresentationsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { token, user } = useAuth();
+  //const { token, logout } = useAuth();
+  const { token, user, logout } = useAuth();
 
   //const [presentations, setPresentations] = useState<any[]>([]);
   //const [loading, setLoading] = useState(true);
@@ -63,6 +69,28 @@ export default function PresentationsListPage() {
   const pageSize = 5;
 
 
+  //const { presentations, loading, error, refetch } = usePresentations(token);
+
+
+  if (token) {
+    const sessionExpired = isTokenExpired(token);
+    if (sessionExpired) {
+      console.log("Session expired. Logging out...");
+      return (
+        <Container maxWidth="md">
+          <Toast
+            open={sessionExpired}
+            message="Session expired. Please log in again."
+            severity="warning"
+            autoHideDuration={5000}
+            onClose={() => logout()}
+          />
+        </Container>
+      );
+    }
+  }
+
+  
   const { presentations, loading, error, refetch } = usePresentations(token);
 
 
@@ -80,6 +108,7 @@ export default function PresentationsListPage() {
   /* -----------------------------
      Search (backend)
   ------------------------------*/
+
 
   useEffect(() => {
     if (!token) return;
@@ -130,14 +159,14 @@ export default function PresentationsListPage() {
   /* -----------------------------
      Share
   ------------------------------*/
-  
-async function handleShare(selectedUserIds: string[]) {
+
+  async function handleShare(selectedUserIds: string[]) {
     if (!token) return;
     await sharePresentation(presId, selectedUserIds, token);
     refetch();
   }
 
-  
+
   async function openShareSelection(pres: any) {
     if (!token) return;
 
@@ -151,7 +180,7 @@ async function handleShare(selectedUserIds: string[]) {
     setShareOpen(true);
   }
 
-  
+
   const handleDelete = async (id: string) => {
     if (!token) return;
     await deletePresentation(id, token);
@@ -218,7 +247,7 @@ async function handleShare(selectedUserIds: string[]) {
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        users={users}        
+        users={users}
         onShare={(selectedUserIds) => {
           setShareOpen(false);
           handleShare(selectedUserIds);

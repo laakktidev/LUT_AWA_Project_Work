@@ -49,7 +49,7 @@ export default function DocumentsListPage() {
   // SESSION EXPIRED STATE
   // -----------------------------
   const [sessionExpired, setSessionExpired] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
+//  const [toastOpen, setToastOpen] = useState(false);
 
   // -----------------------------
   // DOCUMENTS
@@ -207,6 +207,7 @@ if (sessionExpired || !token) {
   // -----------------------------
   // BLOCK PAGE IF SESSION DEAD
   // -----------------------------
+  /*
   if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">
@@ -219,7 +220,7 @@ if (sessionExpired || !token) {
         />
       </Container>
     );
-  }
+  }*/
 
   // -----------------------------
   // LOADING / ERROR

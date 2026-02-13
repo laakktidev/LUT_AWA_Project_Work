@@ -3,6 +3,7 @@ import {
   Box,
   Typography,
   Button,
+  IconButton,
   CircularProgress,
   Stack,
   Paper,
@@ -13,15 +14,44 @@ import { useAuth } from "../context/AuthContext";
 import { usePresentation } from "../hooks/usePresentation";
 import { useState, useEffect, useCallback, useRef } from "react";
 
+import EditIcon from "@mui/icons-material/Edit";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+
+import { isTokenExpired } from "../utils/isTokenExpired";
+import { Toast } from "../components/Toast";
+
 export default function PresentationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user, logout } = useAuth();
+
+
+  if (token) {
+    const sessionExpired = isTokenExpired(token);
+    if (sessionExpired) {
+      console.log("Session expired. Logging out...");
+      return (
+        <Container maxWidth="md">
+          <Toast
+            open={sessionExpired}
+            message="Session expired. Please log in again."
+            severity="warning"
+            autoHideDuration={5000}
+            onClose={() => logout()}
+          />
+        </Container>
+      );
+    }
+  }
 
   const { presentation, loading, error } = usePresentation(id, token);
 
   const [index, setIndex] = useState(0);
   const touchStartXRef = useRef<number | null>(null);
+
+  const isOwner = user?.id === presentation?.userId;
+  const isEditor = presentation?.editors?.includes(user?.id as string);
+  const canEdit = isOwner || isEditor;
 
   const next = useCallback(() => {
     if (!presentation) return;
@@ -93,6 +123,10 @@ export default function PresentationPage() {
         alignItems="center"
         mb={3}
       >
+        <IconButton onClick={() => navigate(-1)}>
+          <ArrowBackIcon />
+        </IconButton>
+
         <Box>
           <Typography variant="h4" fontWeight={600}>
             {presentation.title}
@@ -114,103 +148,98 @@ export default function PresentationPage() {
         </Box>
 
         <Stack direction="row" spacing={2}>
-          <Button
-            variant="outlined"
-            color="inherit"
-            onClick={() => navigate("/presentations")}
-          >
-            Back to list
-          </Button>
-
-          <Button
-            variant="contained"
-            color="primary"
+        
+        {canEdit && (
+          <IconButton
             onClick={() => navigate(`/presentation/${presentation._id}/edit`)}
+            sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}
           >
-            Edit presentation
-          </Button>
-        </Stack>
+            <EditIcon />
+          </IconButton>
+        )}
+
       </Stack>
+    </Stack>
 
-      {/* Slide viewer (cheap carousel) */}
-      <Paper
-        elevation={2}
-        sx={{
-          position: "relative",
-          height: 320,
-          overflow: "hidden",
-          borderRadius: 2,
-          p: 3,
-          mb: 2,
-        }}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
-        <Fade in key={index} timeout={250}>
-          <Box sx={{ height: "100%" }}>
-            <Typography variant="h5" fontWeight={600} gutterBottom>
-              {slide.title || `Slide ${index + 1}`}
-            </Typography>
+      {/* Slide viewer (cheap carousel) */ }
+  <Paper
+    elevation={2}
+    sx={{
+      position: "relative",
+      height: 320,
+      overflow: "hidden",
+      borderRadius: 2,
+      p: 3,
+      mb: 2,
+    }}
+    onTouchStart={handleTouchStart}
+    onTouchEnd={handleTouchEnd}
+  >
+    <Fade in key={index} timeout={250}>
+      <Box sx={{ height: "100%" }}>
+        <Typography variant="h5" fontWeight={600} gutterBottom>
+          {slide.title || `Slide ${index + 1}`}
+        </Typography>
 
-            {slide.bullets.length === 0 ? (
-              <Typography variant="body2" color="text.secondary">
-                No bullets
-              </Typography>
-            ) : (
-              <ul>
-                {slide.bullets.map((b, i) => (
-                  <li key={i}>
-                    <Typography variant="body1">{b}</Typography>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Box>
-        </Fade>
-
-        {/* Navigation arrows */}
-        <Button
-          onClick={prev}
-          disabled={index === 0}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: 8,
-            transform: "translateY(-50%)",
-            minWidth: 0,
-          }}
-        >
-          ◀
-        </Button>
-
-        <Button
-          onClick={next}
-          disabled={index === presentation.slides.length - 1}
-          sx={{
-            position: "absolute",
-            top: "50%",
-            right: 8,
-            transform: "translateY(-50%)",
-            minWidth: 0,
-          }}
-        >
-          ▶
-        </Button>
-
-        {/* Slide indicator */}
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 8,
-            left: "50%",
-            transform: "translateX(-50%)",
-          }}
-        >
-          <Typography variant="caption" color="text.secondary">
-            Slide {index + 1} / {presentation.slides.length}
+        {slide.bullets.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            No bullets
           </Typography>
-        </Box>
-      </Paper>
-    </Container>
+        ) : (
+          <ul>
+            {slide.bullets.map((b, i) => (
+              <li key={i}>
+                <Typography variant="body1">{b}</Typography>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Box>
+    </Fade>
+
+    {/* Navigation arrows */}
+    <Button
+      onClick={prev}
+      disabled={index === 0}
+      sx={{
+        position: "absolute",
+        top: "50%",
+        left: 8,
+        transform: "translateY(-50%)",
+        minWidth: 0,
+      }}
+    >
+      ◀
+    </Button>
+
+    <Button
+      onClick={next}
+      disabled={index === presentation.slides.length - 1}
+      sx={{
+        position: "absolute",
+        top: "50%",
+        right: 8,
+        transform: "translateY(-50%)",
+        minWidth: 0,
+      }}
+    >
+      ▶
+    </Button>
+
+    {/* Slide indicator */}
+    <Box
+      sx={{
+        position: "absolute",
+        bottom: 8,
+        left: "50%",
+        transform: "translateX(-50%)",
+      }}
+    >
+      <Typography variant="caption" color="text.secondary">
+        Slide {index + 1} / {presentation.slides.length}
+      </Typography>
+    </Box>
+  </Paper>
+    </Container >
   );
 }
