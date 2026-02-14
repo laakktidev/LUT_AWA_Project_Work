@@ -10,10 +10,35 @@ import ImageIcon from "@mui/icons-material/Image";
 import { useTranslation } from "react-i18next";
 
 interface Props {
+  /** Tiptap editor instance. If null, the toolbar is not rendered. */
   editor: Editor | null;
+
+  /** Fired when the user clicks the “insert image” button. */
   onImageAddRequest: () => void;
 }
 
+/**
+ * Toolbar for the document editor.
+ *
+ * @remarks
+ * Provides formatting controls for:
+ * - **bold**
+ * - **italic**
+ * - **bullet list**
+ * - **numbered list**
+ * - **image insertion**
+ *
+ * This component is intentionally stateless:
+ * - All formatting actions are delegated to the provided Tiptap `editor` instance.
+ * - Image selection is delegated to the parent via `onImageAddRequest`.
+ *
+ * If the editor instance is not yet ready, the toolbar is not rendered.
+ *
+ * @param editor - Active Tiptap editor instance.
+ * @param onImageAddRequest - Callback fired when the user requests to insert an image.
+ *
+ * @returns JSX element representing the formatting toolbar.
+ */
 export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
   const { t } = useTranslation();
 

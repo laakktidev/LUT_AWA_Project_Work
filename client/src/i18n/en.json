@@ -20,7 +20,7 @@
     "error": "Signup failed"
   },
   "documents": {
-    "title": "My Documents",
+    "title": "Documents",
     "searchPlaceholder": "Search…",
     "new": "New",
     "trash": "Trash",
@@ -122,6 +122,12 @@
       "addBullet": "Add Bullet",
       "deleteSlide": "Delete Slide",
       "addSlide": "Add Slide"
+    }    
+  },
+  "header": {
+      "documents": "Documents",
+      "presentations": "Presentations",
+      "menuDocuments": "Documents",
+      "menuPresentations": "Presentations"
     }
-  }
 }

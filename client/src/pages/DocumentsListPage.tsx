@@ -40,6 +40,25 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { Toast } from "../components/Toast";
 
+/**
+ * Renders the main document list page for authenticated users.
+ *
+ * @remarks
+ * This page supports:
+ * - Searching documents (debounced)
+ * - Sorting by name, creation date, or update date
+ * - Pagination
+ * - Sharing documents with other users
+ * - Cloning and soft‑deleting documents
+ * - Navigating to create, view, edit, or trash pages
+ *
+ * It also handles:
+ * - Session expiration
+ * - Loading and error states
+ * - Toast notifications
+ *
+ * @returns JSX element representing the document list page.
+ */
 export default function DocumentsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -48,50 +67,48 @@ export default function DocumentsListPage() {
   // -----------------------------
   // SESSION EXPIRED STATE
   // -----------------------------
+
+  /** Whether the user's session has expired. */
   const [sessionExpired, setSessionExpired] = useState(false);
-//  const [toastOpen, setToastOpen] = useState(false);
 
   // -----------------------------
   // DOCUMENTS
   // -----------------------------
+
+  /**
+   * Fetches the user's documents.
+   *
+   * @remarks
+   * If the backend returns 401, the hook triggers the sessionExpired callback.
+   */
   const { documents, loading, error, refetch } = useDocuments(
     token,
     () => setSessionExpired(true)
   );
 
   // -----------------------------
-  // SIDE EFFECT: LOGOUT + REDIRECT
+  // PAGE STATE
   // -----------------------------
 
-/*
-  useEffect(() => {
-    if (!sessionExpired) return;
-
-    //setToastOpen(true);
-
-    const timer = setTimeout(() => {
-      logout();
-      navigate("/login", { replace: true });
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [sessionExpired, logout, navigate]);
-  */
-
-
-
-
-  // -----------------------------
-  // PAGE STATE (ALL HOOKS FIRST)
-  // -----------------------------
+  /** Controls visibility of the share dialog. */
   const [shareOpen, setShareOpen] = useState(false);
+
+  /** ID of the document currently being shared. */
   const [docId, setDocId] = useState("");
+
+  /** List of users eligible for sharing. */
   const [users, setUsers] = useState<User[]>([]);
+
+  /** Number of items in the trash. */
   const [trashCount, setTrashCount] = useState(0);
 
+  /** Search input value. */
   const [search, setSearch] = useState("");
+
+  /** Search results (null = no search active). */
   const [searchResults, setSearchResults] = useState<Document[] | null>(null);
 
+  /** Sorting mode. */
   const [sortBy, setSortBy] = useState<
     | "name-asc"
     | "name-desc"
@@ -101,35 +118,47 @@ export default function DocumentsListPage() {
     | "updated-desc"
   >("updated-desc");
 
+  /** Current pagination page. */
   const [page, setPage] = useState(1);
+
+  /** Number of documents per page. */
   const pageSize = 5;
 
   // -----------------------------
   // TRASH COUNT
   // -----------------------------
+
+  /**
+   * Fetches the number of items in the trash.
+   *
+   * @returns Promise resolving when the count is updated.
+   */
   async function refreshTrashCount() {
     if (!token) return;
     const count = await getTrashCount(token);
     setTrashCount(count);
   }
 
-  
-  
+  /**
+   * Updates trash count when documents load or session state changes.
+   */
   useEffect(() => {
-    if(documents.length > 0 || error || sessionExpired) {
-      console.log("documents", documents);
-      console.log("error", error);
-      console.log("sessionExpired", sessionExpired);
-
-       refreshTrashCount();
+    if (documents.length > 0 || error || sessionExpired) {
+      refreshTrashCount();
     }
   }, [token]);
-  
-
 
   // -----------------------------
   // SEARCH
   // -----------------------------
+
+  /**
+   * Debounced search effect.
+   *
+   * @remarks
+   * - Clears results when search text < 3 chars
+   * - Calls backend after 300ms delay
+   */
   useEffect(() => {
     if (!token) return;
 
@@ -146,14 +175,21 @@ export default function DocumentsListPage() {
     return () => clearTimeout(timeout);
   }, [search, token]);
 
+  /**
+   * Resets pagination when search or sorting changes.
+   */
   useEffect(() => {
     setPage(1);
   }, [search, sortBy]);
 
+  // -----------------------------
+  // SESSION EXPIRED BLOCK
+  // -----------------------------
 
-
-if (sessionExpired || !token) {
-    console.log("Session expired. Logging out...");
+  /**
+   * Blocks the page when the session is expired.
+   */
+  if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">
         <Toast
@@ -167,17 +203,26 @@ if (sessionExpired || !token) {
     );
   }
 
-
-
   // -----------------------------
   // ACTIONS
   // -----------------------------
+
+  /**
+   * Shares a document with selected users.
+   *
+   * @param userIds - Array of user IDs to share the document with.
+   */
   async function handleShareDocument(userIds: string[]) {
     if (!token) return;
     await shareDocument(docId, userIds, token);
     refetch();
   }
 
+  /**
+   * Opens the share dialog and loads eligible users.
+   *
+   * @param doc - The document to share.
+   */
   async function openShareSelection(doc: Document) {
     if (!token) return;
 
@@ -191,6 +236,11 @@ if (sessionExpired || !token) {
     setShareOpen(true);
   }
 
+  /**
+   * Soft-deletes a document.
+   *
+   * @param id - Document ID.
+   */
   async function handleDelete(id: string) {
     if (!token) return;
     await softDeleteDocument(id, token);
@@ -198,6 +248,11 @@ if (sessionExpired || !token) {
     await refreshTrashCount();
   }
 
+  /**
+   * Creates a clone of a document.
+   *
+   * @param id - Document ID.
+   */
   async function handleClone(id: string) {
     if (!token) return;
     await cloneDocument(id, token);
@@ -205,26 +260,12 @@ if (sessionExpired || !token) {
   }
 
   // -----------------------------
-  // BLOCK PAGE IF SESSION DEAD
-  // -----------------------------
-  /*
-  if (sessionExpired || !token) {
-    return (
-      <Container maxWidth="md">
-        <Toast
-          open={sessionExpired}
-          message="Session expired. Please log in again."
-          severity="warning"
-          autoHideDuration={3000}
-          onClose={() => setToastOpen(false)}
-        />
-      </Container>
-    );
-  }*/
-
-  // -----------------------------
   // LOADING / ERROR
   // -----------------------------
+
+  /**
+   * Displays loading spinner while fetching documents.
+   */
   if (loading) {
     return (
       <Container maxWidth="md">
@@ -235,6 +276,9 @@ if (sessionExpired || !token) {
     );
   }
 
+  /**
+   * Displays error message if fetching documents fails.
+   */
   if (error) {
     return (
       <Container maxWidth="md">
@@ -246,6 +290,10 @@ if (sessionExpired || !token) {
   // -----------------------------
   // SORTING + PAGINATION
   // -----------------------------
+
+  /**
+   * Sorted list of documents based on selected sort mode.
+   */
   const sortedDocs = [...documents].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
@@ -265,13 +313,19 @@ if (sessionExpired || !token) {
     }
   });
 
+  /** Final list of documents to display (search results override sorting). */
   const docsToShow = searchResults ?? sortedDocs;
+
+  /** Index of first item on current page. */
   const start = (page - 1) * pageSize;
+
+  /** Documents visible on current page. */
   const paginatedDocs = docsToShow.slice(start, start + pageSize);
 
   // -----------------------------
   // RENDER
   // -----------------------------
+
   return (
     <Container maxWidth="md">
       <ShareDialog

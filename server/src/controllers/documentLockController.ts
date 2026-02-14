@@ -5,8 +5,27 @@ import {
   unlockDocumentInDb
 } from "../services/documentLockService";
 
-
-// LOCK DOCUMENT
+/* =======================================================
+   LOCK DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Locks a document for exclusive editing by the authenticated user.
+ *
+ * @remarks
+ * This controller:
+ * - ensures the user is authenticated
+ * - loads the document using `getDocumentForLocking`
+ * - checks whether the document is already locked by another user
+ * - applies the lock using `lockDocumentInDb`
+ *
+ * If the document is already locked by someone else, a `423 Locked`
+ * response is returned.
+ *
+ * @param req - Express request containing user info and document ID.
+ * @param res - Express response returning lock status.
+ *
+ * @returns A JSON message confirming the lock or an error response.
+ */
 export const lockDocument = async (req: Request, res: Response) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -27,8 +46,26 @@ export const lockDocument = async (req: Request, res: Response) => {
   res.json({ message: "Document locked" });
 };
 
-
-// UNLOCK DOCUMENT
+/* =======================================================
+   UNLOCK DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Unlocks a document previously locked by the authenticated user.
+ *
+ * @remarks
+ * This controller:
+ * - ensures the user is authenticated
+ * - loads the document using `getDocumentForLocking`
+ * - verifies that the current user owns the lock
+ * - removes the lock using `unlockDocumentInDb`
+ *
+ * If the user does not own the lock, a `403 Forbidden` response is returned.
+ *
+ * @param req - Express request containing user info and document ID.
+ * @param res - Express response confirming unlock status.
+ *
+ * @returns A JSON message confirming the unlock or an error response.
+ */
 export const unlockDocument = async (req: Request, res: Response) => {
   if (!req.user) {
     return res.status(401).json({ message: "Unauthorized" });

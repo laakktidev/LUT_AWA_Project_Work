@@ -9,8 +9,22 @@ import {
   deleteDocumentById
 } from "../services/documentService";
 
-
-// CREATE DOCUMENT
+/* =======================================================
+   CREATE DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Creates a new document for the authenticated user.
+ *
+ * @remarks
+ * Validates that a title is provided, then delegates creation to the
+ * database service. Returns the newly created document in a normalized
+ * response format.
+ *
+ * @param req - Express request containing `title` and `content`.
+ * @param res - Express response used to send the created document.
+ *
+ * @returns A JSON response with the new document or an error message.
+ */
 export const createDocument = async (req: Request, res: Response) => {
   try {
     const { title, content } = req.body;
@@ -38,9 +52,17 @@ export const createDocument = async (req: Request, res: Response) => {
   }
 };
 
-
-
-// GET ALL DOCUMENTS
+/* =======================================================
+   GET ALL DOCUMENTS
+   ------------------------------------------------------- */
+/**
+ * Retrieves all documents owned by or shared with the authenticated user.
+ *
+ * @param req - Express request containing authenticated user info.
+ * @param res - Express response returning the list of documents.
+ *
+ * @returns A JSON array of documents.
+ */
 export const getDocuments = async (req: Request, res: Response) => {
   try {
     const docs = await getAllDocumentsForUser(req.user!._id);
@@ -51,8 +73,25 @@ export const getDocuments = async (req: Request, res: Response) => {
   }
 };
 
-
-// GET SINGLE DOCUMENT
+/* =======================================================
+   GET SINGLE DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Retrieves a single document by ID with permission checks.
+ *
+ * @remarks
+ * Access is granted if:
+ * - the user is the owner
+ * - the user is an editor
+ * - the document is public
+ *
+ * If the document is locked by another user, a `lockWarning` is included.
+ *
+ * @param req - Express request containing document ID and user info.
+ * @param res - Express response returning the document or an error.
+ *
+ * @returns The document, optionally with a lock warning.
+ */
 export const getDocument = async (req: Request, res: Response) => {
   try {
     const userId = req.user!._id.toString();
@@ -85,8 +124,24 @@ export const getDocument = async (req: Request, res: Response) => {
   }
 };
 
-
-// UPDATE DOCUMENT (already correct)
+/* =======================================================
+   UPDATE DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Updates a document's title and content.
+ *
+ * @remarks
+ * This controller:
+ * - loads the existing document
+ * - extracts image URLs from old and new content
+ * - deletes removed images from disk
+ * - updates the document in the database
+ *
+ * @param req - Express request containing updated fields.
+ * @param res - Express response returning the updated document.
+ *
+ * @returns The updated document or an error message.
+ */
 export const updateDocument = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -123,8 +178,24 @@ export const updateDocument = async (req: Request, res: Response) => {
   }
 };
 
-
-// DELETE DOCUMENT
+/* =======================================================
+   DELETE DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Deletes a document and all associated images.
+ *
+ * @remarks
+ * Steps:
+ * - load the document
+ * - extract image URLs from its content
+ * - delete each image file from disk
+ * - delete the document from the database
+ *
+ * @param req - Express request containing document ID.
+ * @param res - Express response confirming deletion.
+ *
+ * @returns A success message or an error.
+ */
 export const deleteDocument = async (req: Request, res: Response) => {
   try {
     const docId = req.params.id;

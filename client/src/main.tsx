@@ -5,11 +5,41 @@ import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import "./i18n";
 
-
+/**
+ * Root component that initializes global application providers.
+ *
+ * @remarks
+ * This component wraps the entire application with:
+ *
+ * - **AuthProvider** — supplies authentication state and session handling  
+ * - **ThemeProvider** — provides Material UI theming (light/dark modes, breakpoints, overrides)  
+ * - **CssBaseline** — resets and normalizes browser styles  
+ *
+ * It also defines the custom MUI theme used across the app, including:
+ * - responsive breakpoints
+ * - light/dark color schemes
+ * - component style overrides (e.g., switches)
+ *
+ * All routing and page rendering happens inside the nested `<App />` component.
+ *
+ * @returns The fully wrapped application tree.
+ */
 const Root = () => {
   const theme = createTheme({
     cssVariables: { colorSchemeSelector: "class" },
 
+    // Custom breakpoints for better mobile/tablet/desktop behavior
+    breakpoints: {
+      values: {
+        xs: 0,
+        sm: 700,
+        md: 1100,
+        lg: 1400,
+        xl: 1800,
+      },
+    },
+
+    // Light + Dark mode palettes
     colorSchemes: {
       light: {
         palette: {
@@ -20,19 +50,18 @@ const Root = () => {
           },
         },
       },
-
       dark: {
         palette: {
           primary: { main: "#2dd4bf" },
           background: {
             default: "#0d1117",
-            paper:  "#161b22",
+            paper: "#161b22",
           },
         },
       },
     },
 
-    // IMPORTANT: components must be OUTSIDE colorSchemes
+    // Component overrides
     components: {
       MuiSwitch: {
         styleOverrides: {
@@ -71,6 +100,7 @@ const Root = () => {
   );
 };
 
+// Mount the React application
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Root />

@@ -17,6 +17,27 @@ import SendEmailDialog from "./SendEmailDialog";
 import { PublicVisibilityProps } from "../types/PublicVisibilityProps";
 import { useTranslation } from "react-i18next";
 
+/**
+ * Controls the public/private visibility of a document.
+ *
+ * @remarks
+ * This section is only visible to the document owner and provides:
+ * - a toggle between **public** and **private** visibility
+ * - a shareable public URL when visibility is enabled
+ * - copy‑to‑clipboard functionality
+ * - a “send via email” action that opens a dialog
+ *
+ * The component does not perform any backend operations itself; it delegates
+ * visibility changes to the parent via `onTogglePublic`.
+ *
+ * @param isOwner - Whether the current user owns the document.
+ * @param isPublic - Current visibility state of the document.
+ * @param documentId - ID used to generate the public URL.
+ * @param docTitle - Title used when sending the link via email.
+ * @param onTogglePublic - Callback fired when the visibility switch is toggled.
+ *
+ * @returns JSX element for controlling document visibility.
+ */
 export default function PublicVisibilitySection({
   isOwner,
   isPublic,
@@ -25,13 +46,22 @@ export default function PublicVisibilitySection({
   onTogglePublic,
 }: PublicVisibilityProps) {
   const { t } = useTranslation();
+
+  /** Whether the “copied to clipboard” feedback text is visible. */
   const [copied, setCopied] = useState(false);
+
+  /** Controls visibility of the email‑sending dialog. */
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
+  // Non‑owners should not see this section
   if (!isOwner) return null;
 
+  /** Public URL for sharing the document. */
   const publicUrl = `${window.location.origin}/public/${documentId}`;
 
+  /**
+   * Copies the public URL to the clipboard and shows temporary feedback.
+   */
   const handleCopy = () => {
     navigator.clipboard.writeText(publicUrl);
     setCopied(true);

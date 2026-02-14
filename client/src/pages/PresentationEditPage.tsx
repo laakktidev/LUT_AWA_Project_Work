@@ -7,8 +7,7 @@ import {
   IconButton,
   TextField,
   Fade,
-  Stack,
-  Container
+  Stack
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -24,25 +23,49 @@ import { useTranslation } from "react-i18next";
 
 import { isTokenExpired } from "../utils/isTokenExpired";
 import { Toast } from "../components/Toast";
+import PageContainer from "../layout/PageContainer";
 
+/**
+ * Page for editing an existing presentation.
+ *
+ * @remarks
+ * This page allows the user to:
+ * - load an existing presentation
+ * - edit its title and slides
+ * - navigate between slides using keyboard or swipe gestures
+ * - save changes back to the server
+ *
+ * It also handles session expiration and prevents editing when the token is invalid.
+ *
+ * @returns JSX element representing the presentation editing page.
+ */
 export default function PresentationEditPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { token, logout } = useAuth();
   const { t } = useTranslation();
 
+  /** The presentation being edited. */
   const [presentation, setPresentation] = useState<Presentation | null>(null);
+
+  /** Whether the presentation is currently being saved. */
   const [saving, setSaving] = useState(false);
 
+  /** Index of the currently active slide. */
   const [index, setIndex] = useState(0);
 
+  // -----------------------------
+  // SESSION EXPIRED HANDLING
+  // -----------------------------
 
+  /**
+   * If the token exists but is expired, block the page and show a toast.
+   */
   if (token) {
     const sessionExpired = isTokenExpired(token);
     if (sessionExpired) {
-      console.log("Session expired. Logging out...");
       return (
-        <Container maxWidth="md">
+        <PageContainer>
           <Toast
             open={sessionExpired}
             message="Session expired. Please log in again."
@@ -50,15 +73,23 @@ export default function PresentationEditPage() {
             autoHideDuration={5000}
             onClose={() => logout()}
           />
-        </Container>
+        </PageContainer>
       );
     }
   }
 
+  // -----------------------------
+  // LOAD PRESENTATION
+  // -----------------------------
 
   useEffect(() => {
     if (!token || !id) return;
 
+    /**
+     * Loads the presentation from the server.
+     *
+     * @returns Promise resolving when the presentation is loaded.
+     */
     const load = async () => {
       try {
         const data = await getPresentationById(id, token);
@@ -71,15 +102,36 @@ export default function PresentationEditPage() {
     load();
   }, [id, token]);
 
+  // -----------------------------
+  // SLIDE NAVIGATION
+  // -----------------------------
+
+  /**
+   * Moves to the next slide if possible.
+   *
+   * @returns void
+   */
   const next = useCallback(() => {
     if (!presentation) return;
     setIndex((i) => Math.min(i + 1, presentation.slides.length - 1));
   }, [presentation?.slides.length]);
 
+  /**
+   * Moves to the previous slide if possible.
+   *
+   * @returns void
+   */
   const prev = useCallback(() => {
     setIndex((i) => Math.max(i - 1, 0));
   }, []);
 
+  // -----------------------------
+  // KEYBOARD NAVIGATION
+  // -----------------------------
+
+  /**
+   * Enables left/right arrow key navigation between slides.
+   */
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
@@ -90,12 +142,27 @@ export default function PresentationEditPage() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [next, prev]);
 
+  // -----------------------------
+  // SWIPE NAVIGATION
+  // -----------------------------
+
+  /** Stores the X‑coordinate of the initial touch event. */
   const touchStartXRef = useRef<number | null>(null);
 
+  /**
+   * Records the starting X position of a touch gesture.
+   *
+   * @param e - Touch start event.
+   */
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
   };
 
+  /**
+   * Detects swipe direction and navigates slides accordingly.
+   *
+   * @param e - Touch end event.
+   */
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartXRef.current === null) return;
     const diff = e.changedTouches[0].clientX - touchStartXRef.current;
@@ -106,6 +173,19 @@ export default function PresentationEditPage() {
     touchStartXRef.current = null;
   };
 
+  // -----------------------------
+  // SAVE PRESENTATION
+  // -----------------------------
+
+  /**
+   * Saves the updated presentation to the server.
+   *
+   * @remarks
+   * Only the title and slides are sent to the backend.
+   * After saving, the user is redirected to the presentations list.
+   *
+   * @returns Promise resolving when the save completes.
+   */
   const handleSave = async () => {
     if (!token || !presentation || !id) return;
 
@@ -126,16 +206,27 @@ export default function PresentationEditPage() {
     }
   };
 
+  // -----------------------------
+  // LOADING STATE
+  // -----------------------------
+
+  /**
+   * Displays a loading placeholder until the presentation is fetched.
+   */
   if (!presentation) {
     return (
-      <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
+      <PageContainer>
         <Typography>{t("presentations.edit.loading")}</Typography>
-      </Box>
+      </PageContainer>
     );
   }
 
+  // -----------------------------
+  // RENDER
+  // -----------------------------
+
   return (
-    <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
+    <PageContainer>
       {/* Header */}
       <Stack
         direction="row"
@@ -154,7 +245,7 @@ export default function PresentationEditPage() {
             left: 0,
             right: 0,
             textAlign: "center",
-            pointerEvents: "none" // ensures the button stays clickable
+            pointerEvents: "none"
           }}
         >
           {t("presentations.edit.title")}
@@ -198,6 +289,6 @@ export default function PresentationEditPage() {
             : t("presentations.edit.saveChanges")}
         </Button>
       </Box>
-    </Box>
+    </PageContainer>
   );
 }

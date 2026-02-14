@@ -20,7 +20,7 @@
     "error": "Rekisteröinti epäonnistui"
   },
   "documents": {
-    "title": "Omat dokumentit",
+    "title": "Dokumentit",
     "searchPlaceholder": "Haku…",
     "new": "Uusi",
     "trash": "Roskakori",
@@ -122,6 +122,12 @@
       "addBullet": "Lisää kohta",
       "deleteSlide": "Poista dia",
       "addSlide": "Lisää dia"
+    }    
+  },
+  "header": {
+      "documents": "Dokumentit",
+      "presentations": "Esitykset",
+      "menuDocuments": "Dokumentit",
+      "menuPresentations": "Esitykset"
     }
-  }
 }

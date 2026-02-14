@@ -7,8 +7,7 @@ import {
   TextField,
   Fade,
   Stack,
-  IconButton,
-  Container
+  IconButton
 } from "@mui/material";
 
 import SlideEditor from "../components/SlideEditor";
@@ -20,12 +19,27 @@ import { isTokenExpired } from "../utils/isTokenExpired";
 import { Toast } from "../components/Toast";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PageContainer from "../layout/PageContainer";
 
+/**
+ * Page for creating a new presentation.
+ *
+ * @remarks
+ * This page allows the user to:
+ * - create a new presentation deck
+ * - edit slides using the SlideEditor component
+ * - navigate between slides using keyboard or swipe gestures
+ * - save the final presentation to the server
+ *
+ * It also handles session expiration and prevents editing when the token is invalid.
+ *
+ * @returns JSX element representing the presentation creation page.
+ */
 export default function PresentationCreatePage() {
   const navigate = useNavigate();
   const { token, logout } = useAuth();
 
-  // Full presentation object (title included)
+  /** Presentation being created. */
   const [presentation, setPresentation] = useState<Presentation>({
     _id: "",
     title: "",
@@ -40,18 +54,24 @@ export default function PresentationCreatePage() {
     userId: "",
   });
 
-
+  /** Whether the presentation is currently being saved. */
   const [saving, setSaving] = useState(false);
 
-  // Parent‑controlled slide index
+  /** Index of the currently active slide. */
   const [index, setIndex] = useState(0);
 
+  // -----------------------------
+  // SESSION EXPIRED HANDLING
+  // -----------------------------
+
+  /**
+   * If the token exists but is expired, block the page and show a toast.
+   */
   if (token) {
     const sessionExpired = isTokenExpired(token);
     if (sessionExpired) {
-      console.log("Session expired. Logging out...");
       return (
-        <Container maxWidth="md">
+        <PageContainer>
           <Toast
             open={sessionExpired}
             message="Session expired. Please log in again."
@@ -59,21 +79,40 @@ export default function PresentationCreatePage() {
             autoHideDuration={5000}
             onClose={() => logout()}
           />
-        </Container>
+        </PageContainer>
       );
     }
   }
 
-  // Navigation callbacks
+  // -----------------------------
+  // SLIDE NAVIGATION
+  // -----------------------------
+
+  /**
+   * Moves to the next slide if possible.
+   *
+   * @returns void
+   */
   const next = useCallback(() => {
     setIndex((i) => Math.min(i + 1, presentation.slides.length - 1));
   }, [presentation.slides.length]);
 
+  /**
+   * Moves to the previous slide if possible.
+   *
+   * @returns void
+   */
   const prev = useCallback(() => {
     setIndex((i) => Math.max(i - 1, 0));
   }, []);
 
-  // Keyboard navigation
+  // -----------------------------
+  // KEYBOARD NAVIGATION
+  // -----------------------------
+
+  /**
+   * Enables left/right arrow key navigation between slides.
+   */
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
@@ -84,13 +123,27 @@ export default function PresentationCreatePage() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [next, prev]);
 
-  // Swipe navigation
+  // -----------------------------
+  // SWIPE NAVIGATION
+  // -----------------------------
+
+  /** Stores the X‑coordinate of the initial touch event. */
   const touchStartXRef = useRef<number | null>(null);
 
+  /**
+   * Records the starting X position of a touch gesture.
+   *
+   * @param e - Touch start event.
+   */
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartXRef.current = e.touches[0].clientX;
   };
 
+  /**
+   * Detects swipe direction and navigates slides accordingly.
+   *
+   * @param e - Touch end event.
+   */
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartXRef.current === null) return;
     const diff = e.changedTouches[0].clientX - touchStartXRef.current;
@@ -101,7 +154,19 @@ export default function PresentationCreatePage() {
     touchStartXRef.current = null;
   };
 
-  // Save new presentation
+  // -----------------------------
+  // SAVE PRESENTATION
+  // -----------------------------
+
+  /**
+   * Saves the newly created presentation to the server.
+   *
+   * @remarks
+   * Only the title and slides are sent to the backend.
+   * After saving, the user is redirected to the presentations list.
+   *
+   * @returns Promise resolving when the save completes.
+   */
   const handleSave = async () => {
     if (!token) return;
 
@@ -122,8 +187,11 @@ export default function PresentationCreatePage() {
     }
   };
 
+  // -----------------------------
+  // RENDER
+  // -----------------------------
   return (
-    <Box sx={{ maxWidth: 900, margin: "0 auto", mt: 4 }}>
+    <PageContainer>
       {/* Header */}
       <Stack direction="row" alignItems="center" mb={2} sx={{ position: "relative" }}>
         <IconButton onClick={() => navigate(-1)}>
@@ -136,13 +204,12 @@ export default function PresentationCreatePage() {
             left: 0,
             right: 0,
             textAlign: "center",
-            pointerEvents: "none" // <-- important!
+            pointerEvents: "none"
           }}
         >
           <Typography variant="h4">Create New Presentation</Typography>
         </Box>
       </Stack>
-
 
       {/* Title input */}
       <TextField
@@ -179,6 +246,6 @@ export default function PresentationCreatePage() {
           {saving ? "Saving..." : "Create Presentation"}
         </Button>
       </Box>
-    </Box>
+    </PageContainer>
   );
 }

@@ -3,6 +3,19 @@ import { getDocuments } from "../services/documentService";
 import { Document } from "../types/Document";
 import { useAuthGuard } from "./useAuthGuard";
 
+/**
+ * Fetches the authenticated user's document list.
+ *
+ * @remarks
+ * - Validates the token using `useAuthGuard`.
+ * - Calls `onSessionExpired` instead of setting an error when the token is invalid.
+ * - Returns loading state, error state, the document list, and a `refetch` function.
+ *
+ * This hook is used on pages that list a user's private documents.
+ *
+ * @param token - Authentication token or null.
+ * @param onSessionExpired - Optional callback fired when the token is expired.
+ */
 export function useDocuments(
   token: string | null,
   onSessionExpired?: () => void
@@ -14,12 +27,6 @@ export function useDocuments(
   const guard = useAuthGuard();
 
   const fetchDocuments = useCallback(async () => {
-    /*if (!token) {
-      setLoading(false);
-      setError("Not authenticated");
-      return;
-    }*/
-
     try {
       setLoading(true);
       setError(null);
@@ -33,26 +40,16 @@ export function useDocuments(
       } else {
         setDocuments([]);
       }
-
-      // const data = await getDocuments(token);
-
     } catch (err: any) {
-      // Detect expired token from API response
-      /*
-      if (err?.response?.status === 401) {
-        onSessionExpired?.();
-        return;
-      }*/
-
       if (err.message === "TOKEN_EXPIRED") {
         onSessionExpired?.();
-        return; // ❗ IMPORTANT: do NOT set error
-      }  
-      setError("Failed to load documents"); 
+        return;
+      }
+      setError("Failed to load documents");
     } finally {
       setLoading(false);
     }
-  }, [token]); // ✔ stable, no infinite loop
+  }, [token]); // ← correct: guard is intentionally NOT included
 
   useEffect(() => {
     fetchDocuments();

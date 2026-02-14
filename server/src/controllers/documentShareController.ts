@@ -5,8 +5,27 @@ import {
   getDocumentForSharing
 } from "../services/documentShareService";
 
-
-// ADD EDITORS
+/* =======================================================
+   UPDATE EDITORS
+   ------------------------------------------------------- */
+/**
+ * Updates the list of editors for a document.
+ *
+ * @remarks
+ * This controller:
+ * - validates that `userIds` is an array
+ * - checks whether the authenticated user has permission to modify editors
+ *   (typically only the owner)
+ * - delegates the update to `addEditorsToDocument`
+ *
+ * If the user is not allowed to modify editors, a `403 Forbidden` response
+ * is returned.
+ *
+ * @param req - Express request containing the document ID and new editor IDs.
+ * @param res - Express response confirming the update or returning an error.
+ *
+ * @returns A JSON message indicating success or failure.
+ */
 export const updateEditors = async (req: Request, res: Response) => {
   try {
     const { userIds } = req.body;
@@ -30,8 +49,25 @@ export const updateEditors = async (req: Request, res: Response) => {
   }
 };
 
-
-// UPDATE PUBLIC VISIBILITY
+/* =======================================================
+   UPDATE PUBLIC VISIBILITY
+   ------------------------------------------------------- */
+/**
+ * Updates the public visibility status of a document.
+ *
+ * @remarks
+ * This controller:
+ * - validates that `isPublic` is a boolean
+ * - ensures the authenticated user is the owner
+ * - updates the visibility using `updatePublicVisibilityInDb`
+ *
+ * If the user is not the owner, a `403 Forbidden` response is returned.
+ *
+ * @param req - Express request containing the document ID and visibility flag.
+ * @param res - Express response confirming the update or returning an error.
+ *
+ * @returns A JSON message with the updated visibility state.
+ */
 export const updatePublicVisibility = async (req: Request, res: Response) => {
   try {
     const { isPublic } = req.body;

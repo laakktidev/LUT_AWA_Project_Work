@@ -3,8 +3,25 @@ import PDFDocument from "pdfkit";
 import path from "path";
 import { getDocumentById } from "../services/documentService";
 
-
-// UPLOAD IMAGE
+/* =======================================================
+   UPLOAD DOCUMENT IMAGE
+   ------------------------------------------------------- */
+/**
+ * Handles image uploads for document content.
+ *
+ * @remarks
+ * This controller:
+ * - expects a file uploaded via Multer (`req.file`)
+ * - constructs a public URL pointing to the uploaded file
+ * - returns the URL so the frontend can embed it into the document
+ *
+ * The file is stored in `/uploads/documents/` by Multer configuration.
+ *
+ * @param req - Express request containing the uploaded file.
+ * @param res - Express response returning the file URL.
+ *
+ * @returns A JSON object containing the public image URL.
+ */
 export const uploadDocumentImageController = async (req: Request, res: Response) => {
   if (!req.file) {
     return res.status(400).json({ error: "No file uploaded" });
@@ -17,8 +34,29 @@ export const uploadDocumentImageController = async (req: Request, res: Response)
   return res.json({ url });
 };
 
-
-// GENERATE PDF
+/* =======================================================
+   GENERATE PDF FROM DOCUMENT
+   ------------------------------------------------------- */
+/**
+ * Generates a PDF version of a document.
+ *
+ * @remarks
+ * This controller:
+ * - loads the document by ID
+ * - checks whether the user is the owner or an editor
+ * - streams a dynamically generated PDF to the client
+ *
+ * The PDF includes:
+ * - the document title (large, underlined)
+ * - the document content (plain text)
+ *
+ * Images inside the document content are not rendered; this is a text‑only export.
+ *
+ * @param req - Express request containing the document ID and user info.
+ * @param res - Express response streaming the PDF file.
+ *
+ * @returns A streamed PDF file or an error response.
+ */
 export const generatePdf = async (req: Request, res: Response) => {
   const doc = await getDocumentById(req.params.id as string);
 

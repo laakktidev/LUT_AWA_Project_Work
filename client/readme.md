@@ -2,7 +2,7 @@
 Mainitse myös usein menee paljon aikaa UI-suunnitteluun ja toteutukseen, joten AI:n hyödyntäminen UI-koodin nopeuttamisessa on ollut merkittävä ajansäästötekijä. AI on auttanut luomaan nopeasti käyttöliittymän perusrakenteen ja tyylit, mikä on vapauttanut aikaa keskittyä enemmän sovelluksenlogiikkaan ja ominaisuuksiin.
 Normally UI design takes a lot of time, so 
 copilot is pretty good on that, previosly used Bootstrap now MUI first time, copilot teached me with this UI library new for me.
-
+MYös auttanut Typesciptin kannsa
 # Declaration of AI Usage
 
 ## 1. AI Systems Used

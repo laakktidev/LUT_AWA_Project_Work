@@ -13,9 +13,22 @@ import {
   getPresentationForSharing
 } from "../services/presentationService";
 
-/* -----------------------------
-   CREATE
-------------------------------*/
+/* =======================================================
+   CREATE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Creates a new presentation for the authenticated user.
+ *
+ * @remarks
+ * This controller:
+ * - validates that a title is provided
+ * - accepts an optional `slides` array
+ * - delegates creation to `createPresentationInDb`
+ * - returns the newly created presentation
+ *
+ * @param req - Express request containing title and slides.
+ * @param res - Express response returning the created presentation.
+ */
 export const createPresentation = async (req: Request, res: Response) => {
   try {
     const { title, slides } = req.body;
@@ -37,12 +50,17 @@ export const createPresentation = async (req: Request, res: Response) => {
   }
 };
 
-/* -----------------------------
-   GET ALL
-------------------------------*/
+/* =======================================================
+   GET ALL PRESENTATIONS
+   ------------------------------------------------------- */
+/**
+ * Retrieves all presentations owned by or shared with the authenticated user.
+ *
+ * @param req - Express request containing user info.
+ * @param res - Express response returning the list of presentations.
+ */
 export const getPresentations = async (req: Request, res: Response) => {
   try {
-    
     const pres = await getAllPresentationsForUser(req.user!._id.toString());
     return res.json(pres);
   } catch (err) {
@@ -51,12 +69,24 @@ export const getPresentations = async (req: Request, res: Response) => {
   }
 };
 
-/* -----------------------------
-   GET ONE
-------------------------------*/
+/* =======================================================
+   GET SINGLE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Retrieves a single presentation with permission and lock checks.
+ *
+ * @remarks
+ * Access is granted if:
+ * - the user is the owner
+ * - the user is an editor
+ *
+ * If the presentation is locked by another user, a `lockWarning` is included.
+ *
+ * @param req - Express request containing presentation ID and user info.
+ * @param res - Express response returning the presentation or an error.
+ */
 export const getPresentation = async (req: Request, res: Response) => {
   try {
-
     console.log("Fetching presentation with ID:", req.params.id);
     const pres = await getPresentationById(req.params.id as string);
 
@@ -86,9 +116,23 @@ export const getPresentation = async (req: Request, res: Response) => {
   }
 };
 
-/* -----------------------------
-   UPDATE
-------------------------------*/
+/* =======================================================
+   UPDATE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Updates a presentation's fields.
+ *
+ * @remarks
+ * The request body may contain:
+ * - title
+ * - slides
+ * - metadata
+ *
+ * All update logic is handled in the service layer.
+ *
+ * @param req - Express request containing update data.
+ * @param res - Express response returning the updated presentation.
+ */
 export const updatePresentation = async (req: Request, res: Response) => {
   try {
     const updated = await updatePresentationById(req.params.id as string, req.body);
@@ -99,9 +143,18 @@ export const updatePresentation = async (req: Request, res: Response) => {
   }
 };
 
-/* -----------------------------
-   DELETE (hard delete)
-------------------------------*/
+/* =======================================================
+   DELETE PRESENTATION (HARD DELETE)
+   ------------------------------------------------------- */
+/**
+ * Permanently deletes a presentation.
+ *
+ * @remarks
+ * Unlike documents, presentations do not have a trash system.
+ *
+ * @param req - Express request containing presentation ID.
+ * @param res - Express response confirming deletion.
+ */
 export const deletePresentation = async (req: Request, res: Response) => {
   try {
     await deletePresentationById(req.params.id as string);
@@ -112,9 +165,19 @@ export const deletePresentation = async (req: Request, res: Response) => {
   }
 };
 
-/* -----------------------------
-   SEARCH
-------------------------------*/
+/* =======================================================
+   SEARCH PRESENTATIONS
+   ------------------------------------------------------- */
+/**
+ * Searches presentations belonging to the authenticated user.
+ *
+ * @remarks
+ * Results are normalized into a unified "item" format so they can be
+ * displayed alongside documents in a combined search UI.
+ *
+ * @param req - Express request containing search query.
+ * @param res - Express response returning search results.
+ */
 export const searchPresentations = async (req: Request, res: Response) => {
   try {
     const search = (req.query.q as string) || "";
@@ -122,7 +185,6 @@ export const searchPresentations = async (req: Request, res: Response) => {
 
     const results = await searchPresentationsInDb(userId, search);
 
-    // Convert to unified item format
     const items = results.map(p => ({
       _id: p._id.toString(),
       title: p.title,
@@ -139,9 +201,18 @@ export const searchPresentations = async (req: Request, res: Response) => {
   }
 };
 
-/* -----------------------------
-   LOCK / UNLOCK
-------------------------------*/
+/* =======================================================
+   LOCK / UNLOCK PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Locks a presentation for exclusive editing.
+ *
+ * @remarks
+ * Only one user may edit a presentation at a time.
+ *
+ * @param req - Express request containing presentation ID.
+ * @param res - Express response returning the updated lock state.
+ */
 export const lockPres = async (req: Request, res: Response) => {
   try {
     const updated = await lockPresentation(req.params.id as string, req.user!._id.toString());
@@ -152,6 +223,12 @@ export const lockPres = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Unlocks a presentation previously locked by a user.
+ *
+ * @param req - Express request containing presentation ID.
+ * @param res - Express response returning the updated lock state.
+ */
 export const unlockPres = async (req: Request, res: Response) => {
   try {
     const updated = await unlockPresentation(req.params.id as string);
@@ -162,6 +239,18 @@ export const unlockPres = async (req: Request, res: Response) => {
   }
 };
 
+/* =======================================================
+   UPDATE EDITORS
+   ------------------------------------------------------- */
+/**
+ * Updates the list of editors for a presentation.
+ *
+ * @remarks
+ * Only the owner may modify the editor list.
+ *
+ * @param req - Express request containing editor user IDs.
+ * @param res - Express response confirming the update.
+ */
 export const updateEditors = async (req: Request, res: Response) => {
   console.log("Updating editors for presentation ID:", req.params.id);
   try {

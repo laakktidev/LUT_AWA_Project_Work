@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
-  Container,
   Typography,
   Box,
   Button,
@@ -40,44 +39,68 @@ import { getUsers } from "../services/userService";
 
 import { isTokenExpired } from "../utils/isTokenExpired";
 import { Toast } from "../components/Toast";
+import PageContainer from "../layout/PageContainer";
 
-
-
+/**
+ * Displays the list of presentations belonging to the user.
+ *
+ * @remarks
+ * This page supports:
+ * - searching presentations
+ * - sorting by name, creation date, or update date
+ * - pagination
+ * - sharing presentations with other users
+ * - deleting presentations
+ * - navigating to create or view pages
+ *
+ * It also handles session expiration and displays a warning toast when needed.
+ *
+ * @returns JSX element representing the presentations list page.
+ */
 export default function PresentationsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  //const { token, logout } = useAuth();
   const { token, user, logout } = useAuth();
 
-  //const [presentations, setPresentations] = useState<any[]>([]);
-  //const [loading, setLoading] = useState(true);
-
+  /** Controls visibility of the share dialog. */
   const [shareOpen, setShareOpen] = useState(false);
+
+  /** ID of the presentation currently being shared. */
   const [presId, setPresId] = useState("");
+
+  /** List of users available for sharing. */
   const [users, setUsers] = useState<User[]>([]);
 
+  /** Search input text. */
   const [search, setSearch] = useState("");
+
+  /** Search results (null = show full list). */
   const [searchResults, setSearchResults] = useState<any[] | null>(null);
 
+  /** Sorting mode. */
   const [sortBy, setSortBy] = useState<
     "name-asc" | "name-desc" |
     "created-asc" | "created-desc" |
     "updated-asc" | "updated-desc"
   >("updated-desc");
 
+  /** Current pagination page. */
   const [page, setPage] = useState(1);
+
   const pageSize = 5;
 
+  // -----------------------------
+  // SESSION EXPIRED HANDLING
+  // -----------------------------
 
-  //const { presentations, loading, error, refetch } = usePresentations(token);
-
-
+  /**
+   * Blocks the page when the session is expired.
+   */
   if (token) {
     const sessionExpired = isTokenExpired(token);
     if (sessionExpired) {
-      console.log("Session expired. Logging out...");
       return (
-        <Container maxWidth="md">
+        <PageContainer>
           <Toast
             open={sessionExpired}
             message="Session expired. Please log in again."
@@ -85,31 +108,37 @@ export default function PresentationsListPage() {
             autoHideDuration={5000}
             onClose={() => logout()}
           />
-        </Container>
+        </PageContainer>
       );
     }
   }
 
-  
+  // -----------------------------
+  // LOAD PRESENTATIONS
+  // -----------------------------
+
+  /**
+   * Loads the user's presentations.
+   *
+   * @remarks
+   * The hook handles:
+   * - loading state
+   * - error state
+   * - refetching
+   */
   const { presentations, loading, error, refetch } = usePresentations(token);
 
+  // -----------------------------
+  // SEARCH
+  // -----------------------------
 
-  /* -----------------------------
-     Load Presentations
-  ------------------------------*/
-  /*  useEffect(() => {
-      if (!token) return;
-  
-      getPresentations(token)
-        .then(data => setPresentations(data))
-        .finally(() => setLoading(false));
-    }, [token]);*/
-
-  /* -----------------------------
-     Search (backend)
-  ------------------------------*/
-
-
+  /**
+   * Performs a debounced search when the user types.
+   *
+   * @remarks
+   * - Clears results when search text < 3 chars
+   * - Calls backend after 300ms delay
+   */
   useEffect(() => {
     if (!token) return;
 
@@ -130,43 +159,87 @@ export default function PresentationsListPage() {
     return () => clearTimeout(timeout);
   }, [search, token]);
 
+  /**
+   * Resets pagination when search or sorting changes.
+   */
   useEffect(() => {
     setPage(1);
   }, [search, sortBy]);
 
-  ////////////////////////////////////////
+  // -----------------------------
+  // LOADING
+  // -----------------------------
 
+  /**
+   * Displays a loading spinner while presentations are being fetched.
+   */
   if (loading) {
     return (
-      <Box textAlign="center" mt={4}>
-        <CircularProgress />
-      </Box>
+      <PageContainer>
+        <Box textAlign="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      </PageContainer>
     );
   }
 
+  // -----------------------------
+  // ERROR
+  // -----------------------------
+
+  /**
+   * Displays an error message if presentations cannot be loaded.
+   */
   if (error) {
     return (
-      <Typography color="error" mt={4}>
-        {error}
-      </Typography>
+      <PageContainer>
+        <Typography color="error" mt={4}>
+          {error}
+        </Typography>
+      </PageContainer>
     );
   }
 
-  ////////////////////////////////////////  
+  // -----------------------------
+  // MUST LOGIN
+  // -----------------------------
 
+  /**
+   * Blocks the page if the user is not authenticated.
+   */
+  if (!token) {
+    return (
+      <PageContainer>
+        <Alert severity="warning">{t("documents.mustLogin")}</Alert>
+        <Box mt={2}>
+          <Button variant="contained" onClick={() => navigate("/login")}>
+            {t("documents.goToLogin")}
+          </Button>
+        </Box>
+      </PageContainer>
+    );
+  }
 
+  // -----------------------------
+  // SHARE ACTIONS
+  // -----------------------------
 
-  /* -----------------------------
-     Share
-  ------------------------------*/
-
+  /**
+   * Shares a presentation with selected users.
+   *
+   * @param selectedUserIds - IDs of users to share with.
+   */
   async function handleShare(selectedUserIds: string[]) {
     if (!token) return;
     await sharePresentation(presId, selectedUserIds, token);
     refetch();
   }
 
-
+  /**
+   * Opens the share dialog and loads eligible users.
+   *
+   * @param pres - The presentation to share.
+   */
   async function openShareSelection(pres: any) {
     if (!token) return;
 
@@ -180,17 +253,24 @@ export default function PresentationsListPage() {
     setShareOpen(true);
   }
 
-
+  /**
+   * Deletes a presentation.
+   *
+   * @param id - Presentation ID.
+   */
   const handleDelete = async (id: string) => {
     if (!token) return;
     await deletePresentation(id, token);
-    refetch(); // refresh list
+    refetch();
   };
 
+  // -----------------------------
+  // SORTING
+  // -----------------------------
 
-  /* -----------------------------
-     Sorting
-  ------------------------------*/
+  /**
+   * Sort presentations based on the selected sort mode.
+   */
   const sorted = [...presentations].sort((a, b) => {
     switch (sortBy) {
       case "name-asc":
@@ -210,40 +290,21 @@ export default function PresentationsListPage() {
     }
   });
 
+  /** Final list of presentations to display (search results override sorting). */
   const listToShow = searchResults ?? sorted;
 
+  /** Index of first item on current page. */
   const start = (page - 1) * pageSize;
-  const end = start + pageSize;
-  const paginated = listToShow.slice(start, end);
 
-  /* -----------------------------
-     Render
-  ------------------------------*/
-  if (!token) {
-    return (
-      <Container maxWidth="md">
-        <Alert severity="warning">{t("documents.mustLogin")}</Alert>
-        <Box mt={2}>
-          <Button variant="contained" onClick={() => navigate("/login")}>
-            {t("documents.goToLogin")}
-          </Button>
-        </Box>
-      </Container>
-    );
-  }
+  /** Paginated presentations for current page. */
+  const paginated = listToShow.slice(start, start + pageSize);
 
-  if (loading) {
-    return (
-      <Container maxWidth="md">
-        <Box sx={{ textAlign: "center", mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      </Container>
-    );
-  }
+  // -----------------------------
+  // RENDER
+  // -----------------------------
 
   return (
-    <Container maxWidth="md" sx={{ pt: 0, pb: 0 }}>
+    <PageContainer>
       <ShareDialog
         open={shareOpen}
         onClose={() => setShareOpen(false)}
@@ -255,7 +316,14 @@ export default function PresentationsListPage() {
       />
 
       {/* Header */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        justifyContent="space-between"
+        alignItems={{ xs: "stretch", sm: "center" }}
+        mb={3}
+        sx={{ width: "100%" }}
+      >
         <Typography variant="h5" fontWeight={600}>
           {t("presentations.title")}
         </Typography>
@@ -396,6 +464,6 @@ export default function PresentationsListPage() {
           </Box>
         </>
       )}
-    </Container>
+    </PageContainer>
   );
 }

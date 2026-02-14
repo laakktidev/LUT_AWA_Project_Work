@@ -1,7 +1,5 @@
 import { Presentation } from "../types/Presentation";
-
 import axios from "axios";
-
 import { BASE_URL } from "./config";
 
 const API_URL = BASE_URL;
@@ -9,6 +7,20 @@ const API_URL = BASE_URL;
 /* ----------------------------------------
    Axios instance with auth header support
 -----------------------------------------*/
+/**
+ * Creates a preconfigured Axios instance for authenticated requests.
+ *
+ * @remarks
+ * This helper:
+ * - attaches the `Authorization: Bearer <token>` header
+ * - sets the base URL for all presentation‑related API calls
+ * - ensures consistent JSON request formatting
+ *
+ * @param token - Authentication token.
+ * @param baseURL - Optional override for the API base URL.
+ *
+ * @returns A configured Axios instance.
+ */
 function api(token: string, baseURL: string = API_URL) {
   return axios.create({
     baseURL,
@@ -19,14 +31,17 @@ function api(token: string, baseURL: string = API_URL) {
   });
 }
 
-/*export async function getPresentation(
-  id: string,
-  token: string
-): Promise<Presentation> {
-  const res = await api(token).get<Presentation>(`/presentation/${id}`);
-  return res.data;
-}*/
-
+/* =======================================================
+   GET SINGLE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Fetches a single presentation by ID.
+ *
+ * @param id - Presentation ID.
+ * @param token - Authentication token.
+ *
+ * @returns The requested presentation.
+ */
 export async function getPresentationById(
   id: string,
   token: string
@@ -35,8 +50,16 @@ export async function getPresentationById(
   return res.data;
 }
 
-
-
+/* =======================================================
+   GET ALL PRESENTATIONS
+   ------------------------------------------------------- */
+/**
+ * Fetches all presentations owned by or shared with the user.
+ *
+ * @param token - Authentication token.
+ *
+ * @returns Array of presentations.
+ */
 export async function getPresentations(
   token: string
 ): Promise<Presentation[]> {
@@ -44,7 +67,17 @@ export async function getPresentations(
   return res.data;
 }
 
-
+/* =======================================================
+   CREATE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Creates a new presentation.
+ *
+ * @param payload - Partial presentation data (title, slides, etc.).
+ * @param token - Authentication token.
+ *
+ * @returns The newly created presentation.
+ */
 export async function createPresentation(
   payload: Partial<Presentation>,
   token: string
@@ -53,6 +86,18 @@ export async function createPresentation(
   return res.data;
 }
 
+/* =======================================================
+   UPDATE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Updates an existing presentation.
+ *
+ * @param id - Presentation ID.
+ * @param payload - Partial update payload.
+ * @param token - Authentication token.
+ *
+ * @returns The updated presentation.
+ */
 export async function updatePresentation(
   id: string,
   payload: Partial<Presentation>,
@@ -62,6 +107,17 @@ export async function updatePresentation(
   return res.data;
 }
 
+/* =======================================================
+   DELETE PRESENTATION
+   ------------------------------------------------------- */
+/**
+ * Deletes a presentation permanently.
+ *
+ * @param id - Presentation ID.
+ * @param token - Authentication token.
+ *
+ * @returns Nothing (void).
+ */
 export async function deletePresentation(
   id: string,
   token: string
@@ -69,9 +125,21 @@ export async function deletePresentation(
   await api(token).delete(`/presentation/${id}`);
 }
 
-/* -------------------------------------------------------
-   SHARE DOCUMENT (ADD EDITORS)
-------------------------------------------------------- */
+/* =======================================================
+   SHARE PRESENTATION (ADD EDITORS)
+   ------------------------------------------------------- */
+/**
+ * Adds users as editors to a presentation.
+ *
+ * @remarks
+ * This allows multiple users to collaborate on the same presentation.
+ *
+ * @param representionId - Presentation ID.
+ * @param userIds - Array of user IDs to grant edit access.
+ * @param token - Authentication token.
+ *
+ * @returns Updated editor list or presentation metadata.
+ */
 export async function sharePresentation(
   representionId: string,
   userIds: string[],
@@ -91,9 +159,17 @@ export async function sharePresentation(
   return response.data;
 }
 
-/* ----------------------------------------
+/* =======================================================
    SEARCH PRESENTATIONS
------------------------------------------*/
+   ------------------------------------------------------- */
+/**
+ * Searches presentations by title or content.
+ *
+ * @param query - Search query string.
+ * @param token - Authentication token.
+ *
+ * @returns Array of matching presentations.
+ */
 export async function searchPresentations(
   query: string,
   token: string

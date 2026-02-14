@@ -1,8 +1,6 @@
-DocumentDetailsPage.tsx
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
-  Container,
   Typography,
   Box,
   Button,
@@ -27,64 +25,67 @@ import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 import { Toast } from "../components/Toast";
 
+import PageContainer from "../layout/PageContainer";
+
+/**
+ * Displays a single document, including:
+ * - title
+ * - HTML content
+ * - visibility settings
+ * - download button
+ * - edit button (if user has permission)
+ *
+ * @remarks
+ * This page handles:
+ * - session expiration
+ * - loading and error states
+ * - permission checks (owner/editor)
+ * - PDF download
+ * - toggling public visibility
+ *
+ * @returns JSX element representing the document details page.
+ */
 export default function DocumentDetailsPage() {
-  // -----------------------------
-  // HOOKS (must be at the top)
-  // -----------------------------
-  //const [toastOpen, setToastOpen] = useState(false);
+  /** Whether the user's session has expired. */
   const [sessionExpired, setSessionExpired] = useState(false);
 
   const { t } = useTranslation();
   const { token, user, logout } = useAuth();
-  const { id } = useParams<{ id: string }>();
+
+  // -----------------------------
+  // PARAMS & NAVIGATION
+  // -----------------------------
+
+  /** Extracted document ID from the URL. */
+  const params = useParams();
+  const id = params.id as string;
+
   const navigate = useNavigate();
 
+  // -----------------------------
+  // DOCUMENT FETCHING
+  // -----------------------------
+
+  /**
+   * Fetches the document and handles:
+   * - loading state
+   * - error state
+   * - session expiration callback
+   */
   const { doc, loading, error, refetch } = useDocument(id, token, () => {
     setSessionExpired(true);
-    //setToastOpen(true);
   });
 
   // -----------------------------
-  // SESSION EXPIRED → show toast only
+  // SESSION EXPIRED OR NO TOKEN
   // -----------------------------
-    
-  /////////////////////////////
-   /*useEffect(() => {
-    if (!sessionExpired) return;
 
-    setToastOpen(true);
-
-    const timer = setTimeout(() => {
-      logout();
-      navigate("/login", { replace: true });
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [sessionExpired, logout, navigate]);*/
-  /////////////////////////////
-  
-  /*
-  if (sessionExpired) {
+  /**
+   * Blocks the page when the session is expired or token is missing.
+   */
+  if (sessionExpired || !token) {
     return (
-      <Container maxWidth="md">
-        <Toast
-          open={toastOpen}
-          message="Session expired. Please log in again."
-          severity="warning"
-          autoHideDuration={3000}
-          onClose={() => {
-            setToastOpen(false);
-            logout();
-            //navigate("/login");
-          }}
-        />
-      </Container>
-    );
-  }*/
-
-if (sessionExpired || !token) {
-    return (
-      <Container maxWidth="md">
+      <PageContainer>
         <Toast
           open={sessionExpired}
           message="Session expired. Please log in again."
@@ -92,53 +93,80 @@ if (sessionExpired || !token) {
           autoHideDuration={3000}
           onClose={() => logout()}
         />
-      </Container>
+      </PageContainer>
     );
   }
 
+  // -----------------------------
+  // LOADING STATE
+  // -----------------------------
 
-  // -----------------------------
-  // LOADING
-  // -----------------------------
+  /**
+   * Displays a loading spinner while the document is being fetched.
+   */
   if (loading) {
     return (
-      <Container maxWidth="md">
+      <PageContainer>
         <Box sx={{ textAlign: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
-      </Container>
+      </PageContainer>
     );
   }
 
   // -----------------------------
   // ERROR OR NOT FOUND
   // -----------------------------
+
+  /**
+   * Displays an error message if the document cannot be loaded.
+   */
   if (error || !doc) {
     return (
-      <Container maxWidth="md">
+      <PageContainer>
         <Alert severity="error">{error || t("details.notFound")}</Alert>
         <Box mt={2}>
           <Button variant="outlined" onClick={() => navigate("/")}>
             {t("details.backToDocuments")}
           </Button>
         </Box>
-      </Container>
+      </PageContainer>
     );
   }
 
   // -----------------------------
-  // NORMAL RENDER
+  // PERMISSION CHECKS
   // -----------------------------
+
+  /** Whether the current user is the owner of the document. */
   const isOwner = user?.id === doc.userId;
+
+  /** Whether the current user is listed as an editor. */
   const isEditor = doc.editors?.includes(user?.id as string);
+
+  /** Whether the user can edit the document. */
   const canEdit = isOwner || isEditor;
 
+  /**
+   * Toggles the public visibility of the document.
+   *
+   * @param value - Whether the document should be public.
+   * @returns Promise resolving when visibility is updated.
+   */
   const handleTogglePublic = async (value: boolean) => {
     if (!token) return;
-    await updateDocumentVisibility(id!, value, token);
+    await updateDocumentVisibility(id, value, token);
     await refetch();
   };
 
+  /**
+   * Downloads the document as a PDF file.
+   *
+   * @remarks
+   * Creates a temporary blob URL and triggers a browser download.
+   *
+   * @returns Promise resolving when the download is triggered.
+   */
   async function handleDownload() {
     if (!token || !doc) return;
 
@@ -153,8 +181,13 @@ if (sessionExpired || !token) {
     window.URL.revokeObjectURL(url);
   }
 
+  // -----------------------------
+  // NORMAL RENDER
+  // -----------------------------
+
   return (
-    <Container maxWidth="md">
+    <PageContainer>
+
       {/* Top bar */}
       <Box
         sx={(theme) => ({
@@ -171,7 +204,7 @@ if (sessionExpired || !token) {
       >
         <Box
           sx={{
-            maxWidth: "md",
+            maxWidth: "100%",
             margin: "0 auto",
             padding: "12px 0",
             display: "flex",
@@ -185,7 +218,13 @@ if (sessionExpired || !token) {
 
           <Typography
             variant="h5"
-            sx={{ flexGrow: 1, mx: 2, fontWeight: 600 }}
+            sx={{
+              flexGrow: 1,
+              mx: 2,
+              fontWeight: 600,
+              minWidth: 0,
+              fontSize: { xs: "1.1rem", sm: "1.5rem" }
+            }}
           >
             {doc.title}
           </Typography>
@@ -265,19 +304,6 @@ if (sessionExpired || !token) {
         docTitle={doc.title}
         onTogglePublic={handleTogglePublic}
       />
-
-      {/* Toast stays mounted */}
-      {/*<Toast
-        open={toastOpen}
-        message="Session expired. Please log in again."
-        severity="warning"
-        autoHideDuration={3000}
-        onClose={() => {
-          setToastOpen(false);
-          logout();
-          //navigate("/login");
-        }}
-      />*/}
-    </Container>
+    </PageContainer>
   );
 }

@@ -8,67 +8,67 @@ import {
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
-//import SendIcon from "@mui/icons-material/Send";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
 import { useState } from "react";
-
 import { sendDocumentEmail } from "../services/emailService";
 
 interface Props {
+  /** Whether the dialog is visible. */
   open: boolean;
+
+  /** Fired when the dialog should close. */
   onClose: () => void;
+
+  /** Public URL of the shared document. */
   publicUrl: string;
+
+  /** Title of the document being shared. */
   documentTitle: string;
 }
 
+/**
+ * Dialog for sending a public document link via email.
+ *
+ * @remarks
+ * This component:
+ * - collects a recipient email address
+ * - uses the `sendDocumentEmail` service to send the message
+ * - closes automatically after a successful send
+ *
+ * It does not validate email format beyond what the backend or email service handles.
+ *
+ * @param open - Whether the dialog is visible.
+ * @param onClose - Callback fired when the dialog should close.
+ * @param publicUrl - Public link to the shared document.
+ * @param documentTitle - Title included in the email message.
+ *
+ * @returns JSX element representing the email‑sending dialog.
+ */
 export default function SendEmailDialog({
   open,
   onClose,
   publicUrl,
   documentTitle
 }: Props) {
+  /** Email address entered by the user. */
   const [email, setEmail] = useState("");
 
-/*
-  toEmail: string,
-  documentTitle: string,
-  publicUrl: string,
-  fromEmail: string
-*/
-
-const handleSend = async () => {
-  try {
-    await sendDocumentEmail(email, documentTitle, publicUrl, "");
-    onClose();
-  } catch (err) {
-    console.error("EmailJS error:", err);
-  }
-};
-
-
-
-/*  
-const handleSend = () => {
-  const subject = `Shared document: ${documentTitle}`;
-
-  const body = [
-    "Here is the link to the document:",
-    "",
-    publicUrl, 
-    "",
-    "Best regards,", // The comma is here
-    "Timo"           // This will appear on the next line
-  ].join("\r\n");
-
-  const mailtoUrl = `mailto:${email}?subject=${encodeURIComponent(
-    subject
-  )}&body=${encodeURIComponent(body)}`;
-
-  window.location.href = mailtoUrl;
-  onClose();
-};*/
-
+  /**
+   * Sends the email using the email service.
+   *
+   * @remarks
+   * - On success, the dialog closes.
+   * - Errors are logged to the console.
+   */
+  const handleSend = async () => {
+    try {
+      await sendDocumentEmail(email, documentTitle, publicUrl, "");
+      onClose();
+    } catch (err) {
+      console.error("EmailJS error:", err);
+    }
+  };
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -86,7 +86,7 @@ const handleSend = () => {
       </DialogContent>
 
       <DialogActions sx={{ justifyContent: "space-between" }}>
-        {/* Cancel icon */}
+        {/* Cancel */}
         <IconButton
           onClick={onClose}
           sx={{
@@ -97,47 +97,11 @@ const handleSend = () => {
           <CloseIcon />
         </IconButton>
 
-        {/* Send icon */}
-        {/*<IconButton
-          onClick={handleSend}
-          sx={{
-            color: "text.secondary",
-            "&:hover": { color: "text.primary" }
-          }}
-        >
-          <SendIcon />
-        </IconButton>*/}
-
+        {/* Send */}
         <IconButton onClick={handleSend}>
           <SendOutlinedIcon fontSize="small" />
         </IconButton>
-
       </DialogActions>
     </Dialog>
   );
 }
-/*
-async function sendDocumentEmail(
-  email: string,
-  documentTitle: string,
-  publicUrl: string
-) {
-  const response = await fetch("/api/send-email", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      documentTitle,
-      publicUrl,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to send email");
-  }
-
-  return response.json();
-}*/
-

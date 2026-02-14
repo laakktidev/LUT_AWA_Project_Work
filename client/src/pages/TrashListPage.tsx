@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Container,
   Typography,
   Box,
   Button,
@@ -26,41 +25,85 @@ import {
 
 import { Document } from "../types/Document";
 import { useTranslation } from "react-i18next";
+import PageContainer from "../layout/PageContainer";
 
+/**
+ * Displays the list of documents currently in the user's trash.
+ *
+ * @remarks
+ * This page allows the user to:
+ * - view all soft‑deleted documents
+ * - restore individual documents
+ * - permanently delete individual documents
+ * - empty the entire trash
+ *
+ * It also handles:
+ * - loading and error states
+ * - authentication requirements
+ *
+ * @returns JSX element representing the trash list page.
+ */
 export default function TrashListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useAuth();
 
+  /** List of trashed documents. */
   const [docs, setDocs] = useState<Document[]>([]);
+
+  /** Whether the trash list is currently loading. */
   const [loading, setLoading] = useState(true);
+
+  /** Error message, if any. */
   const [error, setError] = useState("");
 
+  /**
+   * Loads all documents currently in the trash.
+   *
+   * @returns Promise resolving when the trash list is loaded.
+   */
   async function loadTrash() {
     if (!token) return;
     try {
       setLoading(true);
       const data = await getTrashDocuments(token);
       setDocs(data);
-    } catch (err: any) {
+    } catch {
       setError(t("trash.loadError"));
     } finally {
       setLoading(false);
     }
   }
 
+  /**
+   * Restores a document from the trash.
+   *
+   * @param id - Document ID.
+   * @returns Promise resolving when the document is restored.
+   */
   async function handleRestore(id: string) {
     if (!token) return;
     await restoreDocument(id, token);
     loadTrash();
   }
 
+  /**
+   * Permanently deletes a document.
+   *
+   * @param id - Document ID.
+   * @returns Promise resolving when the document is deleted.
+   */
   async function handlePermanentDelete(id: string) {
     if (!token) return;
     await deleteDocument(id, token);
     loadTrash();
   }
 
+  /**
+   * Empties the entire trash after user confirmation.
+   *
+   * @returns Promise resolving when the trash is emptied.
+   */
   async function handleEmptyTrash() {
     if (!token) return;
 
@@ -71,38 +114,66 @@ export default function TrashListPage() {
     loadTrash();
   }
 
+  /**
+   * Loads trash contents when the token becomes available.
+   */
   useEffect(() => {
     loadTrash();
   }, [token]);
 
+  // -----------------------------
+  // MUST LOGIN
+  // -----------------------------
+
+  /**
+   * Blocks the page if the user is not authenticated.
+   */
   if (!token) {
     return (
-      <Container maxWidth="md">
+      <PageContainer>
         <Alert severity="warning">{t("trash.mustLogin")}</Alert>
-      </Container>
+      </PageContainer>
     );
   }
 
+  // -----------------------------
+  // LOADING
+  // -----------------------------
+
+  /**
+   * Displays a loading spinner while trash contents are being fetched.
+   */
   if (loading) {
     return (
-      <Container maxWidth="md">
+      <PageContainer>
         <Box sx={{ textAlign: "center", mt: 4 }}>
           <CircularProgress />
         </Box>
-      </Container>
+      </PageContainer>
     );
   }
 
+  // -----------------------------
+  // ERROR
+  // -----------------------------
+
+  /**
+   * Displays an error message if trash contents cannot be loaded.
+   */
   if (error) {
     return (
-      <Container maxWidth="md">
+      <PageContainer>
         <Alert severity="error">{error}</Alert>
-      </Container>
+      </PageContainer>
     );
   }
 
+  // -----------------------------
+  // NORMAL RENDER
+  // -----------------------------
+
   return (
-    <Container maxWidth="md">
+    <PageContainer>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
@@ -160,6 +231,6 @@ export default function TrashListPage() {
           ))}
         </Stack>
       )}
-    </Container>
+    </PageContainer>
   );
 }
