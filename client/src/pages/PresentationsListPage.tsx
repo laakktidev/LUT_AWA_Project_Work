@@ -272,23 +272,29 @@ export default function PresentationsListPage() {
    * Sort presentations based on the selected sort mode.
    */
   const sorted = [...presentations].sort((a, b) => {
-    switch (sortBy) {
-      case "name-asc":
-        return a.title.localeCompare(b.title);
-      case "name-desc":
-        return b.title.localeCompare(a.title);
-      case "created-asc":
-        return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-      case "created-desc":
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      case "updated-asc":
-        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-      case "updated-desc":
-        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-      default:
-        return 0;
-    }
-  });
+  const createdA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+  const createdB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+  const updatedA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+  const updatedB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+
+  switch (sortBy) {
+    case "name-asc":
+      return a.title.localeCompare(b.title);
+    case "name-desc":
+      return b.title.localeCompare(a.title);
+    case "created-asc":
+      return createdA - createdB;
+    case "created-desc":
+      return createdB - createdA;
+    case "updated-asc":
+      return updatedA - updatedB;
+    case "updated-desc":
+      return updatedB - updatedA;
+    default:
+      return 0;
+  }
+});
+
 
   /** Final list of presentations to display (search results override sorting). */
   const listToShow = searchResults ?? sorted;

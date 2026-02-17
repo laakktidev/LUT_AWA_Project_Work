@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import morgan from "morgan";
 
@@ -9,45 +9,73 @@ import documentPublicRouter from "./routes/documentPublic";
 import shareRouter from "./routes/shareRouter";
 import presentationRouter from "./routes/presentationRouter";
 
-const app = express();
-
 /**
  * Express application instance.
  *
  * @remarks
- * This file configures:
- * - global middleware (CORS, logging, JSON parsing)
- * - public health check route
- * - all API route groups (users, documents, presentations, sharing, etc.)
- * - static file serving for uploaded assets
+ * This module configures the core backend application:
  *
- * It acts as the central hub for all backend routing and middleware.
+ * - Global middleware (CORS, logging, JSON parsing)
+ * - Health check endpoint
+ * - API route groups (users, documents, sharing, presentations)
+ * - Static file serving for uploaded assets
+ *
+ * It acts as the central routing and middleware hub of the backend.
  */
+export const app: Express = express();
 
-// Logging middleware
+/* =======================================================
+   GLOBAL MIDDLEWARE
+   ======================================================= */
+
+/**
+ * HTTP request logger middleware.
+ */
 app.use(morgan("dev"));
 
-// CORS configuration
-app.use(cors({ origin: process.env.APP_URL, credentials: true }));
+/**
+ * CORS configuration middleware.
+ *
+ * @remarks
+ * Allows cross-origin requests from the frontend application.
+ */
+app.use(
+  cors({
+    origin: process.env.APP_URL,
+    credentials: true,
+  })
+);
 
-// Body parsers
+/**
+ * JSON body parser middleware.
+ */
 app.use(express.json());
+
+/**
+ * URL-encoded body parser middleware.
+ */
 app.use(express.urlencoded({ extended: false }));
+
+/* =======================================================
+   HEALTH CHECK
+   ======================================================= */
 
 /**
  * Health check endpoint.
  *
  * @remarks
- * Useful for uptime monitoring, deployment checks, and verifying that
- * the server is reachable.
+ * Useful for:
+ * - Deployment verification
+ * - Uptime monitoring
+ * - Connectivity testing
  */
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Server is running!" });
 });
 
 /* =======================================================
    API ROUTES
-   ------------------------------------------------------- */
+   ======================================================= */
 
 /**
  * User authentication & profile routes.
@@ -60,7 +88,7 @@ app.use("/api/user", userRouter);
 app.use("/api/document", documentRouter);
 
 /**
- * Document locking routes (prevent concurrent editing).
+ * Document locking routes (prevents concurrent editing conflicts).
  */
 app.use("/api/documentLock", documentLockRoutes);
 
@@ -70,7 +98,7 @@ app.use("/api/documentLock", documentLockRoutes);
 app.use("/public", documentPublicRouter);
 
 /**
- * Email sharing routes (public link, editor invites, etc.).
+ * Email sharing routes (public link sharing, editor invitations).
  */
 app.use("/api/share", shareRouter);
 
@@ -79,8 +107,12 @@ app.use("/api/share", shareRouter);
  */
 app.use("/api/presentation", presentationRouter);
 
+/* =======================================================
+   STATIC FILE SERVING
+   ======================================================= */
+
 /**
- * Static file serving for uploaded images/files.
+ * Static file serving for uploaded images and files.
  */
 app.use("/uploads", express.static("uploads"));
 
