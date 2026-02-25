@@ -9,37 +9,52 @@ import ImageIcon from "@mui/icons-material/Image";
 
 import { useTranslation } from "react-i18next";
 
-interface Props {
-  /** Tiptap editor instance. If null, the toolbar is not rendered. */
+/**
+ * Props for {@link DocumentEditorToolbar}.
+ *
+ * @remarks
+ * The toolbar is stateless and delegates all formatting actions
+ * to the provided Tiptap {@link Editor} instance.
+ */
+export interface DocumentEditorToolbarProps {
+  /**
+   * Active Tiptap editor instance.
+   *
+   * @remarks
+   * If this is `null`, the toolbar is not rendered.
+   */
   editor: Editor | null;
 
-  /** Fired when the user clicks the “insert image” button. */
+  /**
+   * Callback fired when the user clicks the “insert image” button.
+   *
+   * @remarks
+   * The parent component is responsible for handling image selection
+   * and inserting the image into the editor.
+   */
   onImageAddRequest: () => void;
 }
 
 /**
- * Toolbar for the document editor.
+ * Toolbar for the rich text document editor.
  *
  * @remarks
  * Provides formatting controls for:
- * - **bold**
- * - **italic**
- * - **bullet list**
- * - **numbered list**
- * - **image insertion**
+ * - bold
+ * - italic
+ * - bullet list
+ * - numbered list
+ * - image insertion
  *
- * This component is intentionally stateless:
- * - All formatting actions are delegated to the provided Tiptap `editor` instance.
- * - Image selection is delegated to the parent via `onImageAddRequest`.
+ * Icons automatically adapt to light/dark mode using theme colors.
  *
- * If the editor instance is not yet ready, the toolbar is not rendered.
- *
- * @param editor - Active Tiptap editor instance.
- * @param onImageAddRequest - Callback fired when the user requests to insert an image.
- *
- * @returns JSX element representing the formatting toolbar.
+ * @param props - {@link DocumentEditorToolbarProps}
+ * @returns A formatting toolbar for the document editor, or `null` if no editor is available.
  */
-export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
+export function DocumentEditorToolbar({
+  editor,
+  onImageAddRequest,
+}: DocumentEditorToolbarProps) {
   const { t } = useTranslation();
 
   if (!editor) return null;
@@ -50,53 +65,56 @@ export function DocumentEditorToolbar({ editor, onImageAddRequest }: Props) {
         display: "flex",
         gap: 1,
         mb: 1,
-        border: "1px solid #ccc",
+        border: "1px solid",
+        borderColor: (theme) => theme.palette.divider,
         borderRadius: "8px",
         padding: "6px",
-        backgroundColor: "#fafafa",
+        backgroundColor: (theme) => theme.palette.background.paper,
+        color: (theme) => theme.palette.text.primary,
       }}
     >
       <Tooltip title={t("editor.bold")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleBold().run()}
-          color={editor.isActive("bold") ? "primary" : "default"}
+          color={editor.isActive("bold") ? "primary" : "inherit"}
         >
-          <FormatBoldIcon />
+          <FormatBoldIcon sx={{ color: "inherit" }} />
         </IconButton>
       </Tooltip>
 
       <Tooltip title={t("editor.italic")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          color={editor.isActive("italic") ? "primary" : "default"}
+          color={editor.isActive("italic") ? "primary" : "inherit"}
         >
-          <FormatItalicIcon />
+          <FormatItalicIcon sx={{ color: "inherit" }} />
         </IconButton>
       </Tooltip>
 
       <Tooltip title={t("editor.bulletList")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          color={editor.isActive("bulletList") ? "primary" : "default"}
+          color={editor.isActive("bulletList") ? "primary" : "inherit"}
         >
-          <FormatListBulletedIcon />
+          <FormatListBulletedIcon sx={{ color: "inherit" }} />
         </IconButton>
       </Tooltip>
 
       <Tooltip title={t("editor.numberedList")}>
         <IconButton
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          color={editor.isActive("orderedList") ? "primary" : "default"}
+          color={editor.isActive("orderedList") ? "primary" : "inherit"}
         >
-          <FormatListNumberedIcon />
+          <FormatListNumberedIcon sx={{ color: "inherit" }} />
         </IconButton>
       </Tooltip>
 
       <Tooltip title={t("editor.insertImage")}>
-        <IconButton onClick={onImageAddRequest}>
-          <ImageIcon />
+        <IconButton color="inherit" onClick={onImageAddRequest}>
+          <ImageIcon sx={{ color: "inherit" }} />
         </IconButton>
       </Tooltip>
+      
     </Box>
   );
 }

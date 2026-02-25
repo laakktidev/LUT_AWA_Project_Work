@@ -1,0 +1,3 @@
+### Seed 20 realistic users
+POST http://localhost:8000/dev/seed-users
+Content-Type: application/json

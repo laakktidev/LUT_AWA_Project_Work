@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import morgan from "morgan";
 
-import userRouter from "./routes/user";
+import userRouter from "./routes/userRouter";
 import documentRouter from "./routes/documentRouter";
 import documentLockRoutes from "./routes/documentLock";
 import documentPublicRouter from "./routes/documentPublic";
@@ -107,6 +107,17 @@ app.use("/api/share", shareRouter);
  */
 app.use("/api/presentation", presentationRouter);
 
+// =======================================================
+// DEVELOPMENT / TEST DATA ROUTES (TEMPORARY)
+// =======================================================
+
+if (process.env.NODE_ENV !== "production") {
+  const seedUsersRouter = require("./dev/seedUsers").default;
+  app.use("/dev", seedUsersRouter);
+}
+
+
+
 /* =======================================================
    STATIC FILE SERVING
    ======================================================= */
@@ -115,5 +126,7 @@ app.use("/api/presentation", presentationRouter);
  * Static file serving for uploaded images and files.
  */
 app.use("/uploads", express.static("uploads"));
+
+
 
 export default app;

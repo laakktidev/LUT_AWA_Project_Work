@@ -44,7 +44,7 @@ export async function sendPublicLink(req: Request, res: Response) {
     const publicUrl = `${process.env.APP_URL}/public/${id}`;
 
     const ret = await sendPublicLinkEmail(email, publicUrl);
-    console.log("Email send result:", ret);
+    //console.log("Email send result:", ret);
 
     return res.json({ message: "Email sent" });
 

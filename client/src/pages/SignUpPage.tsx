@@ -188,17 +188,15 @@ const SignUpPage: React.FC = () => {
           </Box>
         </Box>
 
-        <Toast
-          open={toast !== null}
-          message={
-            toast === "success"
-              ? t("signup.success")
-              : t("signup.error")
-          }
-          severity={toast === "success" ? "success" : "error"}
-          autoHideDuration={toast === "error" ? 5000 : 3000}
-          onClose={() => setToast(null)}
-        />
+        {toast && (
+          <Toast
+            open
+            message={t(`signup.${toast}`)}
+            severity={toast}
+            autoHideDuration={toast === "error" ? 3000 : 2000}
+            onClose={() => setToast(null)}
+          />
+        )}
       </Grid>
     </PageContainer>
   );

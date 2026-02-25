@@ -1,0 +1,230 @@
+### LOGIN — get JWT token
+POST http://localhost:8000/api/user/login
+Content-Type: application/json
+
+{
+  "email": "mikko@example.com",
+  "password": "Password123!"
+}
+
+
+### Create a 6‑slide technical presentation
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTk0NjkyNGU2Njg4MTBkOGEzNDNiNWMiLCJ1c2VybmFtZSI6Ik1pa2tvIiwiaWF0IjoxNzcxNzgwNTAzLCJleHAiOjE3NzE3ODQxMDN9.tB-aga2cbZDCM5EupvizvpfxAgwZYrLXoI1fqPG1Jqg
+
+@userId = 69946924e668810d8a343b5c
+
+
+### Create a 6‑slide technical presentation
+POST http://localhost:8000/api/presentation
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Technical Presentation — System Overview",
+  "type": "presentation",
+  "userId": "{{userId}}",
+  "editors": [],
+  "slides": [
+    {
+      "title": "System Overview",
+      "bullets": [
+        "High-level architecture",
+        "Core components",
+        "Technical goals",
+        "Key design principles"
+      ]
+    },
+    {
+      "title": "Architecture Overview",
+      "bullets": [
+        "Client–server model",
+        "React frontend",
+        "Node.js + Express backend",
+        "MongoDB database",
+        "JWT authentication"
+      ]
+    },
+    {
+      "title": "Technology Stack",
+      "bullets": [
+        "Frontend: React, TypeScript",
+        "Backend: Node.js, Express",
+        "Database: MongoDB",
+        "Auth: JWT",
+        "Editor: Tiptap (documents only)"
+      ]
+    },
+    {
+      "title": "Data Model",
+      "bullets": [
+        "Document: title, content, userId, timestamps",
+        "User: username, email, password hash",
+        "Presentation: title, slides[]",
+        "Slide: title, bullets[]"
+      ]
+    },
+    {
+      "title": "API Endpoints",
+      "bullets": [
+        "POST /api/auth/login",
+        "POST /api/auth/register",
+        "GET /api/document",
+        "POST /api/document",
+        "POST /api/presentation",
+        "PUT /api/presentation/:id"
+      ]
+    },
+    {
+      "title": "Future Improvements",
+      "bullets": [
+        "Real-time collaboration",
+        "Offline mode",
+        "AI-powered search",
+        "Tagging system",
+        "Presentation templates"
+      ]
+    }
+  ]
+}
+
+
+############################################################
+### 1) Presentation: "Project Kickoff — Overview"
+############################################################
+POST http://localhost:8000/api/presentation
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Project Kickoff — Overview",
+  "type": "presentation",
+  "userId": "{{userId}}",
+  "editors": [],
+  "slides": [
+    {
+      "title": "Welcome",
+      "bullets": [
+        "Project introduction",
+        "Team roles",
+        "Goals for the kickoff"
+      ]
+    },
+    {
+      "title": "Project Scope",
+      "bullets": [
+        "Core features",
+        "Target users",
+        "Expected timeline"
+      ]
+    },
+    {
+      "title": "Next Steps",
+      "bullets": [
+        "Define requirements",
+        "Set milestones",
+        "Schedule weekly sync"
+      ]
+    }
+  ]
+}
+
+
+############################################################
+### 2) Presentation: "Software Architecture Basics"
+############################################################
+POST http://localhost:8000/api/presentation
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Software Architecture Basics",
+  "type": "presentation",
+  "userId": "{{userId}}",
+  "editors": [],
+  "slides": [
+    {
+      "title": "What is Architecture?",
+      "bullets": [
+        "High-level system structure",
+        "Guiding principles",
+        "Technical constraints"
+      ]
+    },
+    {
+      "title": "Common Patterns",
+      "bullets": [
+        "Layered architecture",
+        "Client–server",
+        "Microservices",
+        "Event-driven systems"
+      ]
+    },
+    {
+      "title": "Quality Attributes",
+      "bullets": [
+        "Scalability",
+        "Maintainability",
+        "Security",
+        "Performance"
+      ]
+    },
+    {
+      "title": "Documentation",
+      "bullets": [
+        "Diagrams",
+        "API specifications",
+        "Sequence flows"
+      ]
+    }
+  ]
+}
+
+
+############################################################
+### 3) Presentation: "Team Onboarding — Quick Start"
+############################################################
+POST http://localhost:8000/api/presentation
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Team Onboarding — Quick Start",
+  "type": "presentation",
+  "userId": "{{userId}}",
+  "editors": [],
+  "slides": [
+    {
+      "title": "Welcome to the Team",
+      "bullets": [
+        "Company mission",
+        "Team culture",
+        "Communication channels"
+      ]
+    },
+    {
+      "title": "Tools You Will Use",
+      "bullets": [
+        "Git + GitHub",
+        "Jira / Trello",
+        "VS Code",
+        "Slack / Teams"
+      ]
+    },
+    {
+      "title": "Development Workflow",
+      "bullets": [
+        "Branching strategy",
+        "Code reviews",
+        "Testing requirements"
+      ]
+    },
+    {
+      "title": "Getting Started",
+      "bullets": [
+        "Clone repositories",
+        "Install dependencies",
+        "Run development environment"
+      ]
+    }
+  ]
+}

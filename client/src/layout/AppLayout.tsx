@@ -1,25 +1,32 @@
 import { Outlet } from "react-router-dom";
-import Header from "../components/Header";
+import Header from "./Header";
 import { Box } from "@mui/material";
+import { useAuth } from "../context/AuthContext";
 
 /**
  * Application‑wide layout wrapper.
  *
  * @remarks
  * This layout:
- * - renders the global `Header` at the top
+ * - renders the global `Header` only when authenticated
+ * - relies on the Header's internal `<Toolbar />` spacer for AppBar offset
  * - positions routed pages underneath using `<Outlet />`
- * - adds spacing so content does not sit under the fixed AppBar
  *
- * All pages rendered inside this layout inherit the same consistent structure.
+ * By placing the spacing inside the Header component, we ensure:
+ * - no vertical scrollbar caused by mismatched heights
+ * - no empty space on login/signup pages
+ * - perfect alignment with MUI's fixed AppBar pattern
  */
 export default function AppLayout() {
+  const { token } = useAuth();
+
   return (
     <Box>
-      <Header />
+      {/* Render header only when logged in */}
+      {token && <Header />}
 
-      {/* Push content below the fixed AppBar */}
-      <Box sx={{ mt: 10, p: 2 }}>
+      {/* Main routed content */}
+      <Box sx={{ p: 2 }}>
         <Outlet />
       </Box>
     </Box>

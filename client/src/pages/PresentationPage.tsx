@@ -16,6 +16,9 @@ import { useState, useEffect, useCallback, useRef } from "react";
 
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
 
 import { isTokenExpired } from "../utils/isTokenExpired";
 import { Toast } from "../components/Toast";
@@ -266,7 +269,9 @@ export default function PresentationPage() {
           height: 320,
           overflow: "hidden",
           borderRadius: 2,
-          p: 3,
+          pl: 9,   // <— perfect spacing
+          pr: 9,
+          py: 3,
           mb: 2,
         }}
         onTouchStart={handleTouchStart}
@@ -295,6 +300,7 @@ export default function PresentationPage() {
         </Fade>
 
         {/* Navigation arrows */}
+
         <Button
           onClick={prev}
           disabled={index === 0}
@@ -306,7 +312,7 @@ export default function PresentationPage() {
             minWidth: 0,
           }}
         >
-          ◀
+          <ArrowBackIosNewIcon sx={{ fontSize: 32 }} />   {/* <— bigger icon */}
         </Button>
 
         <Button
@@ -320,7 +326,7 @@ export default function PresentationPage() {
             minWidth: 0,
           }}
         >
-          ▶
+          <ArrowForwardIosIcon sx={{ fontSize: 32 }} />
         </Button>
 
         {/* Slide indicator */}

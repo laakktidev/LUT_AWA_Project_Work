@@ -87,7 +87,7 @@ export const getPresentations = async (req: Request, res: Response) => {
  */
 export const getPresentation = async (req: Request, res: Response) => {
   try {
-    console.log("Fetching presentation with ID:", req.params.id);
+    //console.log("Fetching presentation with ID:", req.params.id);
     const pres = await getPresentationById(req.params.id as string);
 
     if (!pres) {
@@ -252,7 +252,7 @@ export const unlockPres = async (req: Request, res: Response) => {
  * @param res - Express response confirming the update.
  */
 export const updateEditors = async (req: Request, res: Response) => {
-  console.log("Updating editors for presentation ID:", req.params.id);
+  //console.log("Updating editors for presentation ID:", req.params.id);
   try {
     const { userIds } = req.body;
 

@@ -40,10 +40,11 @@ const Root = () => {
     },
 
     // Light + Dark mode palettes
+    // #F1F0FF #f2f6fc #1E293B
     colorSchemes: {
       light: {
         palette: {
-          primary: { main: "#f2f6fc" },
+          primary: { main: "#F8FAFC" },
           background: {
             default: "#f6fffb",
             paper: "#ffffff",

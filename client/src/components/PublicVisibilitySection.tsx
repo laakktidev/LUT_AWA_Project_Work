@@ -124,7 +124,7 @@ export default function PublicVisibilitySection({
               <ContentCopyIcon fontSize="small" />
             </IconButton>
 
-            <Tooltip title={t("visibility.sendLink")}>
+            <Tooltip title={t("sendLink")}>
               <IconButton onClick={() => setEmailDialogOpen(true)}>
                 <SendOutlinedIcon fontSize="small" />
               </IconButton>

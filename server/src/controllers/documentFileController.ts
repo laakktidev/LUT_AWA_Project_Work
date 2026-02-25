@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import PDFDocument from "pdfkit";
+import { htmlToText } from "html-to-text";
+
 import path from "path";
 import { getDocumentById } from "../services/documentService";
 
@@ -34,6 +36,8 @@ export const uploadDocumentImageController = async (req: Request, res: Response)
   return res.json({ url });
 };
 
+
+
 /* =======================================================
    GENERATE PDF FROM DOCUMENT
    ------------------------------------------------------- */
@@ -57,7 +61,7 @@ export const uploadDocumentImageController = async (req: Request, res: Response)
  *
  * @returns A streamed PDF file or an error response.
  */
-export const generatePdf = async (req: Request, res: Response) => {
+  export const generatePdf = async (req: Request, res: Response) => {
   const doc = await getDocumentById(req.params.id as string);
 
   if (!doc) {
@@ -74,13 +78,23 @@ export const generatePdf = async (req: Request, res: Response) => {
 
   const pdf = new PDFDocument();
   res.setHeader("Content-Type", "application/pdf");
-  res.setHeader("Content-Disposition", `attachment; filename="${doc.title}.pdf"`);
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${doc.title}.pdf"`
+  );
 
   pdf.pipe(res);
 
   pdf.fontSize(20).text(doc.title, { underline: true });
   pdf.moveDown();
-  pdf.fontSize(12).text(doc.content || "");
+
+  const plain = htmlToText(doc.content || "", {
+    wordwrap: 130,
+  });
+
+  pdf.fontSize(12).text(plain);
 
   pdf.end();
 };
+
+

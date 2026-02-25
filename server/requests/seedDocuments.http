@@ -1,0 +1,642 @@
+### LOGIN — get JWT token
+POST http://localhost:8000/api/user/login
+Content-Type: application/json
+
+{
+  "email": "jenna@example.com",
+  "password": "Password123!"
+}
+
+### Set token manually after login
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTk0NjkyNGU2Njg4MTBkOGEzNDNiNWUiLCJ1c2VybmFtZSI6Ikplbm5hIiwiaWF0IjoxNzcxMzU1NjQ5LCJleHAiOjE3NzEzNTkyNDl9.3FSG-1fv3ks9acHUjTyoIZcMv4rCvv_ogVMUE_6M1xw
+
+
+################################################################
+# 1. Project Overview
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Project Overview",
+  "content": "<h2>Project Overview</h2><p><strong>Goal:</strong> Build a modern note-taking application.</p><ul><li>Rich text editor</li><li>Search &amp; filtering</li></ul>"
+}
+
+
+################################################################
+# 2. Meeting Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Meeting Notes",
+  "content": "<h3>Team Meeting – Summary</h3><p>We discussed upcoming deadlines and feature priorities.</p><ol><li>Finalize UI</li><li>Implement search</li></ol>"
+}
+
+
+################################################################
+# 3. Daily Journal
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Daily Journal",
+  "content": "<p><em>A calm and productive day.</em></p><ul><li>Worked on UI</li><li>Went for a walk</li></ul>"
+}
+
+
+################################################################
+# 4. Pasta Recipe
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Pasta Recipe",
+  "content": "<h2>Pasta Recipe</h2><p>Ingredients:</p><ul><li>Pasta</li><li>Tomato sauce</li><li>Garlic</li></ul>"
+}
+
+
+################################################################
+# 5. Bug Report
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Bug Report",
+  "content": "<p><strong>Issue:</strong> Search results not updating.</p><p>Steps to reproduce:</p><ol><li>Open search</li><li>Type query</li><li>No results update</li></ol>"
+}
+
+
+################################################################
+# 6. Travel Plan
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Travel Plan",
+  "content": "<h3>Trip to Helsinki</h3><p>Things to do:</p><ul><li>Visit museums</li><li>Try local food</li><li>Walk around the harbor</li></ul>"
+}
+
+
+################################################################
+# 7. Workout Log
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Workout Log",
+  "content": "<p>Today's exercises:</p><ol><li>Push-ups</li><li>Squats</li><li>Planks</li></ol>"
+}
+
+
+################################################################
+# 8. Ideas
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Ideas",
+  "content": "<p><em>Random ideas for future projects:</em></p><ul><li>AI assistant</li><li>Mobile app</li><li>Browser extension</li></ul>"
+}
+
+
+################################################################
+# 9. Shopping List
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Shopping List",
+  "content": "<ul><li>Bread</li><li>Cheese</li><li>Milk</li><li>Vegetables</li></ul>"
+}
+
+
+################################################################
+# 10. Learning Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Learning Notes",
+  "content": "<h3>React Basics</h3><p>Components are the building blocks of React.</p><p>State and props control data flow.</p>"
+}
+
+
+################################################################
+# 11. Book Summary
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Book Summary",
+  "content": "<p><strong>Main idea:</strong> Focus on habits, not goals.</p><p>Small improvements compound over time.</p>"
+}
+
+
+################################################################
+# 12. Quick Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Quick Notes",
+  "content": "<p>Remember to update the UI and test the new search filter.</p>"
+}
+
+
+################################################################
+# 13. Task List
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Task List",
+  "content": "<ol><li>Fix bugs</li><li>Write tests</li><li>Refactor components</li></ol>"
+}
+
+
+################################################################
+# 14. App Concept
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "App Concept",
+  "content": "<h2>New App Concept</h2><p>A minimal note app with powerful search and clean UI.</p>"
+}
+
+
+################################################################
+# 15. Research Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Research Notes",
+  "content": "<p>Key findings:</p><ul><li>Users prefer simplicity</li><li>Fast search improves retention</li></ul>"
+}
+
+
+################################################################
+# 16. Code Snippet Note
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Code Snippet Note",
+  "content": "<p>Remember to memoize expensive functions to avoid unnecessary re-renders.</p>"
+}
+
+
+################################################################
+# 17. UI Feedback
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "UI Feedback",
+  "content": "<p>The toolbar should be more compact and responsive on mobile.</p>"
+}
+
+
+################################################################
+# 18. Personal Note
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Personal Note",
+  "content": "<p><em>Stay consistent and keep improving every day.</em></p>"
+}
+
+
+################################################################
+# 19. Feature Proposal
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Feature Proposal",
+  "content": "<h3>Smart Search</h3><p>Search should highlight matching text and support fuzzy matching.</p>"
+}
+
+
+################################################################
+# 20. Random Thoughts
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Random Thoughts",
+  "content": "<p>Maybe build a dark-mode-only app someday.</p>"
+}
+
+
+################################################################
+# 21. Weekly Review
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Weekly Review",
+  "content": "<h2>Weekly Review</h2><p>This week was productive and focused.</p><ul><li>Completed UI tasks</li><li>Improved search performance</li></ul>"
+}
+
+
+################################################################
+# 22. Movie Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Movie Notes",
+  "content": "<h3>Inception</h3><p>A mind-bending film exploring dreams within dreams.</p>"
+}
+
+
+################################################################
+# 23. Shopping List 2
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Shopping List 2",
+  "content": "<ul><li>Chicken</li><li>Rice</li><li>Spices</li></ul>"
+}
+
+
+################################################################
+# 24. Travel Ideas
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Travel Ideas",
+  "content": "<p>Places to visit:</p><ul><li>Japan</li><li>Iceland</li><li>Canada</li></ul>"
+}
+
+
+################################################################
+# 25. Study Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Study Notes",
+  "content": "<h3>JavaScript Basics</h3><p>Variables, functions, and closures are core concepts.</p>"
+}
+
+
+################################################################
+# 26. Meeting Agenda
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Meeting Agenda",
+  "content": "<p>Agenda:</p><ol><li>Review tasks</li><li>Plan next sprint</li><li>Discuss blockers</li></ol>"
+}
+
+
+################################################################
+# 27. Brain Dump
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Brain Dump",
+  "content": "<p>Just writing down ideas freely to clear my mind.</p>"
+}
+
+
+################################################################
+# 28. Fitness Log
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Fitness Log",
+  "content": "<p>Today's workout:</p><ul><li>Running</li><li>Push-ups</li><li>Stretching</li></ul>"
+}
+
+
+################################################################
+# 29. Work Plan
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Work Plan",
+  "content": "<h2>Work Plan</h2><p>Focus on improving performance and reducing bundle size.</p>"
+}
+
+
+################################################################
+# 30. Notes Archive
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Notes Archive",
+  "content": "<p>Old notes collected for reference and future review.</p>"
+}
+
+################################################################
+# 31. Design Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Design Notes",
+  "content": "<h2>Design Notes</h2><p>Focus on clean spacing and consistent typography.</p><ul><li>Use 8px grid</li><li>Limit color palette</li></ul>"
+}
+
+################################################################
+# 32. Productivity Tips
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Productivity Tips",
+  "content": "<h3>Stay Focused</h3><p>Reduce distractions and work in short, intense bursts.</p><ul><li>Use Pomodoro</li><li>Turn off notifications</li></ul>"
+}
+
+################################################################
+# 33. Music Playlist
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Music Playlist",
+  "content": "<h2>My Playlist</h2><ul><li>Lo-fi beats</li><li>Ambient piano</li><li>Soft electronic</li></ul>"
+}
+
+################################################################
+# 34. Code Review Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Code Review Notes",
+  "content": "<p>General improvements:</p><ul><li>Reduce duplication</li><li>Improve naming</li><li>Add missing comments</li></ul>"
+}
+
+################################################################
+# 35. Weekend Plans
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Weekend Plans",
+  "content": "<h3>Things to do</h3><ul><li>Clean apartment</li><li>Go for a hike</li><li>Watch a movie</li></ul>"
+}
+
+################################################################
+# 36. Favorite Quotes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Favorite Quotes",
+  "content": "<p><em>“Simplicity is the ultimate sophistication.”</em></p><p><em>“Slow is smooth, smooth is fast.”</em></p>"
+}
+
+################################################################
+# 37. Debugging Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Debugging Notes",
+  "content": "<p>When debugging:</p><ol><li>Reproduce the issue</li><li>Check logs</li><li>Isolate the cause</li></ol>"
+}
+
+################################################################
+# 38. Wishlist
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Wishlist",
+  "content": "<ul><li>New headphones</li><li>Standing desk</li><li>Travel backpack</li></ul>"
+}
+
+################################################################
+# 39. Learning Goals
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Learning Goals",
+  "content": "<h2>Learning Goals</h2><p>Focus on improving technical and soft skills.</p><ul><li>TypeScript</li><li>UI design</li><li>Communication</li></ul>"
+}
+
+################################################################
+# 40. Daily Tasks
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Daily Tasks",
+  "content": "<ol><li>Check emails</li><li>Review tasks</li><li>Write code</li><li>Push updates</li></ol>"
+}
+
+
+################################################################
+# 41. Career Goals
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Career Goals",
+  "content": "<h2>Career Goals</h2><p>Focus on long-term growth and continuous learning.</p><ul><li>Improve leadership skills</li><li>Master TypeScript</li><li>Contribute to open-source</li></ul>"
+}
+
+################################################################
+# 42. Home Maintenance
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Home Maintenance",
+  "content": "<h3>Things to Fix</h3><ul><li>Replace light bulbs</li><li>Clean air filters</li><li>Organize storage room</li></ul>"
+}
+
+################################################################
+# 43. Event Planning
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Event Planning",
+  "content": "<h2>Event Planning</h2><p>Checklist for organizing a small gathering:</p><ol><li>Send invitations</li><li>Prepare food</li><li>Set up music</li></ol>"
+}
+
+################################################################
+# 44. Tech Wishlist
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Tech Wishlist",
+  "content": "<ul><li>New laptop</li><li>Mechanical keyboard</li><li>Noise-cancelling headphones</li></ul>"
+}
+
+################################################################
+# 45. Study Schedule
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Study Schedule",
+  "content": "<h3>Weekly Study Plan</h3><p>Goals for this week:</p><ul><li>Learn React hooks</li><li>Practice algorithms</li><li>Review TypeScript</li></ul>"
+}
+
+################################################################
+# 46. Health Notes
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Health Notes",
+  "content": "<p>Remember to drink enough water and stretch regularly.</p><ul><li>2L water daily</li><li>10-minute stretching</li><li>Evening walk</li></ul>"
+}
+
+################################################################
+# 47. Brainstorm Session
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Brainstorm Session",
+  "content": "<h2>Brainstorm Session</h2><p>Ideas generated during today's session:</p><ul><li>AI-powered note search</li><li>Offline sync</li><li>Custom themes</li></ul>"
+}
+
+################################################################
+# 48. Notes on UI Design
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Notes on UI Design",
+  "content": "<p>Good UI design focuses on clarity and usability.</p><ul><li>Use consistent spacing</li><li>Readable typography</li><li>Accessible color contrast</li></ul>"
+}
+
+################################################################
+# 49. Personal Reflection
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Personal Reflection",
+  "content": "<p><em>Today I felt motivated and focused on my goals.</em></p>"
+}
+
+################################################################
+# 50. Notes for Tomorrow
+################################################################
+POST http://localhost:8000/api/document
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Notes for Tomorrow",
+  "content": "<ol><li>Finish UI tweaks</li><li>Test search filters</li><li>Prepare meeting summary</li></ol>"
+}

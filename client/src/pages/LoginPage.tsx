@@ -108,8 +108,13 @@ export default function LoginPage() {
         container
         justifyContent="center"
         alignItems="center"
-        sx={{ minHeight: "100vh", px: 2 }}
+        sx={{
+          minHeight: "100dvh",
+          px: 2,
+          overflow: "hidden"
+        }}
       >
+
         <Box
           sx={{
             width: isMobile ? "100%" : 400,
@@ -184,7 +189,7 @@ export default function LoginPage() {
           open={toastOpen}
           message={t("login.invalidCredentials")}
           severity="warning"
-          autoHideDuration={3000}
+          autoHideDuration={2000}
           onClose={() => setToastOpen(false)}
         />
       </Grid>
