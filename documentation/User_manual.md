@@ -24,7 +24,7 @@ The animation below demonstrates the full sign‑up and login workflow for a new
 
 This animation illustrates both the validation feedback and the normal workflow for first‑time users.
 
-<img src="../images/signup_login.gif" alt="signup_login" width="600"/>
+<img src="./images/signup_login.gif" alt="signup_login" width="600"/>
 
 ### Logout
 
@@ -41,7 +41,7 @@ You can log out of the application at any time using the menu in the header.
 
 Logging out is recommended when using a shared or public device.
 
-<img src="../images/logout.gif" alt="logout" width="600"/>
+<img src="./images/logout.gif" alt="logout" width="600"/>
 
 ### Create Document
 
@@ -62,7 +62,7 @@ The animation below demonstrates how to create a new document.
 
 This workflow shows how to create and save a new document from scratch.
 
-<img src="../images/create_doc.gif" alt="create_doc" width="600"/>
+<img src="./images/create_doc.gif" alt="create_doc" width="600"/>
 
 ### Read and Update Document
 
@@ -77,7 +77,7 @@ You can open and edit any of your existing documents directly from the Documents
 
 This workflow demonstrates how to view an existing document and update it when needed.
 
-<img src="../images/read_update_doc.gif" alt="read_update_doc" width="600"/>
+<img src="./images/read_update_doc.gif" alt="read_update_doc" width="600"/>
 
 ### Delete and Restore Document
 
@@ -110,7 +110,7 @@ Once a document is permanently deleted, it cannot be recovered.
 
 This workflow demonstrates how to safely delete documents, restore them when needed, and manage the Trash to keep your workspace organized.
 
-<img src="../images/delete_restore_doc.gif" alt="delete_restore_doc" width="600"/>
+<img src="./images/delete_restore_doc.gif" alt="delete_restore_doc" width="600"/>
 
 ### Insert Image into Document
 
@@ -124,7 +124,7 @@ The animation below demonstrates how to add an image to your document.
 
 This workflow shows how images can be added seamlessly to enhance your document content.
 
-<img src="../images/image_to_doc.gif" alt="image_to_doc" width="600"/>
+<img src="./images/image_to_doc.gif" alt="image_to_doc" width="600"/>
 
 ### Pagination
 
@@ -138,7 +138,7 @@ When you have many documents, the list is automatically divided into pages to ke
 
 Pagination helps you navigate large document collections efficiently without loading everything at once.
 
-<img src="../images/pagination_doc.gif" alt="pagination_doc" width="600"/>
+<img src="./images/pagination_doc.gif" alt="pagination_doc" width="600"/>
 
 ###  Locking Document
 
@@ -157,7 +157,7 @@ The lock is applied automatically when a user begins editing.
 
 This locking mechanism ensures that only one person edits a document at a time, preventing conflicts and accidental overwrites.
 
-<img src="../images/locked_doc.gif" alt="locked_doc" width="600"/>
+<img src="./images/locked_doc.gif" alt="locked_doc" width="600"/>
 
 ### Shorting Documents
 
@@ -175,7 +175,7 @@ You can sort your documents to quickly find what you need. The sorting options a
 
 The document list updates immediately based on the selected sorting method.
 
-<img src="../images/sort_doc.gif" alt="sort_doc" width="600"/>
+<img src="./images/sort_doc.gif" alt="sort_doc" width="600"/>
 
 ### Search documents
 
@@ -189,7 +189,7 @@ The search feature helps you quickly find documents by name or content.
 
 Search is especially useful when you have many documents and need to locate something specific quickly.
 
-<img src="../images/search_doc.gif" alt="search_doc" width="600"/>
+<img src="./images/search_doc.gif" alt="search_doc" width="600"/>
 
 ### Share document
 
@@ -207,7 +207,7 @@ Users with edit permissions can modify the document when it is not locked by ano
 
 Sharing supports collaboration while document locking ensures that only one user edits at a time.
 
-<img src="../images/share_doc.gif" alt="share_doc" width="600"/>
+<img src="./images/share_doc.gif" alt="share_doc" width="600"/>
 
 ### Copy Document
 
@@ -223,7 +223,7 @@ You can create a duplicate of any document directly from the document list. Each
 The copied document contains the same title, content, and images as the original.  
 You can open and edit it just like any other document.
 
-<img src="../images/copy_doc.gif" alt="copy_doc" width="600"/>
+<img src="./images/copy_doc.gif" alt="copy_doc" width="600"/>
 
 ### Public Document
 
@@ -237,7 +237,7 @@ A document can be marked as public, making it accessible to anyone who has the p
 
 You can disable the public toggle at any time to make the document private again.
 
-<img src="../images/public_doc.gif" alt="public_doc" width="600"/>
+<img src="./images/public_doc.gif" alt="public_doc" width="600"/>
 
 ### Send Public Document by Email
 
@@ -253,7 +253,7 @@ When a document is marked as public, you can share its public link directly by e
 
 This feature makes it easy to share public documents directly without copying the link manually.
 
-<img src="../images/public_doc_send.gif" alt="public_doc_send" width="600"/>
+<img src="./images/public_doc_send.gif" alt="public_doc_send" width="600"/>
 
 ### Download document as pdf
 
@@ -267,7 +267,7 @@ You can download any document as a PDF file directly from the document page.
 The PDF includes the document’s title and text content.  
 Images inside the document are not supported in the PDF export at the moment.
 
-<img src="../images/download_doc_as_pdf.gif" alt="download_doc_as_pdf" width="600"/>
+<img src="./images/download_doc_as_pdf.gif" alt="download_doc_as_pdf" width="600"/>
 
 ### Create Presentation
 
@@ -289,7 +289,7 @@ You can create a presentation in a similar way as creating a document. A present
 
 Presentations allow you to structure information into clear, slide‑based content.
 
-<img src="../images/create_presentation.gif" alt="create_presentation" width="600"/>
+<img src="./images/create_presentation.gif" alt="create_presentation" width="600"/>
 
 ### Read Presentation
 
@@ -307,7 +307,7 @@ You can move between slides using:
 
 These controls allow you to move through the slides smoothly and at your own pace.
 
-<img src="../images/presentation.gif" alt="presentation" width="600"/>
+<img src="./images/presentation.gif" alt="presentation" width="600"/>
 
 ### Update Presentation
 
@@ -328,7 +328,7 @@ When you have finished updating the presentation, click the **Save Changes** but
 
 The updated presentation is immediately available in the list of presentations.
 
-<img src="../images/update_presentation.gif" alt="update_presentation" width="600"/>
+<img src="./images/update_presentation.gif" alt="update_presentation" width="600"/>
 
 ### Delete Presentation
 
@@ -342,7 +342,7 @@ You can permanently delete a presentation directly from the list of presentation
 
 Note: Unlike documents, presentations cannot be recovered after deletion.
 
-<img src="../images/delete_presentation.gif" alt="delete_presentation" width="600"/>
+<img src="./images/delete_presentation.gif" alt="delete_presentation" width="600"/>
 
 ### Share Presentation
 
@@ -357,7 +357,7 @@ Presentations can be shared in the same way as documents. Each presentation in t
 
 All selected users will immediately receive access to the presentation.
 
-<img src="../images/share_presentation.gif" alt="share_presentation" width="600"/>
+<img src="./images/share_presentation.gif" alt="share_presentation" width="600"/>
 
 
 ## Features
@@ -374,7 +374,7 @@ You can switch the application language between English and Finnish. The languag
 
 The menu option always shows the alternative language, making it easy to switch back and forth.
 
-<img src="../images/language.gif" alt="language" width="600"/>
+<img src="./images/language.gif" alt="language" width="600"/>
 
 ### User Profile Image
 
@@ -389,7 +389,7 @@ You can set a personal profile image that appears in your user account. The prof
 #### View Your Profile Image
 When you return to the profile page later, the previously uploaded image is shown and remains stored until you replace it with a new one.
 
-<img src="../images/profile_image.gif" alt="profile_image" width="600"/>
+<img src="./images/profile_image.gif" alt="profile_image" width="600"/>
 
 ### Theme Light / Dark
 
@@ -401,7 +401,7 @@ You can switch the application appearance between light and dark themes. The the
 
 The menu always shows the alternative theme, making it easy to switch whenever you prefer a different look.
 
-<img src="../images/theme_mode.gif" alt="theme_mode" width=" 600"/>
+<img src="./images/theme_mode.gif" alt="theme_mode" width=" 600"/>
 
 ### About
 
@@ -409,7 +409,7 @@ The About page provides information about the application, including its purpose
 
 The page gives users a clear overview of what the application is designed for and the key functionality it offers.
 
-<img src="../images/about.gif" alt="about" width="600"/>
+<img src="./images/about.gif" alt="about" width="600"/>
 
 ### Responsiveness
 
@@ -417,7 +417,7 @@ The application is fully responsive and adapts to different screen sizes. All pa
 
 On smaller screens, the navigation collapses into a **hamburger menu**, which provides access to documents, presentations. Touch interactions, such as swiping through presentation slides, are supported on mobile devices as well as touch‑screen devices.
 
-<img src="../images/responsiveness.gif" alt="responsibility" width="600"/>
+<img src="./images/responsiveness.gif" alt="responsibility" width="600"/>
 
 ### Token Expiration
 
@@ -426,7 +426,7 @@ For security reasons, the user session token expires automatically after a perio
 
 After the message is shown, the user must sign in again to continue using the application.
 
-<img src="../images/token_expiration.gif" alt="token_expiration" width="600"/>
+<img src="./images/token_expiration.gif" alt="token_expiration" width="600"/>
 
 
 
