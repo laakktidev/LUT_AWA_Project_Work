@@ -2,7 +2,6 @@
 
 This project is built with a modern, scalable, and maintainable full‑stack architecture. Below is an overview of the key technologies and the reasoning behind each choice.
 
-
 ## Frontend
 
 ### React + TypeScript
@@ -25,7 +24,7 @@ This project is built with a modern, scalable, and maintainable full‑stack arc
 - **Why:** Flexible and scalable internationalization framework.
 - **Benefit:** Easy to add languages and dynamic translations.
 
-
+---
 
 ## Backend
 
