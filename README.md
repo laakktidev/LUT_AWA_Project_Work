@@ -1,12 +1,23 @@
-### Project Work (Advanced Web Applications)
+## Project Work (Advanced Web Applications)
 
-[Technology Choices](documentation/Technology_choices.md)
+All the project files can be found also in github repository
+https://github.com/laakktidev/LUT_AWA_Project_Work
 
-[Installation Guidelines](documentation/Installation_guidelines.md)
 
-[User Manual](documentation/User_manual.md)
+### [Technology Choices](documentation/Technology_choices.md)
 
-[Features](documentation/Features.md)
+### [Installation Guidelines](documentation/Installation_guidelines.md)
+ 
+### [Testing](documentation/Testing.md)
 
-[Declaration of AI Usage](documentation/Declaration_of_AI_Usage.md)
+### [User Manual](documentation/User_manual.md)
+
+### [Features](documentation/Features.md)
+
+### [Declaration of AI Usage](documentation/Declaration_of_AI_Usage.md)
+
+### [Rest API Endpoints](documentation/Api_endpoints.md)
+
+### [Code Documentation](documentation/Code_documentation.md)
+
 

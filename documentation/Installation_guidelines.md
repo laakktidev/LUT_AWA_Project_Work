@@ -27,13 +27,13 @@ cd <your-project-folder>
 
 ### Frontend
 ```bash
-cd frontend
+cd client
 npm install
 ```
 
 ### Backend
 ```bash
-cd backend
+cd server
 npm install
 ```
 
@@ -43,14 +43,16 @@ npm install
 
 ### Backend `.env`
 ```
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/your-db
-JWT_SECRET=your-secret-key
+MONGO_URL = "mongodb://127.0.0.1:27017/testdb2"
+SECRET=520933kl2klsdfvklsdmfrwR52452p948u
+PORT=8000
+RESEND_API_KEY=re_59K2u6nw_DtemQz7qwB2VTwgdnk6S5R12
+APP_URL=http://localhost:3000
 ```
 
-### Frontend `.env`
+### Frontend services/config.ts
 ```
-VITE_API_URL=http://localhost:5000
+export const BASE_URL = **"http://localhost:8000/api**
 ```
 
 ---
@@ -59,20 +61,20 @@ VITE_API_URL=http://localhost:5000
 
 ### Backend
 ```bash
-cd backend
+cd server
 npm run dev
 ```
 
 ### Frontend
 ```bash
-cd frontend
+cd client
 npm run dev
 ```
 
 The app will be available at:
 
 ```
-http://localhost:5173
+http://localhost:3000
 ```
 
 ---
