@@ -6,7 +6,7 @@
 
 [User Manual](documentation/User_manual.md)
 
-[Features](documentation/features.md)
+[Features](documentation/Features.md)
 
 [Declaration of AI Usage](documentation/Declaration_of_AI_Usage.md)
 
