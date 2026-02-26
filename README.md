@@ -1,6 +1,6 @@
 ## Project Work (Advanced Web Applications)
 
-All the project files can be found also in github repository
+All the project files can be found also in github repository    
 https://github.com/laakktidev/LUT_AWA_Project_Work
 
 
