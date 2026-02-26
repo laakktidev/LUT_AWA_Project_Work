@@ -18,7 +18,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 import { useColorScheme } from "@mui/material/styles";
 import { useAuth } from "../context/AuthContext";
-import About from "./About";
+import {About} from "./About";
 import i18n from "i18next";
 import { Link } from "react-router-dom";
 
@@ -37,7 +37,7 @@ import { Link } from "react-router-dom";
  *
  * @returns JSX element representing the settings dropdown menu.
  */
-export default function SettingsMenu() {
+export function SettingsMenu() {
   /** Anchor element for the dropdown menu. */
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 

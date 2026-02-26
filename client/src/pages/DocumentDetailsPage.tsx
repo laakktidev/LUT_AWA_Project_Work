@@ -16,7 +16,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 
 import { useDocument } from "../hooks/useDocument";
-import PublicVisibilitySection from "../components/PublicVisibilitySection";
+import {PublicVisibilitySection} from "../components/PublicVisibilitySection";
 import {
   updateDocumentVisibility,
   downloadPdf,
@@ -45,7 +45,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the document details page.
  */
-export default function DocumentDetailsPage() {
+export function DocumentDetailsPage() {
   /** Whether the user's session has expired. */
   const [sessionExpired, setSessionExpired] = useState(false);
 
@@ -83,6 +83,7 @@ export default function DocumentDetailsPage() {
   /**
    * Blocks the page when the session is expired or token is missing.
    */
+  
   if (sessionExpired || !token) {
     return (
       <PageContainer>

@@ -47,7 +47,7 @@ interface PendingImage {
  *
  * @returns JSX element for editing a document.
  */
-export default function DocumentEditPage() {
+export function DocumentEditPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -69,6 +69,7 @@ export default function DocumentEditPage() {
   // SESSION EXPIRED HANDLING
   // -----------------------------
 
+  
   if (token) {
     const sessionExpired = isTokenExpired(token);
     if (sessionExpired) {

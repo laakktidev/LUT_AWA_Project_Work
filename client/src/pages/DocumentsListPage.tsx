@@ -59,7 +59,7 @@ import { Toast } from "../components/Toast";
  *
  * @returns JSX element representing the document list page.
  */
-export default function DocumentsListPage() {
+export function DocumentsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, user, logout } = useAuth();
@@ -189,6 +189,9 @@ export default function DocumentsListPage() {
   /**
    * Blocks the page when the session is expired.
    */
+
+  
+  
   if (sessionExpired || !token) {
     return (
       <Container maxWidth="md">

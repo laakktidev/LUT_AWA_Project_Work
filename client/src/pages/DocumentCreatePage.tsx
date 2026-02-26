@@ -44,7 +44,7 @@ interface PendingImage {
  *
  * @returns JSX element representing the document creation page.
  */
-export default function DocumentCreatePage() {
+export function DocumentCreatePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, logout } = useAuth();
@@ -65,6 +65,8 @@ export default function DocumentCreatePage() {
   /**
    * If the token exists but is expired, block the page and show a toast.
    */
+
+  
   if (token) {
     const sessionExpired = isTokenExpired(token);
 
@@ -82,6 +84,7 @@ export default function DocumentCreatePage() {
       );
     }
   }
+   
 
   // -----------------------------
   // IMAGE HANDLING

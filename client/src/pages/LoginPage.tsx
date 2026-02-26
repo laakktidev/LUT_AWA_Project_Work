@@ -37,7 +37,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the login page.
  */
-export default function LoginPage() {
+export function LoginPage() {
   const { t } = useTranslation();
 
   /** Email input field. */

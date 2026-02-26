@@ -3,12 +3,6 @@ import { test, expect } from "@playwright/test";
 test("user can delete a document", async ({ page }) => {
   const mockUserId = "user-123";
 
-  // Debugging helpers
-  page.on("pageerror", err => console.log("PAGE ERROR:", err.message));
-  page.on("console", msg => msg.type() === "error" && console.log("CONSOLE ERROR:", msg.text()));
-  page.on("request", req => console.log("REQ:", req.method(), req.url()));
-
-  // Initial list
   let documents = [
     {
       _id: "doc-1",
@@ -24,11 +18,11 @@ test("user can delete a document", async ({ page }) => {
   ];
 
   //
-  // MOCK ROUTES
+  // MOCK ALL API ROUTES
   //
 
   // Login
-  await page.route("**/api/user/login**", route => {
+  await page.route("**/api/user/login", route => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -40,7 +34,7 @@ test("user can delete a document", async ({ page }) => {
   });
 
   // /api/user/me
-  await page.route("**/api/user/me**", route => {
+  await page.route("**/api/user/me", route => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -52,8 +46,8 @@ test("user can delete a document", async ({ page }) => {
     });
   });
 
-  // GET /api/document (list) — must match ALL variations
-  await page.route("**/api/document**", async route => {
+  // GET /api/document (list)
+  await page.route("**/api/document", route => {
     if (route.request().method() === "GET") {
       route.fulfill({
         status: 200,
@@ -63,8 +57,8 @@ test("user can delete a document", async ({ page }) => {
     }
   });
 
-  // GET /api/document/trash/count — required because your delete handler calls refreshTrashCount()
-  await page.route("**/api/document/trash/count**", route => {
+  // GET /api/document/trash/count
+  await page.route("**/api/document/trash/count", route => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -72,38 +66,38 @@ test("user can delete a document", async ({ page }) => {
     });
   });
 
-  // DELETE /api/document/doc-1
-  await page.route("**/api/document/doc-1/soft-delete**", route => {
-  if (route.request().method() === "PATCH") {
+  // PATCH /api/document/doc-1/soft-delete
+  await page.route("**/api/document/doc-1/soft-delete", route => {
     documents = []; // remove the document
     route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({ success: true })
     });
-  }
-});
+  });
 
-
+  //
   // LOGIN
-  await page.goto("http://localhost:3000/login");
+  //
+  await page.goto("/login");
   await page.getByLabel(/mail/i).fill("timo@example.com");
   await page.getByLabel(/password/i).fill("StrongPass123!");
   await page.getByRole("button", { name: /login/i }).click();
 
-  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page).toHaveURL("/");
 
+  //
   // VERIFY DOCUMENT IS VISIBLE
+  //
   await expect(page.getByText("Delete Me")).toBeVisible();
 
-  // CLICK DELETE BUTTON
+  //
+  // DELETE DOCUMENT
+  //
   await page.getByLabel("Delete").click();
 
-  // WAIT FOR THE LIST TO REFETCH
-  await page.waitForResponse(res =>
-    res.url().includes("/api/document") && res.request().method() === "GET"
-  );
-
+  //
   // VERIFY DOCUMENT DISAPPEARS
+  //
   await expect(page.getByText("Delete Me")).not.toBeVisible();
 });

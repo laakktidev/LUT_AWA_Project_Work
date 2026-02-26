@@ -43,7 +43,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the trash list page.
  */
-export default function TrashListPage() {
+export function TrashListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token } = useAuth();

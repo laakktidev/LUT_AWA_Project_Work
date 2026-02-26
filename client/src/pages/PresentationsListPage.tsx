@@ -57,7 +57,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the presentations list page.
  */
-export default function PresentationsListPage() {
+export function PresentationsListPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { token, user, logout } = useAuth();

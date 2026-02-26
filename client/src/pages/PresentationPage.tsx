@@ -38,7 +38,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the presentation viewer page.
  */
-export default function PresentationPage() {
+export function PresentationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token, user, logout } = useAuth();

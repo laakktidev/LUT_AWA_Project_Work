@@ -21,7 +21,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the profile page.
  */
-export default function ProfilePage() {
+export function ProfilePage() {
   const { t } = useTranslation();
   const { user, token, updateUser } = useAuth();
   const navigate = useNavigate();

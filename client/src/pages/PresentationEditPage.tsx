@@ -12,7 +12,7 @@ import {
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
-import SlideEditor from "../components/SlideEditor";
+import {SlideEditor} from "../components/SlideEditor";
 import { Presentation } from "../types/Presentation";
 import {
   getPresentationById,
@@ -39,7 +39,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the presentation editing page.
  */
-export default function PresentationEditPage() {
+export function PresentationEditPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const { token, logout } = useAuth();

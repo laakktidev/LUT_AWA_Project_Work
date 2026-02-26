@@ -6,25 +6,25 @@ import AppLayout from "./layout/AppLayout";
 import { useAuth } from "./context/AuthContext";
 
 // Pages — Public
-import LoginPage from "./pages/LoginPage";
-import SignUpPage from "./pages/SignUpPage";
-import PublicDocumentPage from "./pages/PublicDocumentPage";
+import {LoginPage} from "./pages/LoginPage";
+import {SignUpPage} from "./pages/SignUpPage";
+import {PublicDocumentPage} from "./pages/PublicDocumentPage";
 
 // Pages — Documents
-import DocumentsListPage from "./pages/DocumentsListPage";
-import DocumentCreatePage from "./pages/DocumentCreatePage";
-import DocumentDetailPage from "./pages/DocumentDetailsPage";
-import DocumentEditPage from "./pages/DocumentEditPage";
-import TrashListPage from "./pages/TrashListPage";
+import {DocumentsListPage} from "./pages/DocumentsListPage";
+import {DocumentCreatePage} from "./pages/DocumentCreatePage";
+import {DocumentDetailsPage} from "./pages/DocumentDetailsPage";
+import {DocumentEditPage} from "./pages/DocumentEditPage";
+import {TrashListPage} from "./pages/TrashListPage";
 
 // Pages — User
-import ProfilePage from "./pages/ProfilePage";
+import {ProfilePage} from "./pages/ProfilePage";
 
 // Pages — Presentations
-import PresentationsListPage from "./pages/PresentationsListPage";
-import PresentationCreatePage from "./pages/PresentationCreatePage";
-import PresentationPage from "./pages/PresentationPage";
-import PresentationEditPage from "./pages/PresentationEditPage";
+import {PresentationsListPage} from "./pages/PresentationsListPage";
+import {PresentationCreatePage} from "./pages/PresentationCreatePage";
+import {PresentationPage} from "./pages/PresentationPage";
+import {PresentationEditPage} from "./pages/PresentationEditPage";
 
 /**
  * Root application component responsible for:
@@ -70,7 +70,7 @@ export default function App() {
           {/* Documents */}
           <Route path="/" element={<DocumentsListPage />} />
           <Route path="/create" element={<DocumentCreatePage />} />
-          <Route path="/view/:id" element={<DocumentDetailPage />} />
+          <Route path="/view/:id" element={<DocumentDetailsPage />} />
           <Route path="/edit/:id" element={<DocumentEditPage />} />
           <Route path="/trash" element={<TrashListPage />} />
 

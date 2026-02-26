@@ -48,7 +48,7 @@ interface SlideEditorProps {
  *
  * @returns JSX element representing the slide editor.
  */
-export default function SlideEditor({
+export function SlideEditor({
   deck,
   index,
   onIndexChange,

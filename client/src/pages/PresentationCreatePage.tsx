@@ -10,7 +10,7 @@ import {
   IconButton
 } from "@mui/material";
 
-import SlideEditor from "../components/SlideEditor";
+import {SlideEditor} from "../components/SlideEditor";
 import { Presentation } from "../types/Presentation";
 import { createPresentation } from "../services/presentationService";
 import { useAuth } from "../context/AuthContext";
@@ -35,7 +35,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the presentation creation page.
  */
-export default function PresentationCreatePage() {
+export function PresentationCreatePage() {
   const navigate = useNavigate();
   const { token, logout } = useAuth();
 

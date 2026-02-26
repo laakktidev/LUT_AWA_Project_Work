@@ -45,7 +45,7 @@ interface Props {
  *
  * @returns JSX element representing the email‑sending dialog.
  */
-export default function SendEmailDialog({
+export function SendEmailDialog({
   open,
   onClose,
   publicUrl,

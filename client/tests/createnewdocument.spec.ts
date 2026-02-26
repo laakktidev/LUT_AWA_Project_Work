@@ -1,45 +1,58 @@
 import { test, expect } from "@playwright/test";
 
 test("user can create a new document", async ({ page }) => {
-  //
-  // 1. STATE FOR MOCKED DOCUMENTS
-  //
-  let documents:string[] = [];
+  const mockUserId = "user-123";
+
+  let documents = [];
 
   //
-  // 2. MOCK ALL BACKEND CALLS
+  // MOCK ALL API ROUTES
   //
 
-  // Login mock
-  await page.route("**://localhost:8000/api/user/login", async route => {
+  // Login
+  await page.route("**/api/user/login", route => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         token: "mock-token",
-        user: { id: 1, name: "Timo" },
-      }),
+        user: { id: mockUserId, name: "Timo" }
+      })
     });
   });
 
-  // Document list + create mocks
-  await page.route("**://localhost:8000/api/document", async route => {
+  // /api/user/me
+  await page.route("**/api/user/me", route => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: mockUserId,
+        name: "Timo",
+        email: "timo@example.com"
+      })
+    });
+  });
+
+  // GET + POST /api/document
+  await page.route("**/api/document", async route => {
     const method = route.request().method();
 
     if (method === "GET") {
       route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(documents),
+        body: JSON.stringify(documents)
       });
       return;
     }
 
     if (method === "POST") {
       const newDoc = {
-        id: "doc-1",
+        _id: "doc-1",
         title: "My first doc",
         content: "",
+        userId: mockUserId
       };
 
       documents.push(newDoc);
@@ -47,48 +60,43 @@ test("user can create a new document", async ({ page }) => {
       route.fulfill({
         status: 201,
         contentType: "application/json",
-        body: JSON.stringify(newDoc),
+        body: JSON.stringify(newDoc)
       });
       return;
     }
   });
 
-  // Trash count mock
-  await page.route("**://localhost:8000/api/document/trash/count", async route => {
+  // Trash count
+  await page.route("**/api/document/trash/count", route => {
     route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ count: 0 }),
+      body: JSON.stringify({ count: 0 })
     });
   });
 
   //
-  // 3. LOGIN
+  // LOGIN
   //
-  await page.goto("http://localhost:3000/login");
-
+  await page.goto("/login");
   await page.getByLabel("E-mail address").fill("timo@example.com");
   await page.getByLabel("Password").fill("StrongPass123!");
   await page.getByRole("button", { name: "Login" }).click();
 
-  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page).toHaveURL("/");
 
   //
-  // 4. CLICK NEW DOCUMENT
+  // CREATE DOCUMENT
   //
   await page.getByRole("button", { name: "New" }).click();
-  await expect(page).toHaveURL("http://localhost:3000/create");
+  await expect(page).toHaveURL("/create");
 
-  //
-  // 5. FILL FORM
-  //
   await page.getByPlaceholder("Document title").fill("My first doc");
-
   await page.getByRole("button", { name: "CREATE" }).click();
 
   //
-  // 6. VERIFY DOCUMENT APPEARS IN LIST
+  // VERIFY DOCUMENT APPEARS
   //
-  await expect(page).toHaveURL("http://localhost:3000/");
+  await expect(page).toHaveURL("/");
   await expect(page.getByText("My first doc")).toBeVisible();
 });

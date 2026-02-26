@@ -38,7 +38,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the signup page.
  */
-const SignUpPage: React.FC = () => {
+export const SignUpPage: React.FC = () => {
   const { t } = useTranslation();
 
   const theme = useTheme();
@@ -202,4 +202,4 @@ const SignUpPage: React.FC = () => {
   );
 };
 
-export default SignUpPage;
+

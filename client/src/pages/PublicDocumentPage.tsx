@@ -27,7 +27,7 @@ import PageContainer from "../layout/PageContainer";
  *
  * @returns JSX element representing the public document viewer page.
  */
-export default function PublicDocumentPage() {
+export function PublicDocumentPage() {
   const { t } = useTranslation();
   const { id } = useParams();
 

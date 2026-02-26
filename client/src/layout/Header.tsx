@@ -17,7 +17,7 @@ import SlideshowIcon from "@mui/icons-material/Slideshow";
 
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import SettingsMenu from "../components/SettingsMenu";
+import {SettingsMenu} from "../components/SettingsMenu";
 import { useTranslation } from "react-i18next";
 
 /**

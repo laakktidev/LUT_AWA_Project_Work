@@ -13,7 +13,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SendOutlinedIcon from "@mui/icons-material/SendOutlined";
 
-import SendEmailDialog from "./SendEmailDialog";
+import {SendEmailDialog} from "./SendEmailDialog";
 import { PublicVisibilityProps } from "../types/PublicVisibilityProps";
 import { useTranslation } from "react-i18next";
 
@@ -38,7 +38,7 @@ import { useTranslation } from "react-i18next";
  *
  * @returns JSX element for controlling document visibility.
  */
-export default function PublicVisibilitySection({
+export function PublicVisibilitySection({
   isOwner,
   isPublic,
   documentId,
