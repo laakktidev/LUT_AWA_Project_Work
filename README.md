@@ -1,4 +1,8 @@
-# LUT_AWA_Project_Work
+### Project Work (Advanced Web Applications)
+
+[Technology Choices](documentation/Technology_choices.md)
+
+[Installation Guidelines](documentation/Installation_guidelines.md)
 
 [User Manual](documentation/User_manual.md)
 
